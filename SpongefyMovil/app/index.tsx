@@ -1,4 +1,6 @@
 import { Text, View } from "react-native";
+import React from "react";
+import HomeScreen from "@/screens/HomeScreen";
 
 export default function Index() {
   return (
@@ -10,6 +12,7 @@ export default function Index() {
       }}
     >
       <Text>Edit app/index.tsx to edit this screen.</Text>
+      <HomeScreen />
     </View>
   );
 }

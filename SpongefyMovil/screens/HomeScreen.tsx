@@ -1,44 +1,55 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 
-// Définition du type pour une chanson
-interface Song {
-    id: string;
-    title: string;
-    url: string;
-}
-
-// Liste des chansons (mockées pour l’instant)
-const songs: Song[] = [
-    { id: "1", title: "Song 1", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-    { id: "2", title: "Song 2", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-    { id: "3", title: "Song 3", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+const songs = [
+    { id: "1", title: "Song 1" },
+    { id: "2", title: "Song 2" },
+    { id: "3", title: "Song 3" },
+    { id: "4", title: "Song 4" },
+    { id: "5", title: "Song 5" },
 ];
 
 const HomeScreen: React.FC = () => {
-    const [sound, setSound] = useState<Audio.Sound | null>(null);
-
-    // Fonction pour jouer un son
-    async function playSound(songUrl: string) {
-        if (sound) {
-            await sound.stopAsync();
-            await sound.unloadAsync();
-        }
-
-        const { sound: newSound } = await Audio.Sound.createAsync(
-            { uri: songUrl },
-            { shouldPlay: true }
-        );
-
-        setSound(newSound);
-    }
-
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>🎵 Spongify - Home</Text>
+            <Text style={styles.title}>🎵 Spongefy - Home</Text>
             <FlatList
                 data={songs}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                    <TouchableOpacity style={styles.songItem} onPress={() => playSound(item.url)}>
+                    <TouchableOpacity style={styles.songItem}>
                         <Text style={styles.songText}>{item.title}</Text>
+                    </TouchableOpacity>
+                )}
+            />
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#121212",
+        padding: 20,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#fff",
+        textAlign: "center",
+        marginBottom: 20,
+    },
+    songItem: {
+        padding: 15,
+        backgroundColor: "#282828",
+        borderRadius: 10,
+        marginBottom: 10,
+        alignItems: "center",
+    },
+    songText: {
+        color: "#fff",
+        fontSize: 18,
+    },
+});
+
+export default HomeScreen;
