@@ -8,9 +8,10 @@ import { useRouter } from "expo-router";
 export default function RegisterScreen() {
     const router = useRouter();
     const handlePress = () => {
-      console.log("Botón presionado en register");
+      console.log("Login Pressed");
 
     };
+
    
     return (
         <ImageBackground 
