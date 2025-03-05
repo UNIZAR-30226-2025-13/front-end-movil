@@ -7,11 +7,10 @@ export interface Song {
   link_imagen?: string;
   titulo?: string;
   autor?: string;
+  artistas_featuring? : string;
 }
 
-export const fetchSongById = async (id: string): Promise<Song | null> => {
-  console.log("📡 Haciendo fetch a la API con ID:", id);
-  
+export const fetchSongById = async (id: string): Promise<Song | null> => {  
   try {
     const response = await fetch(`http://localhost:8080/play-song?id_cancion=${id}`);
     const data = await response.json();
@@ -19,9 +18,23 @@ export const fetchSongById = async (id: string): Promise<Song | null> => {
     console.log("📥 Respuesta de la API:", data);
     
     if (!data || !data.link_cm) {
-      console.error("🚨 La API no devolvió un link_cm válido:", data);
       return null;
     }
+
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
+export const fetchArtistByName = async (nombre_artista: string): Promise<Song | null> => {  
+  try {
+    const nombre_artista_encoded = encodeURIComponent(nombre_artista);
+    const response = await fetch(`http://localhost:8080/artist?nombre_artista=${nombre_artista_encoded}`);
+    const data = await response.json();
+
+    console.log("📥 Respuesta de la API:", data);
+
 
     return data;
   } catch (error) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Animated, TouchableWithoutFeedback, Pressable } from "react-native";
+import { View, Text, Image, StyleSheet, Animated, Pressable } from "react-native";
 import { Audio } from "expo-av";
 import { usePlayer } from "./PlayerContext";
 
@@ -88,6 +88,10 @@ const PlayerComponent = () => {
     return <Text>No se pudo cargar la canción.</Text>;
   }
 
+  const featuringArtists = currentSong.artistas_featuring
+    ? currentSong.artistas_featuring.split(',').join(', ')
+    : '';
+
   const rotateInterpolate = rotation.interpolate({
     inputRange: [0, 1],
     outputRange: ["0deg", "45deg"],
@@ -102,7 +106,9 @@ const PlayerComponent = () => {
           )}
           <View>
             <Text style={styles.songTitle}>{currentSong.titulo}</Text>
-            <Text style={styles.songArtists}>{currentSong.autor}</Text>
+            <Text style={styles.songArtists}>
+              {currentSong.autor}{featuringArtists && `, ${featuringArtists}`}
+            </Text>
           </View>
         </View>
         <Pressable onPress={togglePlayPause} style={styles.controls}>
