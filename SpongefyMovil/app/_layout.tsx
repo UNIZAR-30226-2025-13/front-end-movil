@@ -1,29 +1,12 @@
-import { Stack } from "expo-router";
+// app/_layout.tsx
+import React from 'react';
+import { PlayerProvider } from './PlayerContext'; // Importa el PlayerProvider para el contexto global
+import { Slot } from 'expo-router'; // Esto es necesario para renderizar las rutas de Expo Router
 
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-import { GestureHandlerRootView } from 'react-native-gesture-handler'; // 👈 Asegura gestos táctiles en Android 9
-
-
-
-
-
-
-
-export default function RootLayout() {
+export default function Layout() {
   return (
-
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="login" />
-      <Stack.Screen name="register" />
-    </Stack>
+    <PlayerProvider> {/* Asegúrate de envolver todas las pantallas dentro del PlayerProvider */}
+      <Slot /> {/* Aquí se renderizan todas las pantallas que se definan en la estructura de carpetas */}
+    </PlayerProvider>
   );
 }
-
-
-

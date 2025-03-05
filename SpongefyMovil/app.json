@@ -2,9 +2,9 @@
   "expo": {
     "name": "SpongifyMovil",
     "slug": "SpongifyMovil",
-    "version": "1.0.0",
+    "version": "48.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/favicon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
