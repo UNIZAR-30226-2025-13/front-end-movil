@@ -29,6 +29,7 @@ If you encounter issues, try removing existing modules and reinstalling:
 ```sh
 rm -rf node_modules package-lock.json
 npm install
+```
 Start the Project
 Run the following command to launch the Expo Developer Tools:
 ```sh
