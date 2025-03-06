@@ -6,7 +6,8 @@ import {
     TouchableOpacity,
     ScrollView,
     Image,
-    Dimensions
+    Dimensions,
+    TextInput
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -38,40 +39,67 @@ export default function HomeScreen() {
         setSelectedTab(tabName);
     };
 
+    // Barre de recherche
+    const SearchBar = () => {
+        const handleMoreOptions = () => {
+            console.log("Plus d'options");
+        };
+
+        return (
+            <View style={styles.searchContainer}>
+                <Ionicons name="search" size={20} color="#fff" style={styles.iconLeft} />
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Buscar"
+                    placeholderTextColor="#888"
+                />
+                <TouchableOpacity onPress={handleMoreOptions}>
+                    <Ionicons name="ellipsis-vertical" size={20} color="#fff" style={styles.iconRight} />
+                </TouchableOpacity>
+            </View>
+        );
+    };
+
     return (
         <View style={styles.container}>
-            {/* Barre supérieure */}
-            <View style={styles.topBar}>
-                <Text style={styles.topBarTitle}>Home</Text>
-                <Ionicons name="search" size={24} color="#fff" />
-            </View>
 
-            {/* Onglets (Todo, Música, Pódcasts) */}
-            <View style={styles.tabsContainer}>
-                {['Todo', 'Música', 'Pódcasts'].map((tab) => (
-                    <TouchableOpacity
-                        key={tab}
-                        onPress={() => handleTabPress(tab)}
-                        style={[
-                            styles.tab,
-                            selectedTab === tab && styles.tabSelected
-                        ]}
-                    >
-                        <Text
+            {/* ScrollView pour tout le contenu sauf la barre inférieure */}
+            <ScrollView
+                style={styles.scrollContainer}
+                contentContainerStyle={styles.scrollContent}
+            >
+                {/* Barre supérieure */}
+                <View style={styles.topBar}>
+                    <Text style={styles.topBarTitle}>Home</Text>
+                </View>
+
+                {/* Barre de recherche */}
+                <SearchBar />
+
+                {/* Onglets (Todo, Música, Pódcasts) */}
+                <View style={styles.tabsContainer}>
+                    {['Todo', 'Música', 'Pódcasts'].map((tab) => (
+                        <TouchableOpacity
+                            key={tab}
+                            onPress={() => handleTabPress(tab)}
                             style={[
-                                styles.tabText,
-                                selectedTab === tab && styles.tabTextSelected
+                                styles.tab,
+                                selectedTab === tab && styles.tabSelected
                             ]}
                         >
-                            {tab}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
+                            <Text
+                                style={[
+                                    styles.tabText,
+                                    selectedTab === tab && styles.tabTextSelected
+                                ]}
+                            >
+                                {tab}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
 
-            {/* Contenu principal défilant */}
-            <ScrollView style={styles.scrollContainer}>
-
+                {/* Contenu défilant */}
                 {/* Sección: Lo mejor de cada artista */}
                 <Text style={styles.sectionTitle}>Lo mejor de cada artista</Text>
                 <ScrollView
@@ -102,10 +130,8 @@ export default function HomeScreen() {
                         </View>
                     ))}
                 </View>
-
-                {/* Exemple de section supplémentaire (TOP 10, etc.) */}
+                <Text style={styles.sectionTitle}>Conoce la mejor música de cada idioma</Text>
                 <Text style={styles.sectionTitle}>Lo mejor de cada artista</Text>
-                {/* Tu peux réutiliser le même composant horizontal ou en créer un autre. */}
                 <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -119,6 +145,31 @@ export default function HomeScreen() {
                     ))}
                 </ScrollView>
 
+                {/* Barre de lecture (player) */}
+                <View style={styles.playerBar}>
+                    <Image
+                        source={require('../assets/exemple_song_1.png')}
+                        style={styles.albumArt}
+                    />
+                    <View style={styles.playerInfo}>
+                        <Text style={styles.songTitle}>capaz (merengueton)</Text>
+                        <Text style={styles.songArtist}>Alleh, Yorgbaki</Text>
+                        <View style={styles.progressBar}>
+                            <View style={styles.progressBarFill} />
+                        </View>
+                    </View>
+                    <View style={styles.playerActions}>
+                        <TouchableOpacity>
+                            <Ionicons name="add-circle-outline" size={24} color="#fff" />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{ marginLeft: 12 }}>
+                            <Ionicons name="heart-outline" size={24} color="#fff" />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{ marginLeft: 12 }}>
+                            <Ionicons name="play" size={24} color="#fff" />
+                        </TouchableOpacity>
+                    </View>
+                </View>
             </ScrollView>
 
             {/* Barre de navigation inférieure */}
@@ -144,8 +195,16 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000', // Fond noir
+        backgroundColor: '#000',
     },
+    scrollContainer: {
+        flex: 1,
+    },
+    // Espace pour scroller sous la bottom bar
+    scrollContent: {
+        paddingBottom: 100,
+    },
+
     topBar: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -157,6 +216,31 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
     },
+
+    // Barre de recherche
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#000',
+        borderColor: '#9400D3',
+        borderWidth: 1,
+        borderRadius: 20,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        marginHorizontal: 16,
+        marginBottom: 10,
+    },
+    iconLeft: {
+        marginRight: 8,
+    },
+    iconRight: {
+        marginLeft: 8,
+    },
+    searchInput: {
+        flex: 1,
+        color: '#fff',
+    },
+
     tabsContainer: {
         flexDirection: 'row',
         paddingHorizontal: 16,
@@ -178,9 +262,7 @@ const styles = StyleSheet.create({
         color: '#000',
         fontWeight: 'bold',
     },
-    scrollContainer: {
-        flex: 1,
-    },
+
     sectionTitle: {
         color: '#fff',
         fontSize: 18,
@@ -229,6 +311,54 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+
+    // Barre de lecture (mini player)
+    playerBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#9400D3',
+        marginHorizontal: 16,
+        marginVertical: 8,
+        padding: 10,
+        borderRadius: 20,
+    },
+    albumArt: {
+        width: 50,
+        height: 50,
+        borderRadius: 8,
+        marginRight: 10,
+    },
+    playerInfo: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    songTitle: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    songArtist: {
+        color: '#eee',
+        fontSize: 12,
+        marginBottom: 4,
+    },
+    progressBar: {
+        height: 2,
+        backgroundColor: '#aaa',
+        marginTop: 4,
+    },
+    progressBarFill: {
+        width: '40%',
+        height: '100%',
+        backgroundColor: '#fff',
+    },
+    playerActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 10,
+    },
+
+    // Barre de navigation inférieure
     bottomBar: {
         flexDirection: 'row',
         alignItems: 'center',
