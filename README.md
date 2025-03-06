@@ -42,7 +42,6 @@ For a physical device: Scan the QR code with Expo Go (available on the Play Stor
 Project Structure
 
 ```bash
-/spongify-movil
   ├── /app
   │   ├── index.tsx         # Splash screen (redirects to login)
   │   ├── login.tsx         # Login screen
