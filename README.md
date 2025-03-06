@@ -17,7 +17,7 @@ Ensure you have the following installed on your system:
 Clone the repository and navigate to the project directory:
   ```sh
 git clone https://github.com/UNIZAR-30226-2025-13/front-end-movil.git
-cd spongify-movil
+ cd SpongefyMovil
 ```
 ### Install Dependencies
 Install all necessary packages with:
