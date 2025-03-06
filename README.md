@@ -16,19 +16,17 @@ Ensure you have the following installed on your system:
    ```
 Clone the repository and navigate to the project directory:
   ```sh
-Copier
 git clone https://github.com/your-repo/spongify-movil.git
 cd spongify-movil
 ```
 ### Install Dependencies
 Install all necessary packages with:
 ```sh
-Copier
 npm install
 ```
 If you encounter issues, try removing existing modules and reinstalling:
-```sh
 
+```sh
 rm -rf node_modules package-lock.json
 npm install
 Start the Project
@@ -41,6 +39,7 @@ For Android: Press a in the Expo terminal (ensure your Android emulator is runni
 For iOS: Press i (requires Xcode on macOS).
 For a physical device: Scan the QR code with Expo Go (available on the Play Store / App Store).
 Project Structure
+
 ```bash
 /spongify-movil
   ├── /app
@@ -65,11 +64,7 @@ npx expo start --clear
 Android Emulator Not Detected
 Ensure Android Studio and the SDK are installed, then run:
 
-```sh
-adb devices
-Module Errors (e.g., @expo/config-plugins not found)
 Reinstall dependencies:
-```
 
 ```sh
 rm -rf node_modules package-lock.json
