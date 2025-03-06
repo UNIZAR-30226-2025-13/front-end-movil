@@ -4,13 +4,17 @@ import { useRouter } from "expo-router";
 
 export default function LoginScreen() {
   const router = useRouter();
+
   const handlePressLogin = () => {
     console.log("Login Pressed");
+    router.push("/home"); 
   };
-      const handlePressRegister = () => {
-        console.log("Register Pressed");
-        router.push("/register");
+
+  const handlePressRegister = () => {
+    console.log("Register Pressed");
+    router.push("/register");
   };
+
   const handlePressForgot = () => {
     console.log("Forgot Password Pressed");
   };
@@ -20,8 +24,17 @@ export default function LoginScreen() {
       <View style={styles.container}>
         <Text style={styles.title}>Iniciar Sesión</Text>
 
-        <TextInput style={styles.input} placeholder="Nombre de usuario" placeholderTextColor="#888" />
-        <TextInput style={styles.input} placeholder="Contraseña" placeholderTextColor="#888" secureTextEntry />
+        <TextInput
+          style={styles.input}
+          placeholder="Nombre de usuario"
+          placeholderTextColor="#888"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Contraseña"
+          placeholderTextColor="#888"
+          secureTextEntry
+        />
 
         <TouchableOpacity style={styles.button} onPress={handlePressLogin}>
           <Text style={styles.buttonText}>Iniciar sesión</Text>

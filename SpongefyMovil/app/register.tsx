@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Alert, Button, Text, TextInput, ImageBackground, View, StyleSheet } from 'react-native';
+import { Alert, Button, Text, TextInput, ImageBackground, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
 export default function RegisterScreen() {
@@ -25,8 +26,13 @@ export default function RegisterScreen() {
     console.log('Registrarse presionado', { username, email, password });
     Alert.alert('¡Éxito!', 'Cuenta creada exitosamente.');
 
-    // Navegar a la pantalla de login tras el registro
+    // Después del registro, opcionalmente puedes navegar a la pantalla de login
     // router.push('/login');
+  };
+
+  const handleBack = () => {
+    // Regresa a la pantalla de login
+    router.push('/');
   };
 
   return (
@@ -34,6 +40,11 @@ export default function RegisterScreen() {
       source={require('../assets/halfalogo.png')}
       style={styles.background}
     >
+      {/* Botón de retroceso */}
+      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+        <Ionicons name="arrow-back" size={40} color="#000" />
+      </TouchableOpacity>
+
       <View style={styles.container}>
         <Text style={styles.title}>Crear Cuenta</Text>
         <TextInput
@@ -81,6 +92,12 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'center',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40, // Adjust as needed
+    left: 20,
+    zIndex: 10,
   },
   container: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
