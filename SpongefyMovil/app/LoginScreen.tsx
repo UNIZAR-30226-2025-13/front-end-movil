@@ -1,14 +1,49 @@
-import React from "react";
-import { Text, TextInput, TouchableOpacity, ImageBackground, View, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import {  Alert, Text, TextInput, TouchableOpacity, ImageBackground, View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 
 export default function LoginScreen() {
   const router = useRouter();
+  const [username, setUsername] = useState(""); // Estado para el nombre de usuario
+  const [password, setPassword] = useState(""); // Estado para la contraseña
 
-  const handlePressLogin = () => {
-    console.log("Login Pressed");
-    router.push("/home"); 
+  const handlePressLogin = async () => {
+    if (!username || !password) {
+      Alert.alert("Error", "Todos los campos son obligatorios.");
+      return;
+    }
+
+    try {
+      const response = await fetch("https://spongefy-back-end.onrender.com/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre_usuario: username,
+          contrasena: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error();
+      }
+
+      Alert.alert("Éxito", "Inicio de sesión correcto");
+
+      // Guardar token (puedes usar AsyncStorage para persistencia)
+      console.log("Token:", data.token);
+
+      // Redirigir a la pantalla principal
+      router.push("/home");
+    
+    } catch (error) {
+      Alert.alert("Error", "Error en el inicio de sesión");
+    }
   };
+
 
   const handlePressRegister = () => {
     console.log("Register Pressed");
@@ -29,12 +64,14 @@ export default function LoginScreen() {
           style={styles.input}
           placeholder="Nombre de usuario"
           placeholderTextColor="#888"
+          onChangeText={setUsername}
         />
         <TextInput
           style={styles.input}
           placeholder="Contraseña"
           placeholderTextColor="#888"
           secureTextEntry
+          onChangeText={setPassword}
         />
 
         <TouchableOpacity style={styles.button} onPress={handlePressLogin}>
