@@ -32,7 +32,7 @@ export default function RegisterScreen() {
 
   const handleBack = () => {
     // Regresa a la pantalla de login
-    router.push('/');
+    router.push('/LoginScreen');
   };
 
   return (
@@ -100,7 +100,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   container: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     padding: 20,
     margin: 20,
     borderRadius: 10,
@@ -110,7 +109,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#333',
+    color: '#fff',
   },
   input: {
     width: '100%',
