@@ -30,7 +30,7 @@ export default function LoginScreen() {
       Alert.alert("Éxito", "Revisa tu correo para obtener el código.");
       router.push('/ChangePasswordScreen');
     } catch (error) {
-      console.error("Error en la solicitud de token:", error); // 📌 DEBUG: Ver en consola
+      console.error("Error en la solicitud de token:", error);
       Alert.alert("Error", "Error al solicitar el token.");
     }
   };
