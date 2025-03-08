@@ -12,23 +12,35 @@ export default function LoginScreen() {
       Alert.alert("Error", "Por favor, ingresa tu correo electrónico.");
       return;
     }
-
+  
     try {
-      const response = await fetch("https://spongefy-back-end.onrender.com/changePasswordRequest", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ correo: email }),
+      // Construye la URL con el correo en la query string
+      const url = `https://spongefy-back-end.onrender.com/changePasswordRequest?correo=${encodeURIComponent(email)}`;
+  
+      const response = await fetch(url, {
+        method: "GET",
       });
+  
+      // Intenta parsear la respuesta como JSON
+      const contentType = response.headers.get("Content-Type");
 
-      const data = await response.json();
-      console.log("Respuesta del servidor:", data); // 📌 DEBUG: Ver en consola
-
-      if (!response.ok) {
-        throw new Error();
+      // Si la respuesta es JSON, lo parseamos, si no, mostramos el cuerpo como texto
+      let data;
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text(); // Leemos la respuesta como texto
+        data = { message: text }; // Guardamos la respuesta como mensaje
       }
-
+  
+      console.log("Respuesta del servidor:", data);
+  
+      if (!response.ok) {
+        throw new Error(data.message || "Error al solicitar el token.");
+      }
+  
       Alert.alert("Éxito", "Revisa tu correo para obtener el código.");
-      router.push('/ChangePasswordScreen');
+      router.push("/ChangePasswordScreen");
     } catch (error) {
       console.error("Error en la solicitud de token:", error);
       Alert.alert("Error", "Error al solicitar el token.");
