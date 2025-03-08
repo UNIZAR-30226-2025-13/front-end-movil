@@ -1,29 +1,29 @@
 import React from "react";
 import { Text, TextInput, TouchableOpacity, ImageBackground, View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { Ionicons } from '@expo/vector-icons';
 
 export default function LoginScreen() {
   const router = useRouter();
 
-  const handlePressLogin = () => {
-    console.log("Login Pressed");
-    router.push("/home"); 
+  const handlePressChangePswd = () => {
+    console.log("Cambiar Contraseña Pressed");
   };
 
-  const handlePressRegister = () => {
-    console.log("Register Pressed");
-    router.push("/register");
-  };
-
-  const handlePressForgot = () => {
-    console.log("Forgot Password Pressed");
-    router.push("/ChangePasswordScreen");
+  const handleBack = () => {
+    // Regresa a la pantalla de login
+    router.push('/LoginScreen');
   };
 
   return (
     <ImageBackground source={require("../assets/halfalogo.png")} style={styles.background}>
+      
+      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+        <Ionicons name="arrow-back" size={40} color="#000" />
+      </TouchableOpacity>
+      
       <View style={styles.container}>
-        <Text style={styles.title}>Iniciar Sesión</Text>
+        <Text style={styles.title}>Cambiar Contraseña</Text>
 
         <TextInput
           style={styles.input}
@@ -32,20 +32,19 @@ export default function LoginScreen() {
         />
         <TextInput
           style={styles.input}
-          placeholder="Contraseña"
+          placeholder="Token"
           placeholderTextColor="#888"
-          secureTextEntry
+        />
+          <TextInput
+          style={styles.input}
+          placeholder="Nueva contraseña"
+          placeholderTextColor="#888"
         />
 
-        <TouchableOpacity style={styles.button} onPress={handlePressLogin}>
-          <Text style={styles.buttonText}>Iniciar sesión</Text>
+        <TouchableOpacity style={styles.button} onPress={handlePressChangePswd}>
+          <Text style={styles.buttonText}>Cambiar contrseña</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handlePressRegister}>
-          <Text style={styles.buttonText}>Registrarse</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button2} onPress={handlePressForgot}>
-          <Text style={styles.buttonText2}>He olvidado mi contraseña</Text>
-        </TouchableOpacity>
+        
       </View>
     </ImageBackground>
   );
@@ -62,6 +61,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40, // Adjust as needed
+    left: 20,
+    zIndex: 10,
   },
   title: {
     fontSize: 24,
