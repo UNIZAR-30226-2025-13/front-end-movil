@@ -97,7 +97,9 @@ export default function RegisterScreen() {
           onChangeText={setConfirmPassword}
         />
         <View style={styles.buttonContainer}>
-          <Button title="Registrarse" onPress={handleRegister} color="#9400D3" />
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+                    <Text style={styles.buttonText}>Registrarse</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </ImageBackground>
@@ -135,6 +137,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     textAlign: 'center',
+  },
+  button: {
+    backgroundColor: "#9400D3",
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    width: "100%",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
   buttonContainer: {
     width: '100%',
