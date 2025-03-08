@@ -1,51 +1,40 @@
 import React from "react";
 import { Text, TextInput, TouchableOpacity, ImageBackground, View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { Ionicons } from '@expo/vector-icons';
 
 export default function LoginScreen() {
   const router = useRouter();
 
-  const handlePressLogin = () => {
-    console.log("Login Pressed");
-    router.push("/home"); 
+  const handleSendMail = () => {
+    console.log("Recibir token Pressed");
+    router.push('/ChangePasswordScreen');
   };
 
-  const handlePressRegister = () => {
-    console.log("Register Pressed");
-    router.push("/register");
-  };
-
-  const handlePressForgot = () => {
-    console.log("Forgot Password Pressed");
-    router.push("/RequestTokenScreen");
+  const handleBack = () => {
+    // Regresa a la pantalla de login
+    router.push('/LoginScreen');
   };
 
   return (
     <ImageBackground source={require("../assets/halfalogo.png")} style={styles.background}>
+      
+      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+        <Ionicons name="arrow-back" size={40} color="#000" />
+      </TouchableOpacity>
+      
       <View style={styles.container}>
-        <Text style={styles.title}>Iniciar Sesión</Text>
+        <Text style={styles.title}>¿Has olvidado tu contraseña?</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="Nombre de usuario"
+          placeholder="Correo electronico"
           placeholderTextColor="#888"
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Contraseña"
-          placeholderTextColor="#888"
-          secureTextEntry
-        />
-
-        <TouchableOpacity style={styles.button} onPress={handlePressLogin}>
-          <Text style={styles.buttonText}>Iniciar sesión</Text>
+        <TouchableOpacity style={styles.button} onPress={handleSendMail}>
+          <Text style={styles.buttonText}>Recibir token</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handlePressRegister}>
-          <Text style={styles.buttonText}>Registrarse</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button2} onPress={handlePressForgot}>
-          <Text style={styles.buttonText2}>He olvidado mi contraseña</Text>
-        </TouchableOpacity>
+        
       </View>
     </ImageBackground>
   );
@@ -62,6 +51,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40, // Adjust as needed
+    left: 20,
+    zIndex: 10,
   },
   title: {
     fontSize: 24,
