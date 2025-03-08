@@ -52,7 +52,7 @@ export default function LoginScreen() {
 
   const handlePressForgot = () => {
     console.log("Forgot Password Pressed");
-    router.push("/ChangePasswordScreen");
+    router.push("/RequestTokenScreen");
   };
 
   return (
