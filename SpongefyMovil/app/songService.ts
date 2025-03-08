@@ -12,7 +12,7 @@ export interface Song {
 
 export const fetchSongById = async (id: string): Promise<Song | null> => {  
   try {
-    const response = await fetch(`http://localhost:8080/play-song?id_cancion=${id}`);
+    const response = await fetch(`https://spongefy-back-end.onrender.com/play-song?id_cancion=${id}`);
     const data = await response.json();
 
     console.log("📥 Respuesta de la API:", data);
