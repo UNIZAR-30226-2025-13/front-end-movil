@@ -1,18 +1,41 @@
-import React from "react";
-import { Text, TextInput, TouchableOpacity, ImageBackground, View, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { Alert, Text, TextInput, TouchableOpacity, ImageBackground, View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from '@expo/vector-icons';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const [email, setEmail] = useState("");
 
-  const handleSendMail = () => {
-    console.log("Recibir token Pressed");
-    router.push('/ChangePasswordScreen');
+  const handleSendMail = async () => {
+    if (!email) {
+      Alert.alert("Error", "Por favor, ingresa tu correo electrónico.");
+      return;
+    }
+
+    try {
+      const response = await fetch("https://spongefy-back-end.onrender.com/changePasswordRequest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo: email }),
+      });
+
+      const data = await response.json();
+      console.log("Respuesta del servidor:", data); // 📌 DEBUG: Ver en consola
+
+      if (!response.ok) {
+        throw new Error();
+      }
+
+      Alert.alert("Éxito", "Revisa tu correo para obtener el código.");
+      router.push('/ChangePasswordScreen');
+    } catch (error) {
+      console.error("Error en la solicitud de token:", error); // 📌 DEBUG: Ver en consola
+      Alert.alert("Error", "Error al solicitar el token.");
+    }
   };
 
   const handleBack = () => {
-    // Regresa a la pantalla de login
     router.push('/LoginScreen');
   };
 
@@ -30,6 +53,7 @@ export default function LoginScreen() {
           style={styles.input}
           placeholder="Correo electronico"
           placeholderTextColor="#888"
+          onChangeText={setEmail}
         />
         <TouchableOpacity style={styles.button} onPress={handleSendMail}>
           <Text style={styles.buttonText}>Recibir token</Text>
