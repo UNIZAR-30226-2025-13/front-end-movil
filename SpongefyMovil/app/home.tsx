@@ -171,7 +171,7 @@ export default function HomeScreen() {
             <View style={styles.bottomBar}>
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/home')}
+                    onPress={() => router.push('/Home')}
                 >
                     <Ionicons name="home" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Home</Text>
@@ -187,7 +187,7 @@ export default function HomeScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/perfil')}
+                    onPress={() => router.push('/Perfil')}
                 >
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>

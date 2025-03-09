@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {  Alert, Text, TextInput, TouchableOpacity, ImageBackground, View, StyleSheet } from "react-native";
+import { Alert, Text, TextInput, TouchableOpacity, ImageBackground, View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 
 export default function LoginScreen() {
@@ -35,8 +35,8 @@ export default function LoginScreen() {
       console.log("Token:", data.token);
 
       // Redirigir a la pantalla principal
-      router.push("/home");
-    
+      router.push("/Home");
+
     } catch (error) {
       Alert.alert("Error", "Error en el inicio de sesión");
     }

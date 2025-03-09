@@ -75,7 +75,7 @@ export default function ProfileScreen() {
             </ImageBackground>
 
             <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/home')}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/Home')}>
                     <Ionicons name="home" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Home</Text>
                 </TouchableOpacity>
