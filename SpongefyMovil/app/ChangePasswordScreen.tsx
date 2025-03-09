@@ -16,7 +16,7 @@ export default function LoginScreen() {
     }
   
     try {
-      const response = await fetch("https://spongefy-back-end.onrender.com/change/password", {
+      const response = await fetch("https://spongefy-back-end.onrender.com/change-password", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
