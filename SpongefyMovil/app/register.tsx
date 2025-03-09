@@ -10,29 +10,46 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleRegister = () => {
-    // Validar que todos los campos estén completos
+  const handleRegister = async () => {
     if (!username || !email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Por favor, rellena todos los campos.');
+      Alert.alert("Error", "Por favor, rellena todos los campos.");
       return;
     }
-    // Validar que las contraseñas coincidan
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Las contraseñas no coinciden.');
+      Alert.alert("Error", "Las contraseñas no coinciden.");
       return;
     }
 
-    // Por ahora, solo loguear los valores y mostrar un mensaje de éxito
-    console.log('Registrarse presionado', { username, email, password });
-    Alert.alert('¡Éxito!', 'Cuenta creada exitosamente.');
+    try {
+      const response = await fetch("https://spongefy-back-end.onrender.com/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre_usuario: username,
+          correo: email,
+          contrasena: password,
+        }),
+      });
 
-    // Después del registro, opcionalmente puedes navegar a la pantalla de login
-    // router.push('/login');
+      const data = await response.json();
+      console.log("Respuesta del servidor:", data);
+
+      if (!response.ok) {
+        throw new Error();
+      }
+
+      Alert.alert("¡Éxito!", "Cuenta creada exitosamente.");
+      router.push("/LoginScreen");
+    } catch (error) {
+      Alert.alert("Error", "Error en el registro");
+    }
   };
 
   const handleBack = () => {
     // Regresa a la pantalla de login
-    router.push('/');
+    router.push('/LoginScreen');
   };
 
   return (
@@ -80,7 +97,9 @@ export default function RegisterScreen() {
           onChangeText={setConfirmPassword}
         />
         <View style={styles.buttonContainer}>
-          <Button title="Registrarse" onPress={handleRegister} color="#9400D3" />
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+                    <Text style={styles.buttonText}>Registrarse</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </ImageBackground>
@@ -100,7 +119,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   container: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     padding: 20,
     margin: 20,
     borderRadius: 10,
@@ -110,7 +128,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#333',
+    color: '#fff',
   },
   input: {
     width: '100%',
@@ -119,6 +137,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     textAlign: 'center',
+  },
+  button: {
+    backgroundColor: "#9400D3",
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    width: "100%",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
   buttonContainer: {
     width: '100%',
