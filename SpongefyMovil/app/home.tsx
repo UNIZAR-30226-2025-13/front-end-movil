@@ -10,10 +10,12 @@ import {
     TextInput
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router'; // <-- Import pour la navigation
 
 const screenWidth = Dimensions.get('window').width;
 
 export default function HomeScreen() {
+    const router = useRouter(); // <-- On récupère le routeur
     const [selectedTab, setSelectedTab] = useState('Todo');
 
     // Exemple de données fictives pour "Lo mejor de cada artista"
@@ -34,10 +36,6 @@ export default function HomeScreen() {
         { id: '6', label: 'TOP 10 ITALIANO', color: '#3F51B5' },
         { id: '7', label: 'TOP 10 ESPAÑOL', color: '#009688' },
     ];
-
-    const handleTabPress = (tabName) => {
-        setSelectedTab(tabName);
-    };
 
     // Barre de recherche
     const SearchBar = () => {
@@ -81,11 +79,11 @@ export default function HomeScreen() {
                     {['Todo', 'Música', 'Pódcasts'].map((tab) => (
                         <TouchableOpacity
                             key={tab}
-                            onPress={() => handleTabPress(tab)}
                             style={[
                                 styles.tab,
                                 selectedTab === tab && styles.tabSelected
                             ]}
+                            onPress={() => setSelectedTab(tab)}
                         >
                             <Text
                                 style={[
@@ -130,6 +128,7 @@ export default function HomeScreen() {
                         </View>
                     ))}
                 </View>
+
                 <Text style={styles.sectionTitle}>Conoce la mejor música de cada idioma</Text>
                 <Text style={styles.sectionTitle}>Lo mejor de cada artista</Text>
                 <ScrollView
@@ -178,11 +177,17 @@ export default function HomeScreen() {
                     <Ionicons name="home" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Home</Text>
                 </TouchableOpacity>
+
                 <TouchableOpacity style={styles.bottomBarItem}>
                     <Ionicons name="library" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Tu biblioteca</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomBarItem}>
+
+                {/* Bouton "Perfil" qui redirige vers la page /perfil */}
+                <TouchableOpacity
+                    style={styles.bottomBarItem}
+                    onPress={() => router.push('/perfil')} // <-- Navigation vers /perfil
+                >
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>
                 </TouchableOpacity>
