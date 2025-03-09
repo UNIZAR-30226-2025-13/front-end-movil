@@ -31,8 +31,6 @@ export default function LoginScreen() {
         throw new Error();
       }
 
-      Alert.alert("Éxito", "Inicio de sesión correcto");
-
       // Guardar token (puedes usar AsyncStorage para persistencia)
       console.log("Token:", data.token);
 

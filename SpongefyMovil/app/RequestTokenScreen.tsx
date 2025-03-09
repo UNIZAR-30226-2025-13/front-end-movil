@@ -40,6 +40,8 @@ export default function LoginScreen() {
     router.push('/LoginScreen');
   };
 
+
+
   return (
     <ImageBackground source={require("../assets/halfalogo.png")} style={styles.background}>
       
