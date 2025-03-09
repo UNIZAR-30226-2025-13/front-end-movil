@@ -10,15 +10,14 @@ import {
     TextInput
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router'; // <-- Import pour la navigation
+import { useRouter } from 'expo-router';
 
 const screenWidth = Dimensions.get('window').width;
 
 export default function HomeScreen() {
-    const router = useRouter(); // <-- On récupère le routeur
+    const router = useRouter();
     const [selectedTab, setSelectedTab] = useState('Todo');
 
-    // Exemple de données fictives pour "Lo mejor de cada artista"
     const bestArtists = [
         { id: '1', name: 'This is Bad Bunny', image: require('../assets/exemple_song_1.png') },
         { id: '2', name: 'This is Feid', image: require('../assets/exemple_song_2.png') },
@@ -26,7 +25,6 @@ export default function HomeScreen() {
         { id: '4', name: 'This is Lola Índigo', image: require('../assets/exemple_song_3.png') },
     ];
 
-    // Exemple de données pour "Descubre música nueva"
     const newMusicCategories = [
         { id: '1', label: 'POP', color: '#F44336' },
         { id: '2', label: 'ROCK', color: '#9C27B0' },
@@ -37,7 +35,6 @@ export default function HomeScreen() {
         { id: '7', label: 'TOP 10 ESPAÑOL', color: '#009688' },
     ];
 
-    // Barre de recherche
     const SearchBar = () => {
         const handleMoreOptions = () => {
             console.log("Plus d'options");
@@ -58,20 +55,20 @@ export default function HomeScreen() {
         );
     };
 
+    const handleBiblioteca = () => {
+        router.push('/Biblioteca');
+    };
+
     return (
         <View style={styles.container}>
-
-            {/* ScrollView pour tout le contenu sauf la barre inférieure */}
             <ScrollView
                 style={styles.scrollContainer}
                 contentContainerStyle={styles.scrollContent}
             >
-                {/* Barre supérieure */}
                 <View style={styles.topBar}>
                     <Text style={styles.topBarTitle}>Home</Text>
                 </View>
 
-                {/* Barre de recherche */}
                 <SearchBar />
 
                 {/* Onglets (Todo, Música, Pódcasts) */}
@@ -97,7 +94,6 @@ export default function HomeScreen() {
                     ))}
                 </View>
 
-                {/* Contenu défilant */}
                 {/* Sección: Lo mejor de cada artista */}
                 <Text style={styles.sectionTitle}>Lo mejor de cada artista</Text>
                 <ScrollView
@@ -173,20 +169,25 @@ export default function HomeScreen() {
 
             {/* Barre de navigation inférieure */}
             <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.bottomBarItem}>
+                <TouchableOpacity
+                    style={styles.bottomBarItem}
+                    onPress={() => router.push('/home')}
+                >
                     <Ionicons name="home" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Home</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.bottomBarItem}>
+                <TouchableOpacity
+                    style={styles.bottomBarItem}
+                    onPress={handleBiblioteca}
+                >
                     <Ionicons name="library" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Tu biblioteca</Text>
                 </TouchableOpacity>
 
-                {/* Bouton "Perfil" qui redirige vers la page /perfil */}
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/perfil')} // <-- Navigation vers /perfil
+                    onPress={() => router.push('/perfil')}
                 >
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>
@@ -196,7 +197,6 @@ export default function HomeScreen() {
     );
 }
 
-// Styles
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -209,7 +209,6 @@ const styles = StyleSheet.create({
     scrollContent: {
         paddingBottom: 100,
     },
-
     topBar: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -221,7 +220,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
     },
-
     // Barre de recherche
     searchContainer: {
         flexDirection: 'row',
@@ -245,7 +243,6 @@ const styles = StyleSheet.create({
         flex: 1,
         color: '#fff',
     },
-
     tabsContainer: {
         flexDirection: 'row',
         paddingHorizontal: 16,
@@ -267,7 +264,6 @@ const styles = StyleSheet.create({
         color: '#000',
         fontWeight: 'bold',
     },
-
     sectionTitle: {
         color: '#fff',
         fontSize: 18,
@@ -316,7 +312,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-
     // Barre de lecture (mini player)
     playerBar: {
         flexDirection: 'row',
@@ -362,7 +357,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginLeft: 10,
     },
-
     // Barre de navigation inférieure
     bottomBar: {
         flexDirection: 'row',

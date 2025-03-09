@@ -6,34 +6,43 @@ import {
     TouchableOpacity,
     ImageBackground
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 export default function ProfileScreen() {
+    const router = useRouter();
+
+    const handleBack = () => {
+        router.push('/Home');
+    };
+
     const handleEditProfile = () => {
-        console.log("Editar perfil");
-        // Naviguer vers l'écran d'édition de profil si besoin
+        router.push('/EditPerfil');
     };
 
     const handleLogout = () => {
         console.log("Cerrar Sesión");
-        // Déconnexion (retour à la page login, par ex.)
     };
 
     const handleDeleteAccount = () => {
         console.log("Eliminar Cuenta");
-        // Demander confirmation avant de supprimer le compte
+    };
+
+    const handleBiblioteca = () => {
+        router.push('/Biblioteca');
     };
 
     return (
         <View style={styles.container}>
-            {/* 
-        Si tu as une image de fond violette, remplace require(...) 
-        par le chemin vers ton asset. Sinon, laisse un simple fond coloré.
-      */}
             <ImageBackground
                 source={require('../assets/logo.png')}
                 style={styles.background}
                 resizeMode="cover"
             >
+                <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+                    <Ionicons name="arrow-back" size={28} color="#fff" />
+                </TouchableOpacity>
+
                 <View style={styles.content}>
                     <Text style={styles.profileTitle}>Tu perfil</Text>
                     <Text style={styles.subtitle}>Datos personales</Text>
@@ -54,11 +63,36 @@ export default function ProfileScreen() {
                         <Text style={styles.buttonText}>Cerrar Sesión</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={handleDeleteAccount}>
-                        <Text style={[styles.buttonText, styles.deleteButtonText]}>Eliminar Cuenta</Text>
+                    <TouchableOpacity
+                        style={[styles.button, styles.deleteButton]}
+                        onPress={handleDeleteAccount}
+                    >
+                        <Text style={[styles.buttonText, styles.deleteButtonText]}>
+                            Eliminar Cuenta
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </ImageBackground>
+
+            <View style={styles.bottomBar}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/home')}>
+                    <Ionicons name="home" size={24} color="#fff" />
+                    <Text style={styles.bottomBarText}>Home</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.bottomBarItem} onPress={handleBiblioteca}>
+                    <Ionicons name="library" size={24} color="#fff" />
+                    <Text style={styles.bottomBarText}>Tu biblioteca</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.bottomBarItem}
+                    onPress={() => router.push('/Perfil')}
+                >
+                    <Ionicons name="person" size={24} color="#fff" />
+                    <Text style={styles.bottomBarText}>Perfil</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
@@ -72,6 +106,12 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
     },
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
+        zIndex: 10,
+    },
     content: {
         paddingHorizontal: 30,
         alignItems: 'center',
@@ -81,6 +121,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
         marginBottom: 6,
+        marginTop: 50,
     },
     subtitle: {
         fontSize: 18,
@@ -124,5 +165,20 @@ const styles = StyleSheet.create({
     },
     deleteButtonText: {
         color: '#fff',
+    },
+    bottomBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        backgroundColor: '#111',
+        paddingVertical: 8,
+    },
+    bottomBarItem: {
+        alignItems: 'center',
+    },
+    bottomBarText: {
+        color: '#fff',
+        fontSize: 12,
+        marginTop: 2,
     },
 });
