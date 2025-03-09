@@ -16,11 +16,11 @@ export default function EditProfile() {
 
     const handleSave = () => {
         console.log('Nouvelles valeurs:', email, password);
-        router.push('/Perfil');
+        router.push('/perfil');
     };
 
     const handleCancel = () => {
-        router.push('/Perfil');
+        router.push('/perfil');
     };
 
     return (

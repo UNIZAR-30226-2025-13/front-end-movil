@@ -35,7 +35,7 @@ export default function LoginScreen() {
       console.log("Token:", data.token);
 
       // Redirigir a la pantalla principal
-      router.push("/Home");
+      router.push("/home");
 
     } catch (error) {
       Alert.alert("Error", "Error en el inicio de sesión");

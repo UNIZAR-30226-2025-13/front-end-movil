@@ -54,7 +54,7 @@ export default function BibliotecaScreen() {
     };
 
     const handleBiblioteca = () => {
-        router.push('/Biblioteca');
+        router.push('/biblioteca');
     };
 
     return (
@@ -96,7 +96,7 @@ export default function BibliotecaScreen() {
             <View style={styles.bottomBar}>
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/Home')}
+                    onPress={() => router.push('/home')}
                 >
                     <Ionicons name="home" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Home</Text>
@@ -112,7 +112,7 @@ export default function BibliotecaScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/Perfil')}
+                    onPress={() => router.push('/perfil')}
                 >
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>

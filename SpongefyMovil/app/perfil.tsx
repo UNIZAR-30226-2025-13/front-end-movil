@@ -13,7 +13,7 @@ export default function ProfileScreen() {
     const router = useRouter();
 
     const handleBack = () => {
-        router.push('/Home');
+        router.push('/home');
     };
 
     const handleEditProfile = () => {
@@ -29,7 +29,7 @@ export default function ProfileScreen() {
     };
 
     const handleBiblioteca = () => {
-        router.push('/Biblioteca');
+        router.push('/biblioteca');
     };
 
     return (
@@ -87,7 +87,7 @@ export default function ProfileScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/Perfil')}
+                    onPress={() => router.push('/perfil')}
                 >
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>

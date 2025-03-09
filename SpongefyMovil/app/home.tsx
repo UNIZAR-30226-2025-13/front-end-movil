@@ -56,7 +56,7 @@ export default function HomeScreen() {
     };
 
     const handleBiblioteca = () => {
-        router.push('/Biblioteca');
+        router.push('/biblioteca');
     };
 
     return (
@@ -187,7 +187,7 @@ export default function HomeScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/Perfil')}
+                    onPress={() => router.push('/perfil')}
                 >
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>
