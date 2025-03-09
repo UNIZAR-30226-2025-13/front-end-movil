@@ -1,13 +1,45 @@
-import React from "react";
-import { Text, TextInput, TouchableOpacity, ImageBackground, View, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { Alert, Text, TextInput, TouchableOpacity, ImageBackground, View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from '@expo/vector-icons';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [token, setToken] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
-  const handlePressChangePswd = () => {
-    console.log("Cambiar Contraseña Pressed");
+  const handleChangePassword = async () => {
+    if (!username || !token || !newPassword) {
+      Alert.alert("Error", "Por favor, completa todos los campos.");
+      return;
+    }
+  
+    try {
+      const response = await fetch("https://spongefy-back-end.onrender.com/change/password", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre_usuario: username,
+          token: token,
+          nueva_contrasena: newPassword,
+        }),
+      });
+  
+      const data = await response.json();
+      console.log("Respuesta del servidor:", data);
+  
+      if (!response.ok) {
+        throw new Error(data.message || "Error al cambiar la contraseña.");
+      }
+  
+      Alert.alert("Éxito", "Contraseña cambiada correctamente.");
+      router.push("/LoginScreen");
+  
+    } catch (error) {
+      console.error("Error al cambiar contraseña:", error);
+      Alert.alert("Error", "No se pudo cambiar la contraseña.");
+    }
   };
 
   const handleBack = () => {
@@ -29,19 +61,22 @@ export default function LoginScreen() {
           style={styles.input}
           placeholder="Nombre de usuario"
           placeholderTextColor="#888"
+          onChangeText={setUsername}
         />
         <TextInput
           style={styles.input}
           placeholder="Token"
           placeholderTextColor="#888"
+          onChangeText={setToken}
         />
           <TextInput
           style={styles.input}
           placeholder="Nueva contraseña"
           placeholderTextColor="#888"
+          onChangeText={setNewPassword}
         />
 
-        <TouchableOpacity style={styles.button} onPress={handlePressChangePswd}>
+        <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
           <Text style={styles.buttonText}>Cambiar contrseña</Text>
         </TouchableOpacity>
         
