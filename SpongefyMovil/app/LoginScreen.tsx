@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Alert, Text, TextInput, TouchableOpacity, ImageBackground, View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { saveData, getData, removeData } from "../utils/storage";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -31,8 +32,7 @@ export default function LoginScreen() {
         throw new Error();
       }
 
-      // Guardar token (puedes usar AsyncStorage para persistencia)
-      console.log("Token:", data.token);
+     await saveData("username", username);
 
       // Redirigir a la pantalla principal
       router.push("/home");

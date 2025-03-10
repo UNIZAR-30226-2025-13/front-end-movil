@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import {
-    View,
+import React, { useState, useEffect } from 'react';
+import {View,
     Text,
     StyleSheet,
     TouchableOpacity,
@@ -11,8 +10,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { saveData, getData, removeData } from "../utils/storage";
+import { fetchAndSavePlaylists } from "../utils/fetch";
 
 const screenWidth = Dimensions.get('window').width;
+
+
 
 const artistsData = [
     { id: '1', name: 'Bad Bunny' },
@@ -21,7 +24,6 @@ const artistsData = [
     { id: '4', name: 'Lola Indigo' },
     { id: '5', name: 'Fernando Costa' },
 ];
-
 const songsData = [
     { id: '1', name: 'Song 1' },
     { id: '2', name: 'Song 2' },
@@ -30,17 +32,34 @@ const songsData = [
     { id: '5', name: 'Song 5' },
 ];
 
+
+
+
 export default function BibliotecaScreen() {
     const router = useRouter();
-    const [selectedTab, setSelectedTab] = useState('Todo');
+    const [selectedTab, setSelectedTab] = useState('Listas');
+    const tabs = ['Listas', 'Podcastas', 'Artistas'];
+    const [playlists, setPlaylists] = useState([]);
+    const username = getData("username");
 
-    const tabs = ['Todo', 'Podcastas', 'Artistas'];
+      const handlePressDebug = async () => {
+        console.log("Debug Pressed");
+        const username = await getData("username");
+        console.log(username);  // Debería mostrar "javi"
+      };
+
+    useEffect(() => {
+        fetchAndSavePlaylists(username);
+        const storedPlaylists = getData("playlists");
+        console.log("Playlists almacenadas:", storedPlaylists);
+        //setPlaylists(storedPlaylists || []);
+      }, []);
+    
 
     const SearchBar = () => {
         const handleMoreOptions = () => {
             console.log("Plus d'options");
         };
-
         return (
             <View style={styles.searchContainer}>
                 <Ionicons name="search" size={20} color="#fff" style={styles.iconLeft} />
@@ -58,9 +77,11 @@ export default function BibliotecaScreen() {
 
     const renderSectionContent = () => {
         switch (selectedTab) {
-            case 'Todo':
-                return <Text style={styles.sectionText}>Todo el contenido de tu biblioteca...</Text>;
-
+            case 'Listas':
+                return (
+                    <ScrollView>
+                    </ScrollView>
+                );
             case 'Podcastas':
                 return (
                     <ScrollView style={styles.artistasContainer}>
@@ -99,7 +120,6 @@ export default function BibliotecaScreen() {
     };
 
     const handleBiblioteca = () => {
-        router.push('/biblioteca');
     };
 
     return (
@@ -107,9 +127,14 @@ export default function BibliotecaScreen() {
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons name="library" size={24} color="#fff" />
                 <Text style={styles.title}>Tu biblioteca</Text>
+                <TouchableOpacity style={styles.button} onPress={handlePressDebug}>
+                              <Text style={styles.playlistText}>DEBUG</Text>
+                </TouchableOpacity>
             </View>
 
             <SearchBar />
+
+
 
             <ScrollView
                 horizontal
@@ -273,4 +298,22 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 2,
     },
+    playlistItem: {
+        backgroundColor: "#222",
+        padding: 15,
+        marginVertical: 5,
+        borderRadius: 10,
+    },
+    playlistText: {
+        color: "#fff",
+        fontSize: 16,
+    },
+    button: {
+        backgroundColor: "#9400D3",
+        padding: 15,
+        borderRadius: 10,
+        marginTop: 10,
+        width: "100%",
+        alignItems: "center",
+      },
 });
