@@ -205,7 +205,6 @@ const styles = StyleSheet.create({
     scrollContainer: {
         flex: 1,
     },
-    // Espace pour scroller sous la bottom bar
     scrollContent: {
         paddingBottom: 100,
     },
@@ -220,7 +219,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
     },
-    // Barre de recherche
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
