@@ -14,11 +14,27 @@ import { useRouter } from 'expo-router';
 
 const screenWidth = Dimensions.get('window').width;
 
+const artistsData = [
+    { id: '1', name: 'Bad Bunny' },
+    { id: '2', name: 'Feid' },
+    { id: '3', name: 'Cruz Cafuné' },
+    { id: '4', name: 'Lola Indigo' },
+    { id: '5', name: 'Fernando Costa' },
+];
+
+const songsData = [
+    { id: '1', name: 'Song 1' },
+    { id: '2', name: 'Song 2' },
+    { id: '3', name: 'Song 3' },
+    { id: '4', name: 'Song 4' },
+    { id: '5', name: 'Song 5' },
+];
+
 export default function BibliotecaScreen() {
     const router = useRouter();
     const [selectedTab, setSelectedTab] = useState('Todo');
 
-    const tabs = ['Todo', 'Músicas', 'Podcastas'];
+    const tabs = ['Todo', 'Podcastas', 'Artistas'];
 
     const SearchBar = () => {
         const handleMoreOptions = () => {
@@ -44,10 +60,39 @@ export default function BibliotecaScreen() {
         switch (selectedTab) {
             case 'Todo':
                 return <Text style={styles.sectionText}>Todo el contenido de tu biblioteca...</Text>;
-            case 'Músicas':
-                return <Text style={styles.sectionText}>Aquí van tus canciones favoritas...</Text>;
+
+            case 'Podcastas':
+                return (
+                    <ScrollView style={styles.artistasContainer}>
+                        {songsData.map((song) => (
+                            <View key={song.id} style={styles.artistRow}>
+                                <Image
+                                    source={require('../assets/exemple_song_1.png')}
+                                    style={styles.artistAvatar}
+                                />
+                            </View>
+                        ))}
+                    </ScrollView>
+                );
+
             case 'Podcastas':
                 return <Text style={styles.sectionText}>Aquí van tus episodios favoritos...</Text>;
+
+            case 'Artistas':
+                return (
+                    <ScrollView style={styles.artistasContainer}>
+                        {artistsData.map((artist) => (
+                            <View key={artist.id} style={styles.artistRow}>
+                                <Image
+                                    source={require('../assets/image_test_artiste.png')}
+                                    style={styles.artistAvatar}
+                                />
+                                <Text style={styles.artistName}>{artist.name}</Text>
+                            </View>
+                        ))}
+                    </ScrollView>
+                );
+
             default:
                 return <Text style={styles.sectionText}>Selecciona una sección</Text>;
         }
@@ -59,7 +104,10 @@ export default function BibliotecaScreen() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Tu biblioteca</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="library" size={24} color="#fff" />
+                <Text style={styles.title}>Tu biblioteca</Text>
+            </View>
 
             <SearchBar />
 
@@ -93,6 +141,7 @@ export default function BibliotecaScreen() {
                 {renderSectionContent()}
             </View>
 
+            {/* Barre de navigation inférieure */}
             <View style={styles.bottomBar}>
                 <TouchableOpacity
                     style={styles.bottomBarItem}
@@ -157,6 +206,7 @@ const styles = StyleSheet.create({
         flex: 1,
         color: '#fff',
     },
+    // Onglets
     tabsContainer: {
         marginBottom: 10,
         paddingHorizontal: 10,
@@ -178,6 +228,7 @@ const styles = StyleSheet.create({
         color: '#000',
         fontWeight: 'bold',
     },
+    // Contenu
     content: {
         flex: 1,
         marginHorizontal: 16,
@@ -186,6 +237,26 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         marginTop: 20,
+    },
+    artistasContainer: {
+        marginTop: 10,
+    },
+    artistRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    artistAvatar: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        marginRight: 12,
+        resizeMode: 'cover',
+    },
+    artistName: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     bottomBar: {
         flexDirection: 'row',
