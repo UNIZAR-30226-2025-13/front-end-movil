@@ -53,6 +53,9 @@ export default function BibliotecaScreen() {
         loadPlaylists();
     }, []);
     
+    const handleAddPlaylist = async () => {
+        console.log("Boton añadir playlist pulsado");
+    };
 
     const SearchBar = () => {
         const handleMoreOptions = () => {
@@ -76,14 +79,18 @@ export default function BibliotecaScreen() {
     const renderSectionContent = () => {
         switch (selectedTab) {
             case 'Listas':
-                return (
-                    <ScrollView>
-                {playlists.map((playlist, index) => (
-                    <TouchableOpacity key={index} style={styles.playlistItem}>
-                        <Text style={styles.playlistText}>{playlist.nombre}</Text>
+                return (<View style={styles.container}>
+                    <ScrollView style={styles.scrollView}>
+                        {playlists.map((playlist, index) => (
+                            <TouchableOpacity key={index} style={styles.playlistItem}>
+                                <Text style={styles.playlistText}>{playlist.nombre}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                    <TouchableOpacity style={styles.addButton} onPress={handleAddPlaylist}>
+                        <Ionicons name="add" size={24} color="white" />
                     </TouchableOpacity>
-                ))}
-            </ScrollView>
+                </View>
                 );
             case 'Podcastas':
                 return (
@@ -122,45 +129,41 @@ export default function BibliotecaScreen() {
         }
     };
 
-    const handleBiblioteca = () => {
-    };
-
     return (
         <View style={styles.container}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="library" size={24} color="#fff" />
+            
+                {/* Encabezado */}
+            <View style={styles.header}>
+                <Ionicons name="library-outline" size={28} color="white" />
                 <Text style={styles.title}>Tu biblioteca</Text>
             </View>
-
-            <SearchBar />
-
-
-
-            <ScrollView
-                horizontal
-                style={styles.tabsContainer}
-                showsHorizontalScrollIndicator={false}
-            >
+        
+            {/* Barra de búsqueda */}
+            <View style={styles.searchContainer}>
+                <Ionicons name="search" size={20} color="#888" style={styles.iconLeft} />
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Buscar"
+                    placeholderTextColor="#888"
+                />
+            </View>
+        
+            {/* Tabs de navegación */}
+            <View style={styles.tabsContainer}>
                 {tabs.map((tab) => (
                     <TouchableOpacity
                         key={tab}
-                        style={[
-                            styles.tab,
-                            selectedTab === tab && styles.tabSelected
-                        ]}
+                        style={[styles.tab, selectedTab === tab && styles.tabSelected]}
                         onPress={() => setSelectedTab(tab)}
                     >
-                        <Text
-                            style={[
-                                styles.tabText,
-                                selectedTab === tab && styles.tabTextSelected
-                            ]}
-                        >
+                        <Text style={[styles.tabText, selectedTab === tab && styles.tabTextSelected]}>
                             {tab}
                         </Text>
                     </TouchableOpacity>
                 ))}
-            </ScrollView>
+            </View>
+
+
 
             <View style={styles.content}>
                 {renderSectionContent()}
@@ -178,7 +181,6 @@ export default function BibliotecaScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={handleBiblioteca}
                 >
                     <Ionicons name="library" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Tu biblioteca</Text>
@@ -202,22 +204,27 @@ const styles = StyleSheet.create({
         backgroundColor: '#000',
         paddingTop: 40,
     },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        marginBottom: 10,
+    },
     title: {
         color: '#fff',
         fontSize: 22,
         fontWeight: 'bold',
-        marginLeft: 16,
-        marginBottom: 10,
+        marginLeft: 10,
     },
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#000',
+        backgroundColor: '#111',
         borderColor: '#9400D3',
         borderWidth: 1,
         borderRadius: 20,
         paddingHorizontal: 12,
-        paddingVertical: 8,
+        height: 40,
         marginHorizontal: 16,
         marginBottom: 10,
     },
@@ -230,17 +237,20 @@ const styles = StyleSheet.create({
     searchInput: {
         flex: 1,
         color: '#fff',
+        fontSize: 16,
     },
     // Onglets
     tabsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        paddingHorizontal: 16,
         marginBottom: 10,
-        paddingHorizontal: 10,
     },
     tab: {
         backgroundColor: '#333',
         borderRadius: 20,
         paddingVertical: 6,
-        paddingHorizontal: 12,
+        paddingHorizontal: 14,
         marginRight: 10,
     },
     tabSelected: {
@@ -248,6 +258,7 @@ const styles = StyleSheet.create({
     },
     tabText: {
         color: '#fff',
+        fontSize: 14,
     },
     tabTextSelected: {
         color: '#000',
@@ -316,4 +327,18 @@ const styles = StyleSheet.create({
         width: "100%",
         alignItems: "center",
       },
+      scrollView: {
+        flex: 1, // Ocupar todo el espacio posible
+    },
+    addButton: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        backgroundColor: 'purple',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });

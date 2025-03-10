@@ -20,7 +20,7 @@ export const fetchAndSavePlaylists = async (nombre_usuario) => {
 
       await saveData("playlists", playlists);
 
-      console.log("Playlists guardadas correctamente:", playlists);
+      //console.log("Playlists guardadas correctamente:", playlists);
   } catch (error) {
       console.error("Error en fetchAndSavePlaylists:", error);
   }
