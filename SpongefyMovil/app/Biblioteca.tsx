@@ -32,28 +32,26 @@ const songsData = [
     { id: '5', name: 'Song 5' },
 ];
 
-
-
-
 export default function BibliotecaScreen() {
     const router = useRouter();
     const [selectedTab, setSelectedTab] = useState('Listas');
     const tabs = ['Listas', 'Podcastas', 'Artistas'];
-    const [playlists, setPlaylists] = useState([]);
-    const username = getData("username");
-
-      const handlePressDebug = async () => {
-        console.log("Debug Pressed");
-        const username = await getData("username");
-        console.log(username);  // Debería mostrar "javi"
-      };
+    const [playlists, setPlaylists] = useState<{ id_lista: number; nombre: string }[]>([]);
 
     useEffect(() => {
-        fetchAndSavePlaylists(username);
-        const storedPlaylists = getData("playlists");
-        console.log("Playlists almacenadas:", storedPlaylists);
-        //setPlaylists(storedPlaylists || []);
-      }, []);
+        const loadPlaylists = async () => {
+            const username = await getData("username"); 
+            if (username) {
+                await fetchAndSavePlaylists(username); 
+                const playlistsGuardadas = await getData("playlists"); 
+                if (playlistsGuardadas) {
+                    setPlaylists(playlistsGuardadas); 
+                }
+            }
+        };
+
+        loadPlaylists();
+    }, []);
     
 
     const SearchBar = () => {
@@ -80,7 +78,12 @@ export default function BibliotecaScreen() {
             case 'Listas':
                 return (
                     <ScrollView>
-                    </ScrollView>
+                {playlists.map((playlist, index) => (
+                    <TouchableOpacity key={index} style={styles.playlistItem}>
+                        <Text style={styles.playlistText}>{playlist.nombre}</Text>
+                    </TouchableOpacity>
+                ))}
+            </ScrollView>
                 );
             case 'Podcastas':
                 return (
@@ -127,9 +130,6 @@ export default function BibliotecaScreen() {
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons name="library" size={24} color="#fff" />
                 <Text style={styles.title}>Tu biblioteca</Text>
-                <TouchableOpacity style={styles.button} onPress={handlePressDebug}>
-                              <Text style={styles.playlistText}>DEBUG</Text>
-                </TouchableOpacity>
             </View>
 
             <SearchBar />

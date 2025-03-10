@@ -38,10 +38,16 @@ export default function LoginScreen() {
       router.push("/home");
 
     } catch (error) {
+      console.log("Error en el inicio de sesion");
       Alert.alert("Error", "Error en el inicio de sesión");
     }
   };
 
+  const handleDebug = async () => {
+    console.log("debug desde login");
+    await saveData("username", "javi");
+    router.push("/home");
+  };
 
   const handlePressRegister = () => {
     console.log("Register Pressed");
@@ -80,6 +86,9 @@ export default function LoginScreen() {
         </TouchableOpacity>
         <TouchableOpacity style={styles.button2} onPress={handlePressForgot}>
           <Text style={styles.buttonText2}>He olvidado mi contraseña</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleDebug}>
+          <Text style={styles.buttonText}>DEBUG</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
