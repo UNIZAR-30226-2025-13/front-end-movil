@@ -1,8 +1,24 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-//basicamente una tabla hash para guardar datos entre pantallas
-// importar con: 
-// import { saveData, getData, removeData } from "../utils/storage";
+/*
+basicamente una tabla hash para guardar datos entre pantallas
+ejemplo de uso abajo
+importar con: 
+import { saveData, getData, removeData } from "../utils/storage";
+*/
+
+
+
+/* CLAVES USADAS:
+
+username              nombre de usuario
+playlists             lista de las playlist y carpetas del usuario
+home                  datos de la pestaña "Todo" de home
+homeMusic             datos de la pestaña "Musica" de home
+homePodcast           datos de la pestaña "Podcast" de home
+
+
+*/
 
 
 
