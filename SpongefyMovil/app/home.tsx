@@ -80,6 +80,34 @@ interface MusicaListaAleatorio {
 }
 
 
+//Podcat
+
+interface PodcastEpisodio {
+    id_ep: number;
+    titulo: string;
+    link_imagen: string;
+    fecha_pub: string;
+}
+
+interface PodcastCompleto {
+    nombre_podcast: string;
+    foto_podcast: string;
+    episodios_recientes: PodcastEpisodio[];
+}
+
+interface PodcastListaPodcastersInfo {
+    id_lista: number;
+    nombre: string;
+    nombre_creador: string;
+    link_imagen: string;
+}
+
+interface PodcastListaAleatorioInfo {
+    id_lista: number;
+    nombre: string;
+    color: string;
+}
+
 
 export default function HomeScreen() {
     const router = useRouter();
@@ -100,6 +128,13 @@ export default function HomeScreen() {
     const [listasMusicaArtistas, setListasMusicaArtistas] = useState<MusicaListaArtistas[]>([]);
     const [listasMusicaAleatorio, setListasMusicaAleatorio] = useState<MusicaListaAleatorio[]>([]);
     const [listasMusicaArtista, setListasMusicaArtista] = useState<MusicaArtista | null>(null);
+
+    //Podcast
+
+    const [listasPodcastPodcastersInfo, setListasPodcastPodcastersInfo] = useState<PodcastListaPodcastersInfo[]>([]);
+    const [listasPodcastAleatorioInfo, setListasPodcastAleatorioInfo] = useState<PodcastListaAleatorioInfo[]>([]);
+    const [listasPodcastCompleto, setListasPodcastCompleto] = useState<PodcastCompleto[]>([]); 
+    const [podcastCompleto, setPodcastCompleto] = useState<PodcastCompleto | null>(null); 
 
     useEffect(() => {
         const fetchData = async () => {
