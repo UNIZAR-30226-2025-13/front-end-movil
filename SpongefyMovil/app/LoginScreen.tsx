@@ -45,7 +45,7 @@ export default function LoginScreen() {
 
   const handleDebug = async () => {
     console.log("debug desde login");
-    await saveData("username", "javi");
+    await saveData("username", "spongefy");
     router.push("/home");
   };
 

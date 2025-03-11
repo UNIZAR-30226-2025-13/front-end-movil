@@ -11,7 +11,7 @@ export const fetchAndSavePlaylists = async (nombre_usuario) => {
       );
 
       if (!response.ok) {
-          const errorResponse = await response.text(); // Obtener el cuerpo de la respuesta como texto
+          const errorResponse = await response.text(); 
           console.error("Error en la respuesta del servidor:", errorResponse);
           throw new Error(`Error al obtener las playlists: ${response.status} - ${response.statusText}`);
       }
@@ -24,4 +24,25 @@ export const fetchAndSavePlaylists = async (nombre_usuario) => {
   } catch (error) {
       console.error("Error en fetchAndSavePlaylists:", error);
   }
+};
+
+
+export const fetchAndSaveHomeData = async () => {
+    try {
+        const response = await fetch(`https://spongefy-back-end.onrender.com/home`);
+
+        if (!response.ok) {
+            const errorResponse = await response.text(); 
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al obtener los datos de home: ${response.status} - ${response.statusText}`);
+        }
+
+        const homeData = await response.json();
+
+        await saveData("home", homeData);
+
+        console.log("Datos de Home guardados correctamente:", homeData);
+    } catch (error) {
+        console.error("Error en fetchAndSaveHomeData:", error);
+    }
 };
