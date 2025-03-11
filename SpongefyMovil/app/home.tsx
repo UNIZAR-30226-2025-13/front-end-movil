@@ -11,9 +11,9 @@ import {View,
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { saveData, getData, removeData } from "../utils/storage";
-import { fetchAndSaveHomeData, fetchAndSavePlaylists } from "../utils/fetch";
+import { fetchAndSaveHomeData, fetchAndSaveHomeMusicData, fetchAndSaveHomePodcastData } from "../utils/fetch";
 
-
+//Todo
 interface Artista {
     id_lista: number;
     link_imagen: string;
@@ -39,35 +39,104 @@ interface Podcast {
     nombre: string;
 }
 
-export default function BibliotecaScreen() {
+//Musica
+interface MusicaCancionAlbum {
+    id: number;
+    titulo: string;
+    link_imagen: string;
+    fecha_pub: string;
+    tipo: string;
+}
+
+interface MusicaArtista {
+    nombre_artista: string;
+    link_imagen: string;
+    canciones_albumes: MusicaCancionAlbum[];
+}
+
+interface MusicaListaGenero {
+    id_lista: number;
+    nombre: string;
+    color: string;
+}
+
+interface MusicaListaIdioma {
+    id_lista: number;
+    nombre: string;
+    color: string;
+}
+
+interface MusicaListaArtistas {
+    id_lista: number;
+    nombre: string;
+    nombre_creador: string;
+    link_imagen: string;
+}
+
+interface MusicaListaAleatorio {
+    id_lista: number;
+    nombre: string;
+    color: string;
+}
+
+
+
+export default function HomeScreen() {
     const router = useRouter();
     const [selectedTab, setSelectedTab] = useState('Todo');
     const tabs = ['Todo', 'Musica', 'Podcasts'];
+
+    //Todo
+
     const [listasArtistas, setListasArtistas] = useState<Artista[]>([]);
     const [listasGeneros, setListasGeneros] = useState<Genero[]>([]);
     const [listasIdiomas, setListasIdiomas] = useState<Idioma[]>([]);
     const [listasPodcast, setListasPodcast] = useState<Podcast[]>([]);
 
+    //Musica
+
+    const [listasMusicaGenero, setListasMusicaGenero] = useState<MusicaListaGenero[]>([]);
+    const [listasMusicaIdioma, setListasMusicaIdioma] = useState<MusicaListaIdioma[]>([]);
+    const [listasMusicaArtistas, setListasMusicaArtistas] = useState<MusicaListaArtistas[]>([]);
+    const [listasMusicaAleatorio, setListasMusicaAleatorio] = useState<MusicaListaAleatorio[]>([]);
+    const [listasMusicaArtista, setListasMusicaArtista] = useState<MusicaArtista | null>(null);
+
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getData("home"); 
-            if (data) {
-                setListasArtistas(data.listas_artistas_info || []);
-                setListasGeneros(data.listas_genero_info || []);
-                setListasIdiomas(data.listas_idioma_info || []);
-                setListasPodcast(data.podcasts || [])
+
+            //Todo
+            await fetchAndSaveHomeData();
+            const homeData = await getData("home"); 
+            if (homeData) {
+                setListasArtistas(homeData.listas_artistas_info || []);
+                setListasGeneros(homeData.listas_genero_info || []);
+                setListasIdiomas(homeData.listas_idioma_info || []);
+                setListasPodcast(homeData.podcasts || [])
             }
+
+            //Musica
+            await fetchAndSaveHomeMusicData();
+            const homeMusicData = await getData("homeMusic");
+            if (homeMusicData) {
+                setListasMusicaGenero(homeMusicData.listas_genero_info || []);
+                setListasMusicaIdioma(homeMusicData.listas_idioma_info || []);
+                setListasMusicaArtistas(homeMusicData.listas_artistas_info || []);
+                setListasMusicaAleatorio(homeMusicData.listas_aleatorio_info || []);
+                setListasMusicaArtista(homeMusicData.artista || null);
+            }
+
+
         };
         fetchData();
     }, []);
     
-    // const handleDebug = async () => {
-    //     console.log("DEBUG");
-    //     const username = await getData("username"); 
-    //     if (username) {
-    //         await fetchAndSaveHomeData();
-    //     }
-    // };
+    const handleDebug = async () => {
+        console.log("DEBUG");
+        const username = await getData("username"); 
+        if (username) {
+            await fetchAndSaveHomePodcastData();
+        }
+    };
 
     const SearchBar = () => {
         const handleMoreOptions = () => {
@@ -138,15 +207,65 @@ export default function BibliotecaScreen() {
                                 ))}
                             </ScrollView>
 
-                            {/* <TouchableOpacity style={styles.addButton} onPress={handleDebug}>
+                            <TouchableOpacity style={styles.addButton} onPress={handleDebug}>
                                 <Ionicons name="add" size={24} color="white" />
-                            </TouchableOpacity> */}
+                            </TouchableOpacity>
                         
                     </ScrollView>
                 );
             
             case 'Musica':
-                return ;
+                return (
+                    <ScrollView style={styles.containerVerticalScroll} showsVerticalScrollIndicator={false}>    
+                        
+                        <Text style={styles.subtitle}>Spongefy recomienda </Text>
+                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+                                {listasMusicaAleatorio.map((idioma) => (
+                                    <TouchableOpacity 
+                                        key={idioma.id_lista} 
+                                        style={[styles.genreItem, { backgroundColor: idioma.color }]}
+                                    >
+                                        <Text style={styles.genreText}>{idioma.nombre}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+
+                            <Text style={styles.subtitle}>Descubre musica nueva</Text>
+                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+                                {listasMusicaGenero.map((genero) => (
+                                    <TouchableOpacity 
+                                        key={genero.id_lista} 
+                                        style={[styles.genreItem, { backgroundColor: genero.color }]}
+                                    >
+                                        <Text style={styles.genreText}>{genero.nombre}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+
+                            <Text style={styles.subtitle}>Conoce la mejor musica de cada idioma </Text>
+                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+                                {listasMusicaIdioma.map((idioma) => (
+                                    <TouchableOpacity 
+                                        key={idioma.id_lista} 
+                                        style={[styles.genreItem, { backgroundColor: idioma.color }]}
+                                    >
+                                        <Text style={styles.genreText}>{idioma.nombre}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+
+                            <Text style={styles.subtitle}>Lo mejor de cada artista</Text>
+                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+                                {listasMusicaArtistas.map((artista) => (
+                                    <TouchableOpacity key={artista.id_lista} style={styles.itemContainer}>
+                                        <Image source={{ uri: artista.link_imagen }} style={styles.itemImage} />
+                                        <Text style={styles.itemText}>{artista.nombre}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        
+                    </ScrollView>
+                );
 
             case 'Podcasts':
                 return ;

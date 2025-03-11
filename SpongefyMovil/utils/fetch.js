@@ -1,8 +1,7 @@
-import { saveData, getData, removeData } from "../utils/storage";
-// 
-// importar con: 
-// import { fetchAndSavePlaylists } from "../utils/fetch";
+// importar esta biblioteca con: 
+// import { fetchAndSavePlaylists, fetchAndSaveHomeData, fetchAndSaveHomeMusicData } from "../utils/fetch";
 
+import { saveData, getData, removeData } from "../utils/storage";
 
 export const fetchAndSavePlaylists = async (nombre_usuario) => {
   try {
@@ -41,8 +40,52 @@ export const fetchAndSaveHomeData = async () => {
 
         await saveData("home", homeData);
 
-        console.log("Datos de Home guardados correctamente:", homeData);
+        //console.log("Datos de Home guardados correctamente:", homeData);
+
     } catch (error) {
         console.error("Error en fetchAndSaveHomeData:", error);
+    }
+};
+
+
+
+export const fetchAndSaveHomeMusicData = async () => {
+    try {
+        const response = await fetch(`https://spongefy-back-end.onrender.com/home-music`);
+
+        if (!response.ok) {
+            const errorResponse = await response.text(); 
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al obtener los datos de home: ${response.status} - ${response.statusText}`);
+        }
+
+        const homeMusicData = await response.json();
+
+        await saveData("homeMusic", homeMusicData);
+
+        //console.log("Datos de Home Music guardados correctamente:", homeMusicData);
+    } catch (error) {
+        console.error("Error en fetchAndSaveHomeMusicData:", error);
+    }
+};
+
+
+export const fetchAndSaveHomePodcastData = async () => {
+    try {
+        const response = await fetch(`https://spongefy-back-end.onrender.com/home-podcast`);
+
+        if (!response.ok) {
+            const errorResponse = await response.text(); 
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al obtener los datos de home: ${response.status} - ${response.statusText}`);
+        }
+
+        const homePodcastData = await response.json();
+
+        await saveData("homePodcast", homePodcastData);
+
+        console.log("Datos de Home Podcast guardados correctamente:", homePodcastData);
+    } catch (error) {
+        console.error("Error en fetchAndSaveHomePodcastData:", error);
     }
 };
