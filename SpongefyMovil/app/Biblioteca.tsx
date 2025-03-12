@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {View,
+import {
+    View,
     Text,
     StyleSheet,
     TouchableOpacity,
@@ -40,19 +41,19 @@ export default function BibliotecaScreen() {
 
     useEffect(() => {
         const loadPlaylists = async () => {
-            const username = await getData("username"); 
+            const username = await getData("username");
             if (username) {
-                await fetchAndSavePlaylists(username); 
-                const playlistsGuardadas = await getData("playlists"); 
+                await fetchAndSavePlaylists(username);
+                const playlistsGuardadas = await getData("playlists");
                 if (playlistsGuardadas) {
-                    setPlaylists(playlistsGuardadas); 
+                    setPlaylists(playlistsGuardadas);
                 }
             }
         };
 
         loadPlaylists();
     }, []);
-    
+
     const handleAddPlaylist = async () => {
         console.log("Boton añadir playlist pulsado");
     };
@@ -79,19 +80,48 @@ export default function BibliotecaScreen() {
     const renderSectionContent = () => {
         switch (selectedTab) {
             case 'Listas':
-                return (<View style={styles.container}>
-                    <ScrollView style={styles.scrollView}>
-                        {playlists.map((playlist, index) => (
-                            <TouchableOpacity key={index} style={styles.playlistItem}>
-                                <Text style={styles.playlistText}>{playlist.nombre}</Text>
+                return (
+                    <View style={{ flex: 1 }}>
+                        <ScrollView style={styles.scrollView}>
+                            {/* Favoris */}
+                            <TouchableOpacity style={styles.favItem}>
+                                <Text style={styles.favItemText}>Tus canciones favoritas</Text>
+                                <Ionicons name="heart" size={16} color="#fff" />
                             </TouchableOpacity>
-                        ))}
-                    </ScrollView>
-                    <TouchableOpacity style={styles.addButton} onPress={handleAddPlaylist}>
-                        <Ionicons name="add" size={24} color="white" />
-                    </TouchableOpacity>
-                </View>
+
+                            <TouchableOpacity style={styles.favItem}>
+                                <Text style={styles.favItemText}>Tus episodios favoritos</Text>
+                                <Ionicons name="heart" size={16} color="#fff" />
+                            </TouchableOpacity>
+
+                            {/* Playlists statiques */}
+                            <TouchableOpacity style={styles.playlistItem}>
+                                <Text style={styles.playlistText}>discos4ever</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.playlistItem}>
+                                <Text style={styles.playlistText}>¿</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.playlistItem}>
+                                <Text style={styles.playlistText}>2025</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.playlistItem}>
+                                <Text style={styles.playlistText}>Mi playlist nº94329</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.playlistItem}>
+                                <Text style={styles.playlistText}>a la ducha</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.playlistItem}>
+                                <Text style={styles.playlistText}>Camino uni</Text>
+                            </TouchableOpacity>
+                        </ScrollView>
+
+                        {/* Bouton + pour ajouter une playlist */}
+                        <TouchableOpacity style={styles.addButton} onPress={handleAddPlaylist}>
+                            <Ionicons name="add" size={24} color="white" />
+                        </TouchableOpacity>
+                    </View>
                 );
+
             case 'Podcastas':
                 return (
                     <ScrollView style={styles.artistasContainer}>
@@ -131,13 +161,13 @@ export default function BibliotecaScreen() {
 
     return (
         <View style={styles.container}>
-            
-                {/* Encabezado */}
+
+            {/* Encabezado */}
             <View style={styles.header}>
                 <Ionicons name="library-outline" size={28} color="white" />
                 <Text style={styles.title}>Tu biblioteca</Text>
             </View>
-        
+
             {/* Barra de búsqueda */}
             <View style={styles.searchContainer}>
                 <Ionicons name="search" size={20} color="#888" style={styles.iconLeft} />
@@ -147,7 +177,7 @@ export default function BibliotecaScreen() {
                     placeholderTextColor="#888"
                 />
             </View>
-        
+
             {/* Tabs de navegación */}
             <View style={styles.tabsContainer}>
                 {tabs.map((tab) => (
@@ -319,6 +349,19 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 16,
     },
+    favItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#9400D3', // Violet
+        padding: 12,
+        borderRadius: 8,
+        marginBottom: 8,
+        justifyContent: 'space-between',
+    },
+    favItemText: {
+        color: '#fff',
+        fontSize: 16,
+    },
     button: {
         backgroundColor: "#9400D3",
         padding: 15,
@@ -326,8 +369,8 @@ const styles = StyleSheet.create({
         marginTop: 10,
         width: "100%",
         alignItems: "center",
-      },
-      scrollView: {
+    },
+    scrollView: {
         flex: 1, // Ocupar todo el espacio posible
     },
     addButton: {
