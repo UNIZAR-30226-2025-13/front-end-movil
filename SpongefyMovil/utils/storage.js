@@ -16,7 +16,7 @@ playlists             lista de las playlist y carpetas del usuario
 home                  datos de la pestaña "Todo" de home
 homeMusic             datos de la pestaña "Musica" de home
 homePodcast           datos de la pestaña "Podcast" de home
-
+library               datos de la blbioteca
 
 */
 

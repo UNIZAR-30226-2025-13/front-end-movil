@@ -12,7 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { saveData, getData, removeData } from "../utils/storage";
-import { fetchAndSavePlaylists } from "../utils/fetch";
+import { fetchAndSaveLibrary } from "../utils/fetch";
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -32,25 +32,50 @@ const songsData = [
     { id: '5', name: 'Song 5' },
 ];
 
+interface BibliotecaLista {
+    id_lista: number;
+    nombre: string;
+}
+interface BibliotecaCarpeta {
+    id_carpeta: number;
+    nombre: string;
+}
+interface BibliotecaArtistaFavorito {
+    nombre_artista: string;
+    link_imagen: string;
+}
+interface BibliotecaPodcastFavorito {
+    nombre_podcaster: string;
+    link_imagen: string;
+}
+
 export default function BibliotecaScreen() {
     const router = useRouter();
     const [selectedTab, setSelectedTab] = useState('Listas');
-    const tabs = ['Listas', 'Podcastas', 'Artistas'];
-    const [playlists, setPlaylists] = useState<{ id_lista: number; nombre: string }[]>([]);
+    const tabs = ['Listas', 'Podcasts', 'Artistas'];
 
-    useEffect(() => {
-        const loadPlaylists = async () => {
+    const [listas, setListas] = useState<BibliotecaLista[]>([]);
+    const [carpetas, setCarpetas] = useState<BibliotecaCarpeta[]>([]);
+    const [artistasFavoritos, setArtistasFavoritos] = useState<BibliotecaArtistaFavorito[]>([]);
+    const [podcastsFavoritos, setPodcastsFavoritos] = useState<BibliotecaPodcastFavorito[]>([]);
+
+    useEffect(() => { 
+        const loadLibrary = async () => {
             const username = await getData("username");
+            console.log(username);
             if (username) {
-                await fetchAndSavePlaylists(username);
-                const playlistsGuardadas = await getData("playlists");
-                if (playlistsGuardadas) {
-                    setPlaylists(playlistsGuardadas);
+                await fetchAndSaveLibrary(username);
+                const datosBiblioteca = await getData("library");
+                if (datosBiblioteca) {
+                    setListas(datosBiblioteca.listas || []);
+                    setCarpetas(datosBiblioteca.carpetas || []);
+                    setArtistasFavoritos(datosBiblioteca.artistas_favoritos || []);
+                    setPodcastsFavoritos(datosBiblioteca.podcasts_favoritos || []);
                 }
             }
         };
 
-        loadPlaylists();
+        loadLibrary();
     }, []);
 
     const handleAddPlaylist = async () => {
@@ -93,15 +118,27 @@ export default function BibliotecaScreen() {
                                 <Ionicons name="heart" size={16} color="#fff" />
                             </TouchableOpacity>
                             {/* Playlists statiques */}
-                            {playlists.map((playlist, index) => (
+                            
+                            {Array.isArray(listas) ? listas.map((lista, index) => (
+                             <TouchableOpacity
+                             key={index}
+                             style={styles.playlistItem}
+                             onPress={() => router.push('./PlaylistDetail')}
+                             >
+                                 <Text style={styles.playlistText}>{lista.nombre}</Text>
+                             </TouchableOpacity>
+                            )) : <Text style={styles.playlistText}>No hay listas disponibles</Text>}
+                           
+                            {Array.isArray(carpetas) ? carpetas.map((carpeta, index) => (
                                 <TouchableOpacity
                                     key={index}
                                     style={styles.playlistItem}
-                                    onPress={() => router.push('./PlaylistDetail')}
                                 >
-                                    <Text style={styles.playlistText}>{playlist.nombre}</Text>
+                                    <Text style={styles.playlistText}>{carpeta.nombre}</Text>
                                 </TouchableOpacity>
-                            ))}
+                            )) : <Text style={styles.playlistText}>No tienes carpetas</Text>}
+
+
                             <TouchableOpacity
                                 style={styles.playlistItem}
                                 onPress={() => router.push('./PlaylistDetail')}
@@ -144,32 +181,26 @@ export default function BibliotecaScreen() {
                         </TouchableOpacity>
                     </View>
                 );
-            case 'Podcastas':
+            case 'Podcasts':
                 return (
                     <ScrollView style={styles.artistasContainer}>
-                        {songsData.map((song) => (
-                            <View key={song.id} style={styles.artistRow}>
-                                <Image
-                                    source={require('../assets/exemple_song_1.png')}
-                                    style={styles.artistAvatar}
-                                />
-                                <Text style={styles.artistName}>{song.name}</Text>
-                            </View>
-                        ))}
+                        {Array.isArray(podcastsFavoritos) ? podcastsFavoritos.map((podcast, index) => (
+                            <TouchableOpacity key={index} style={styles.podcastItem}>
+                                <Image source={{ uri: podcast.link_imagen }} style={styles.podcastImage} />
+                                <Text style={styles.podcastText}>{podcast.nombre_podcaster}</Text>
+                            </TouchableOpacity>
+                        )) : <Text style={styles.playlistText}>No hay podcasts favoritos</Text>}
                     </ScrollView>
                 );
             case 'Artistas':
                 return (
                     <ScrollView style={styles.artistasContainer}>
-                        {artistsData.map((artist) => (
-                            <View key={artist.id} style={styles.artistRow}>
-                                <Image
-                                    source={require('../assets/image_test_artiste.png')}
-                                    style={styles.artistAvatar}
-                                />
-                                <Text style={styles.artistName}>{artist.name}</Text>
-                            </View>
-                        ))}
+                        {Array.isArray(artistasFavoritos) ? artistasFavoritos.map((artista, index) => (
+                            <TouchableOpacity key={index} style={styles.podcastItem}>
+                                <Image source={{ uri: artista.link_imagen }} style={styles.podcastImage} />
+                                <Text style={styles.podcastText}>{artista.nombre_artista}</Text>
+                            </TouchableOpacity>
+                        )) : <Text style={styles.playlistText}>No hay artistas favoritos</Text>}
                     </ScrollView>
                 );
             default:
@@ -400,5 +431,22 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    podcastItem: {
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+    },
+    podcastImage: {
+        width: 80, 
+        height: 80,
+        borderRadius: 25, 
+        marginRight: 15, 
+    },
+    podcastText: {
+        fontSize: 16,
+        color: 'white',
+        fontWeight: 'bold',
     },
 });
