@@ -3,7 +3,8 @@
 
 import { saveData, getData, removeData } from "../utils/storage";
 
-export const fetchAndSavePlaylists = async (nombre_usuario) => {
+//todas las playlists del usuario, incluyendo las de las carpetas
+export const fetchAndSaveAllPlaylists = async (nombre_usuario) => {
   try {
       const response = await fetch(
           `https://spongefy-back-end.onrender.com/get-playlists?nombre_usuario=${nombre_usuario}`
@@ -21,9 +22,34 @@ export const fetchAndSavePlaylists = async (nombre_usuario) => {
 
       //console.log("Playlists guardadas correctamente:", playlists);
   } catch (error) {
-      console.error("Error en fetchAndSavePlaylists:", error);
+      console.error("Error en fetchAndSaveAllPlaylists:", error);
   }
 };
+
+
+//todo el contenido de la biblioteca
+export const fetchAndSaveLibrary = async (nombre_usuario) => {
+    try {
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/get-lists?nombre_usuario=${nombre_usuario}`
+        );
+  
+        if (!response.ok) {
+            const errorResponse = await response.text(); 
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al obtener la biblioteca: ${response.status} - ${response.statusText}`);
+        }
+  
+        const library = await response.json();
+  
+        await saveData("library", library);
+  
+        console.log("Datos biblioteca guardados correctamente:", library);
+    } catch (error) {
+        console.error("Error en fetchAndSaveLibrary:", error);
+    }
+  };
+
 
 
 export const fetchAndSaveHomeData = async () => {
@@ -84,7 +110,7 @@ export const fetchAndSaveHomePodcastData = async () => {
 
         await saveData("homePodcast", homePodcastData);
 
-        console.log("Datos de Home Podcast guardados correctamente:", homePodcastData);
+        //console.log("Datos de Home Podcast guardados correctamente:", homePodcastData);
     } catch (error) {
         console.error("Error en fetchAndSaveHomePodcastData:", error);
     }
