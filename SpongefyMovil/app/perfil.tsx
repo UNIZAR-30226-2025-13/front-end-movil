@@ -17,7 +17,7 @@ export default function ProfileScreen() {
     };
 
     const handleEditProfile = () => {
-        router.push('/EditPerfil');
+        router.push('/editPerfil');
     };
 
     const handleLogout = () => {
@@ -29,7 +29,7 @@ export default function ProfileScreen() {
     };
 
     const handleBiblioteca = () => {
-        router.push('/biblioteca');
+        router.push('/Biblioteca');
     };
 
     return (
@@ -75,7 +75,7 @@ export default function ProfileScreen() {
             </ImageBackground>
 
             <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/Home')}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/home')}>
                     <Ionicons name="home" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Home</Text>
                 </TouchableOpacity>

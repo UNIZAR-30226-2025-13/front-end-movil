@@ -6,6 +6,10 @@ import { useRouter } from 'expo-router';
 export default function PlaylistDetailScreen() {
     const router = useRouter();
 
+    const handleBiblioteca = () => {
+        router.push('/Biblioteca');
+    };
+
     // Liste de chansons statiques (même contenu)
     const songs = [
         { id: 1, title: 'A quién le importa', artist: 'Alaska y Dinarama', cover: require('../assets/exemple_song_1.png') },
@@ -42,6 +46,31 @@ export default function PlaylistDetailScreen() {
                     </View>
                 ))}
             </ScrollView>
+            <View style={styles.bottomBar}>
+                <TouchableOpacity
+                    style={styles.bottomBarItem}
+                    onPress={() => router.push('/home')}
+                >
+                    <Ionicons name="home" size={24} color="#fff" />
+                    <Text style={styles.bottomBarText}>Home</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.bottomBarItem}
+                    onPress={handleBiblioteca}
+                >
+                    <Ionicons name="library" size={24} color="#fff" />
+                    <Text style={styles.bottomBarText}>Tu biblioteca</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.bottomBarItem}
+                    onPress={() => router.push('/perfil')}
+                >
+                    <Ionicons name="person" size={24} color="#fff" />
+                    <Text style={styles.bottomBarText}>Perfil</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
@@ -109,5 +138,20 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         marginRight: 12,
         resizeMode: 'cover',
+    },
+    bottomBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        backgroundColor: '#111',
+        paddingVertical: 8,
+    },
+    bottomBarItem: {
+        alignItems: 'center',
+    },
+    bottomBarText: {
+        color: '#fff',
+        fontSize: 12,
+        marginTop: 2,
     },
 });

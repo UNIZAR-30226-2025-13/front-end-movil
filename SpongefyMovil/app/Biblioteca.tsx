@@ -16,8 +16,6 @@ import { fetchAndSavePlaylists } from "../utils/fetch";
 
 const screenWidth = Dimensions.get('window').width;
 
-
-
 const artistsData = [
     { id: '1', name: 'Bad Bunny' },
     { id: '2', name: 'Feid' },
@@ -25,6 +23,7 @@ const artistsData = [
     { id: '4', name: 'Lola Indigo' },
     { id: '5', name: 'Fernando Costa' },
 ];
+
 const songsData = [
     { id: '1', name: 'Song 1' },
     { id: '2', name: 'Song 2' },
@@ -62,6 +61,7 @@ export default function BibliotecaScreen() {
         const handleMoreOptions = () => {
             console.log("Plus d'options");
         };
+
         return (
             <View style={styles.searchContainer}>
                 <Ionicons name="search" size={20} color="#fff" style={styles.iconLeft} />
@@ -88,43 +88,62 @@ export default function BibliotecaScreen() {
                                 <Text style={styles.favItemText}>Tus canciones favoritas</Text>
                                 <Ionicons name="heart" size={16} color="#fff" />
                             </TouchableOpacity>
-
                             <TouchableOpacity style={styles.favItem}>
                                 <Text style={styles.favItemText}>Tus episodios favoritos</Text>
                                 <Ionicons name="heart" size={16} color="#fff" />
                             </TouchableOpacity>
-
                             {/* Playlists statiques */}
-                            <TouchableOpacity style={styles.playlistItem} onPress={() => router.push('./PlaylistDetail')}
+                            {playlists.map((playlist, index) => (
+                                <TouchableOpacity
+                                    key={index}
+                                    style={styles.playlistItem}
+                                    onPress={() => router.push('./PlaylistDetail')}
+                                >
+                                    <Text style={styles.playlistText}>{playlist.nombre}</Text>
+                                </TouchableOpacity>
+                            ))}
+                            <TouchableOpacity
+                                style={styles.playlistItem}
+                                onPress={() => router.push('./PlaylistDetail')}
                             >
                                 <Text style={styles.playlistText}>discos4ever</Text>
-
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.playlistItem} onPress={() => router.push('./PlaylistDetail')}
+                            <TouchableOpacity
+                                style={styles.playlistItem}
+                                onPress={() => router.push('./PlaylistDetail')}
                             >
                                 <Text style={styles.playlistText}>¿</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.playlistItem} onPress={() => router.push('./PlaylistDetail')}>
+                            <TouchableOpacity
+                                style={styles.playlistItem}
+                                onPress={() => router.push('./PlaylistDetail')}
+                            >
                                 <Text style={styles.playlistText}>2025</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.playlistItem} onPress={() => router.push('./PlaylistDetail')}>
+                            <TouchableOpacity
+                                style={styles.playlistItem}
+                                onPress={() => router.push('./PlaylistDetail')}
+                            >
                                 <Text style={styles.playlistText}>Mi playlist nº94329</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.playlistItem} onPress={() => router.push('./PlaylistDetail')}>
+                            <TouchableOpacity
+                                style={styles.playlistItem}
+                                onPress={() => router.push('./PlaylistDetail')}
+                            >
                                 <Text style={styles.playlistText}>a la ducha</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.playlistItem} onPress={() => router.push('./PlaylistDetail')}>
+                            <TouchableOpacity
+                                style={styles.playlistItem}
+                                onPress={() => router.push('./PlaylistDetail')}
+                            >
                                 <Text style={styles.playlistText}>Camino uni</Text>
                             </TouchableOpacity>
                         </ScrollView>
-
-                        {/* Bouton + pour ajouter une playlist */}
                         <TouchableOpacity style={styles.addButton} onPress={handleAddPlaylist}>
                             <Ionicons name="add" size={24} color="white" />
                         </TouchableOpacity>
                     </View>
                 );
-
             case 'Podcastas':
                 return (
                     <ScrollView style={styles.artistasContainer}>
@@ -134,14 +153,11 @@ export default function BibliotecaScreen() {
                                     source={require('../assets/exemple_song_1.png')}
                                     style={styles.artistAvatar}
                                 />
+                                <Text style={styles.artistName}>{song.name}</Text>
                             </View>
                         ))}
                     </ScrollView>
                 );
-
-            case 'Podcastas':
-                return <Text style={styles.sectionText}>Aquí van tus episodios favoritos...</Text>;
-
             case 'Artistas':
                 return (
                     <ScrollView style={styles.artistasContainer}>
@@ -156,15 +172,17 @@ export default function BibliotecaScreen() {
                         ))}
                     </ScrollView>
                 );
-
             default:
                 return <Text style={styles.sectionText}>Selecciona una sección</Text>;
         }
     };
 
+    const handleBiblioteca = () => {
+        router.push('/Biblioteca');
+    };
+
     return (
         <View style={styles.container}>
-
             {/* Encabezado */}
             <View style={styles.header}>
                 <Ionicons name="library-outline" size={28} color="white" />
@@ -196,8 +214,7 @@ export default function BibliotecaScreen() {
                 ))}
             </View>
 
-
-
+            {/* Contenu de la section sélectionnée */}
             <View style={styles.content}>
                 {renderSectionContent()}
             </View>
@@ -214,6 +231,7 @@ export default function BibliotecaScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
+                    onPress={handleBiblioteca}
                 >
                     <Ionicons name="library" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Tu biblioteca</Text>
@@ -249,6 +267,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginLeft: 10,
     },
+    // Barre de recherche
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -272,7 +291,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
     },
-    // Onglets
+    // Tabs de navigation
     tabsContainer: {
         flexDirection: 'row',
         justifyContent: 'flex-start',
@@ -307,6 +326,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginTop: 20,
     },
+    // Liste d'artistes ou chansons
     artistasContainer: {
         marginTop: 10,
     },
@@ -327,6 +347,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    // Barre de navigation inférieure
     bottomBar: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -342,6 +363,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 2,
     },
+    // Styles pour les playlists dans l'onglet "Listas"
     playlistItem: {
         backgroundColor: "#222",
         padding: 15,
@@ -365,16 +387,8 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
     },
-    button: {
-        backgroundColor: "#9400D3",
-        padding: 15,
-        borderRadius: 10,
-        marginTop: 10,
-        width: "100%",
-        alignItems: "center",
-    },
     scrollView: {
-        flex: 1, // Ocupar todo el espacio posible
+        flex: 1,
     },
     addButton: {
         position: 'absolute',
