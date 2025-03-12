@@ -253,6 +253,34 @@ export default function HomeScreen() {
                 return (
                     <ScrollView style={styles.containerVerticalScroll} showsVerticalScrollIndicator={false}>    
                         
+
+
+                       
+
+                        {listasMusicaArtista && (
+                            <View style={styles.artistaContainer}>
+                                <Text style={styles.subtitle}>Lo mejor de {listasMusicaArtista.nombre_artista}</Text>
+
+                                {/* Imagen y nombre del artista */}
+                                <View style={styles.artistaHeader}>
+                                    <Image source={{ uri: listasMusicaArtista.link_imagen }} style={styles.itemImage} />
+                                    <Text style={styles.itemText}>{listasMusicaArtista.nombre_artista}</Text>
+                                </View>
+                        
+                                {/* Canciones / Álbumes */}
+                                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+                                    {listasMusicaArtista.canciones_albumes.map((cancion, index) => (
+                                        <TouchableOpacity key={index} style={styles.cancionItem}>
+                                            <Image source={{ uri: cancion.link_imagen }} style={styles.itemImage} />
+                                            <Text style={styles.itemText}>{cancion.titulo}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </ScrollView>
+                            </View>
+                        )}
+
+
+
                         <Text style={styles.subtitle}>Spongefy recomienda </Text>
                             <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
                                 {listasMusicaAleatorio.map((idioma) => (
@@ -548,4 +576,16 @@ const styles = StyleSheet.create({
         marginRight: 10 
     },
     genreText: { color: '#fff', fontSize: 14, fontWeight: 'bold', textAlign: 'center' },
+    artistaContainer: {
+        marginBottom: 20,
+    },
+    artistaHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    cancionItem: {
+        alignItems: 'center',
+        marginRight: 10,
+    },
 });
