@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -6,11 +6,7 @@ import { useRouter } from 'expo-router';
 export default function PlaylistDetailScreen() {
     const router = useRouter();
 
-    const handleBiblioteca = () => {
-        router.push('/Biblioteca');
-    };
-
-    // Liste de chansons statiques (même contenu)
+    // Liste de chansons statiques
     const songs = [
         { id: 1, title: 'A quién le importa', artist: 'Alaska y Dinarama', cover: require('../assets/exemple_song_1.png') },
         { id: 2, title: 'Ave María', artist: 'David Bisbal', cover: require('../assets/exemple_song_1.png') },
@@ -19,12 +15,27 @@ export default function PlaylistDetailScreen() {
         { id: 5, title: 'Devuélveme a mi chica', artist: 'Hombres G', cover: require('../assets/exemple_song_1.png') },
     ];
 
+    const handleShuffle = () => {
+        console.log("Bouton shuffle cliqué");
+    };
+
+    const handleAddMusic = () => {
+        // Navigue vers l'écran d'ajout de musiques
+        router.push('/AddMusicToPlaylist');
+    };
+
+    const handleMoreOptions = () => {
+        console.log("Plus d'options...");
+    };
+
     return (
         <View style={styles.container}>
+            {/* Bouton retour */}
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                 <Ionicons name="arrow-back" size={28} color="#fff" />
             </TouchableOpacity>
 
+            {/* Pochette et info */}
             <View style={styles.coverContainer}>
                 <View style={styles.bigCover}>
                     <Text style={styles.bigCoverText}>a la ducha</Text>
@@ -32,13 +43,24 @@ export default function PlaylistDetailScreen() {
                 <Text style={styles.playlistInfo}>Pública | 5 canciones | 15 mins 18 s</Text>
             </View>
 
+            {/* Barre d’actions (shuffle, add, menu) */}
+            <View style={styles.actionsBar}>
+                <TouchableOpacity onPress={handleShuffle} style={styles.actionButton}>
+                    <Ionicons name="shuffle" size={24} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleAddMusic} style={styles.actionButton}>
+                    <Ionicons name="add-circle" size={24} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleMoreOptions} style={styles.actionButton}>
+                    <Ionicons name="ellipsis-horizontal" size={24} color="#fff" />
+                </TouchableOpacity>
+            </View>
+
+            {/* Liste de chansons */}
             <ScrollView style={styles.songsContainer}>
                 {songs.map((song) => (
                     <View key={song.id} style={styles.songRow}>
-                        <Image
-                            source={require('../assets/exemple_song_1.png')}
-                            style={styles.artistAvatar}
-                        />
+                        <Image source={song.cover} style={styles.artistAvatar} />
                         <View style={styles.songInfo}>
                             <Text style={styles.songTitle}>{song.title}</Text>
                             <Text style={styles.songArtist}>{song.artist}</Text>
@@ -46,6 +68,8 @@ export default function PlaylistDetailScreen() {
                     </View>
                 ))}
             </ScrollView>
+
+            {/* Barre de navigation inférieure */}
             <View style={styles.bottomBar}>
                 <TouchableOpacity
                     style={styles.bottomBarItem}
@@ -57,7 +81,7 @@ export default function PlaylistDetailScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={handleBiblioteca}
+                    onPress={() => router.push('/Biblioteca')}
                 >
                     <Ionicons name="library" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Tu biblioteca</Text>
@@ -92,7 +116,7 @@ const styles = StyleSheet.create({
     bigCover: {
         width: 300,
         height: 300,
-        backgroundColor: '#2F4F4F', // ou un image
+        backgroundColor: '#2F4F4F', // Couleur de fond (ou un <Image>)
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 10,
@@ -106,6 +130,14 @@ const styles = StyleSheet.create({
         color: '#bbb',
         fontSize: 14,
     },
+    actionsBar: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        marginBottom: 10,
+    },
+    actionButton: {
+        marginRight: 20,
+    },
     songsContainer: {
         flex: 1,
     },
@@ -114,9 +146,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16,
     },
-    songCover: {
+    artistAvatar: {
         width: 50,
         height: 50,
+        borderRadius: 25,
         marginRight: 12,
         resizeMode: 'cover',
     },
@@ -131,13 +164,6 @@ const styles = StyleSheet.create({
     songArtist: {
         color: '#bbb',
         fontSize: 14,
-    },
-    artistAvatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        marginRight: 12,
-        resizeMode: 'cover',
     },
     bottomBar: {
         flexDirection: 'row',
