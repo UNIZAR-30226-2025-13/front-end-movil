@@ -95,22 +95,25 @@ export default function BibliotecaScreen() {
                             </TouchableOpacity>
 
                             {/* Playlists statiques */}
-                            <TouchableOpacity style={styles.playlistItem}>
+                            <TouchableOpacity style={styles.playlistItem} onPress={() => router.push('./PlaylistDetail')}
+                            >
                                 <Text style={styles.playlistText}>discos4ever</Text>
+
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.playlistItem}>
+                            <TouchableOpacity style={styles.playlistItem} onPress={() => router.push('./PlaylistDetail')}
+                            >
                                 <Text style={styles.playlistText}>¿</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.playlistItem}>
+                            <TouchableOpacity style={styles.playlistItem} onPress={() => router.push('./PlaylistDetail')}>
                                 <Text style={styles.playlistText}>2025</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.playlistItem}>
+                            <TouchableOpacity style={styles.playlistItem} onPress={() => router.push('./PlaylistDetail')}>
                                 <Text style={styles.playlistText}>Mi playlist nº94329</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.playlistItem}>
+                            <TouchableOpacity style={styles.playlistItem} onPress={() => router.push('./PlaylistDetail')}>
                                 <Text style={styles.playlistText}>a la ducha</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.playlistItem}>
+                            <TouchableOpacity style={styles.playlistItem} onPress={() => router.push('./PlaylistDetail')}>
                                 <Text style={styles.playlistText}>Camino uni</Text>
                             </TouchableOpacity>
                         </ScrollView>
