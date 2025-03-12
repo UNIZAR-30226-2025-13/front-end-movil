@@ -160,6 +160,14 @@ export default function HomeScreen() {
                 setListasMusicaArtista(homeMusicData.artista || null);
             }
 
+            await fetchAndSaveHomePodcastData();
+            const homePodcastData = await getData("homePodcast");
+            if (homePodcastData) {
+                setListasPodcastPodcastersInfo(homePodcastData.listas_podcasters_info || []);
+                setListasPodcastAleatorioInfo (homePodcastData.listas_aleatorio_info || []);
+                setListasPodcastCompleto(homePodcastData.podcasts || []);
+                setPodcastCompleto(homePodcastData.podcast || null);
+            }
 
         };
         fetchData();
@@ -242,9 +250,9 @@ export default function HomeScreen() {
                                 ))}
                             </ScrollView>
 
-                            <TouchableOpacity style={styles.addButton} onPress={handleDebug}>
+                            {/* <TouchableOpacity style={styles.addButton} onPress={handleDebug}>
                                 <Ionicons name="add" size={24} color="white" />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         
                     </ScrollView>
                 );
@@ -252,23 +260,18 @@ export default function HomeScreen() {
             case 'Musica':
                 return (
                     <ScrollView style={styles.containerVerticalScroll} showsVerticalScrollIndicator={false}>    
-                        
-
-
-                       
 
                         {listasMusicaArtista && (
                             <View style={styles.artistaContainer}>
                                 <Text style={styles.subtitle}>Lo mejor de {listasMusicaArtista.nombre_artista}</Text>
 
-                                {/* Imagen y nombre del artista */}
-                                <View style={styles.artistaHeader}>
-                                    <Image source={{ uri: listasMusicaArtista.link_imagen }} style={styles.itemImage} />
-                                    <Text style={styles.itemText}>{listasMusicaArtista.nombre_artista}</Text>
-                                </View>
-                        
-                                {/* Canciones / Álbumes */}
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+
+                                                            
+                                    <View style={styles.itemContainer}>
+                                        <Image source={{ uri: listasMusicaArtista.link_imagen }} style={styles.artistaImage} />
+                                        <Text style={styles.itemText}>{listasMusicaArtista.nombre_artista}</Text>
+                                    </View>
                                     {listasMusicaArtista.canciones_albumes.map((cancion, index) => (
                                         <TouchableOpacity key={index} style={styles.cancionItem}>
                                             <Image source={{ uri: cancion.link_imagen }} style={styles.itemImage} />
@@ -331,7 +334,52 @@ export default function HomeScreen() {
                 );
 
             case 'Podcasts':
-                return ;
+                return (
+                    <ScrollView style={styles.containerVerticalScroll} showsVerticalScrollIndicator={false}>    
+            
+
+            {podcastCompleto && (
+                            <View style={styles.artistaContainer}>
+                                <Text style={styles.subtitle}>Lo mejor de {podcastCompleto.nombre_podcast}</Text>
+
+                                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+
+                                                            
+                                    <View style={styles.itemContainer}>
+                                        <Image source={{ uri: podcastCompleto.foto_podcast }} style={styles.artistaImage} />
+                                        <Text style={styles.itemText}>{podcastCompleto.nombre_podcast}</Text>
+                                    </View>
+                                    {podcastCompleto.episodios_recientes.map((episodio, index) => (
+                                        <TouchableOpacity key={index} style={styles.cancionItem}>
+                                            <Image source={{ uri: episodio.link_imagen }} style={styles.itemImage} />
+                                            <Text style={styles.itemText}>{episodio.titulo}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </ScrollView>
+                            </View>
+                        )}
+            
+                        <Text style={styles.subtitle}>Spongefy recomienda</Text>
+                        <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+                            {listasPodcastAleatorioInfo.map((item) => (
+                                <TouchableOpacity key={item.id_lista} style={[styles.genreItem, { backgroundColor: item.color }]}>
+                                    <Text style={styles.genreText}>{item.nombre}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+            
+                        <Text style={styles.subtitle}>Los mejores creadores de podcasts</Text>
+                        <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+                            {listasPodcastPodcastersInfo.map((podcaster) => (
+                                <TouchableOpacity key={podcaster.id_lista} style={styles.itemContainer}>
+                                    <Image source={{ uri: podcaster.link_imagen }} style={styles.itemImage} />
+                                    <Text style={styles.itemText}>{podcaster.nombre}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+            
+                    </ScrollView>
+                );
 
             default:
                 return <Text style={styles.sectionText}>Selecciona una sección</Text>;
@@ -566,7 +614,8 @@ const styles = StyleSheet.create({
     },
     itemContainer: { marginRight: 10, alignItems: 'center' },
     itemImage: { width: 80, height: 80, borderRadius: 10 },
-    itemText: { color: '#fff', fontSize: 11, marginTop: 8, textAlign: 'center' },
+    artistaImage: { width: 100, height: 100, borderRadius: 10 },
+    itemText: { color: '#fff', fontSize: 11, marginTop: 8, textAlign: 'center', width: 80 },
     genreItem: { 
         width: 80, 
         height: 80, 
