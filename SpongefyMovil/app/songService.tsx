@@ -23,6 +23,7 @@ export const fetchSongById = async (id: string): Promise<Song | null> => {
 
     return data;
   } catch (error) {
+    console.error("❌ Error en fetchSongById:", error);
     return null;
   }
 };
@@ -30,7 +31,7 @@ export const fetchSongById = async (id: string): Promise<Song | null> => {
 export const fetchArtistByName = async (nombre_artista: string): Promise<Song | null> => {  
   try {
     const nombre_artista_encoded = encodeURIComponent(nombre_artista);
-    const response = await fetch(`http://localhost:8080/artist?nombre_artista=${nombre_artista_encoded}`);
+    const response = await fetch(`https://spongefy-back-end.onrender.com/artist?nombre_artista=${nombre_artista_encoded}`);
     const data = await response.json();
 
     console.log("📥 Respuesta de la API:", data);
@@ -38,7 +39,7 @@ export const fetchArtistByName = async (nombre_artista: string): Promise<Song | 
 
     return data;
   } catch (error) {
-    console.error("❌ Error en fetchSongById:", error);
+    console.error("❌ Error en fetchArtistByName:", error);
     return null;
   }
 };

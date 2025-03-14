@@ -7,6 +7,7 @@ import { usePlayer } from '../PlayerContext';
 
 const ArtistScreen = () => {
   const { nombre_artista } = useLocalSearchParams<{ nombre_artista: string | string[] }>();
+  console.log("Pantalla Artista para:", nombre_artista);
   const { fetchAndPlaySong } = usePlayer();
 
   const [artistData, setArtistData] = useState<any>(null);
@@ -17,9 +18,11 @@ const ArtistScreen = () => {
     const fetchArtistInfo = async () => {
       if (nombre_artista) {
         const artistName = Array.isArray(nombre_artista) ? nombre_artista[0] : nombre_artista;
+        console.log("Nombre del artista:", artistName);
         setIsLoading(true);
         try {
           const artist = await fetchArtistByName(artistName);
+          console.log("Datos del artista obtenidos:", artist);
           if (artist) {
             setArtistData(artist);
             setError(null);
@@ -86,6 +89,7 @@ const ArtistScreen = () => {
               <Text style={styles.section2Title}>Canciones</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.songsContainer}>
                 {artistData.canciones?.map((cancion: any) => (
+                  console.log('Datos de la canción:', cancion),
                   <Pressable
                     key={cancion.id}
                     style={({ pressed }) => [

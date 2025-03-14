@@ -81,7 +81,10 @@ export default function BibliotecaScreen() {
     const handleAddPlaylist = async () => {
         console.log("Boton añadir playlist pulsado");
     };
-
+    const handleGoToArtista = (nombre_artista: string) => {
+        console.log("Boton Artista pulsado para:", nombre_artista);
+        router.push(`/artista/${nombre_artista}`);
+    };
     const SearchBar = () => {
         const handleMoreOptions = () => {
             console.log("Plus d'options");
@@ -196,7 +199,7 @@ export default function BibliotecaScreen() {
                 return (
                     <ScrollView style={styles.artistasContainer}>
                         {Array.isArray(artistasFavoritos) ? artistasFavoritos.map((artista, index) => (
-                            <TouchableOpacity key={index} style={styles.podcastItem}>
+                            <TouchableOpacity key={index} style={styles.podcastItem} onPress={() => handleGoToArtista(artista.nombre_artista)}>
                                 <Image source={{ uri: artista.link_imagen }} style={styles.podcastImage} />
                                 <Text style={styles.podcastText}>{artista.nombre_artista}</Text>
                             </TouchableOpacity>
