@@ -80,6 +80,7 @@ export default function BibliotecaScreen() {
 
     const handleAddPlaylist = async () => {
         console.log("Boton añadir playlist pulsado");
+        router.push('/CrearPlaylist');
     };
     const handleGoToArtista = (nombre_artista: string) => {
         console.log("Boton Artista pulsado para:", nombre_artista);

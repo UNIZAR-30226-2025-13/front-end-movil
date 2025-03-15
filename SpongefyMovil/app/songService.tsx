@@ -3,6 +3,7 @@
 import axios from 'axios';
 
 export interface Song {
+  id: string;
   link_cm?: string;
   link_imagen?: string;
   titulo?: string;
@@ -14,13 +15,13 @@ export const fetchSongById = async (id: string): Promise<Song | null> => {
   try {
     const response = await fetch(`https://spongefy-back-end.onrender.com/play-song?id_cancion=${id}`);
     const data = await response.json();
-
+    
     console.log("📥 Respuesta de la API:", data);
     
     if (!data || !data.link_cm) {
       return null;
     }
-
+    data.id = id;
     return data;
   } catch (error) {
     console.error("❌ Error en fetchSongById:", error);
