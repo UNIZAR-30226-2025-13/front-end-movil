@@ -59,7 +59,7 @@ export default function BibliotecaScreen() {
     const [artistasFavoritos, setArtistasFavoritos] = useState<BibliotecaArtistaFavorito[]>([]);
     const [podcastsFavoritos, setPodcastsFavoritos] = useState<BibliotecaPodcastFavorito[]>([]);
 
-    useEffect(() => { 
+    useEffect(() => {
         const loadLibrary = async () => {
             const username = await getData("username");
             console.log(username);
@@ -109,26 +109,26 @@ export default function BibliotecaScreen() {
                     <View style={{ flex: 1 }}>
                         <ScrollView style={styles.scrollView}>
                             {/* Favoris */}
-                            <TouchableOpacity style={styles.favItem}>
+                            <TouchableOpacity style={styles.favItem} onPress={() => router.push('./PlaylistDetail')}>
                                 <Text style={styles.favItemText}>Tus canciones favoritas</Text>
                                 <Ionicons name="heart" size={16} color="#fff" />
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.favItem}>
+                            <TouchableOpacity style={styles.favItem} onPress={() => router.push('./PlaylistDetail')}>
                                 <Text style={styles.favItemText}>Tus episodios favoritos</Text>
                                 <Ionicons name="heart" size={16} color="#fff" />
                             </TouchableOpacity>
                             {/* Playlists statiques */}
-                            
+
                             {Array.isArray(listas) ? listas.map((lista, index) => (
-                             <TouchableOpacity
-                             key={index}
-                             style={styles.playlistItem}
-                             onPress={() => router.push('./PlaylistDetail')}
-                             >
-                                 <Text style={styles.playlistText}>{lista.nombre}</Text>
-                             </TouchableOpacity>
+                                <TouchableOpacity
+                                    key={index}
+                                    style={styles.playlistItem}
+                                    onPress={() => router.push('./PlaylistDetail')}
+                                >
+                                    <Text style={styles.playlistText}>{lista.nombre}</Text>
+                                </TouchableOpacity>
                             )) : <Text style={styles.playlistText}>No hay listas disponibles</Text>}
-                           
+
                             {Array.isArray(carpetas) ? carpetas.map((carpeta, index) => (
                                 <TouchableOpacity
                                     key={index}
@@ -433,16 +433,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     podcastItem: {
-        flexDirection: 'row', 
-        alignItems: 'center', 
+        flexDirection: 'row',
+        alignItems: 'center',
         paddingVertical: 10,
         paddingHorizontal: 15,
     },
     podcastImage: {
-        width: 80, 
+        width: 80,
         height: 80,
-        borderRadius: 25, 
-        marginRight: 15, 
+        borderRadius: 25,
+        marginRight: 15,
     },
     podcastText: {
         fontSize: 16,
