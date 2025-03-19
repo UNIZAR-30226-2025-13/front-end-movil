@@ -56,16 +56,19 @@ export default function PlaylistDetailScreen() {
                 </TouchableOpacity>
             </View>
 
-            {/* Liste de chansons */}
             <ScrollView style={styles.songsContainer}>
                 {songs.map((song) => (
-                    <View key={song.id} style={styles.songRow}>
+                    <TouchableOpacity
+                        key={song.id}
+                        style={styles.songRow}
+                        onPress={() => router.push('/SongDetail')} // <-- Navigation
+                    >
                         <Image source={song.cover} style={styles.artistAvatar} />
                         <View style={styles.songInfo}>
                             <Text style={styles.songTitle}>{song.title}</Text>
                             <Text style={styles.songArtist}>{song.artist}</Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
                 ))}
             </ScrollView>
 

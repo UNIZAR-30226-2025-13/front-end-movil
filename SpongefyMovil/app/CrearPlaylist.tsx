@@ -26,15 +26,15 @@ interface CreatePlaylistLista {
     nombre: string;
 }
 const username = getData("username");
-useEffect(() => { 
-        const loadUser = async () => {
-            const username = await getData("username");
-            console.log(username);
-        };
-        loadUser();
-    }, []);
+useEffect(() => {
+    const loadUser = async () => {
+        const username = await getData("username");
+        console.log(username);
+    };
+    loadUser();
+}, []);
 export default function CreatePlaylistScreen() {
-    
+
     const router = useRouter();
     const [selectedTab, setSelectedTab] = useState('Canciones');
     const [playlistName, setplaylistName] = useState<string>("");
@@ -47,33 +47,33 @@ export default function CreatePlaylistScreen() {
         nombreUsuario: string,
         tipo: "canciones" | "episodios"
     ) => {
-    
-    try {
-        const url = `https://spongefy-back-end.onrender.com/create-list`;
 
-        const bodyData = {
-            nombre_usuario: nombreUsuario,
-            nombre_lista: playlistName,
-            color: selectedColor,
-            tipo: tipo,
-        };
+        try {
+            const url = `https://spongefy-back-end.onrender.com/create-list`;
 
-        const response = await fetch(url, {
-            method: "POST", // Cambiado a POST
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(bodyData),
-        });
-    
-        const data = await response.json();
-    
-        if (response.ok) {
-            console.log("Playlist creada exitosamente:", data);
-            router.push("/Biblioteca");
-        } else {
-            console.error("Error al crear la playlist:", data);
-        }
+            const bodyData = {
+                nombre_usuario: nombreUsuario,
+                nombre_lista: playlistName,
+                color: selectedColor,
+                tipo: tipo,
+            };
+
+            const response = await fetch(url, {
+                method: "POST", // Cambiado a POST
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(bodyData),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                console.log("Playlist creada exitosamente:", data);
+                router.push("/Biblioteca");
+            } else {
+                console.error("Error al crear la playlist:", data);
+            }
         } catch (error) {
             console.error("Error en la solicitud:", error);
         }
@@ -84,9 +84,9 @@ export default function CreatePlaylistScreen() {
         selectedColor: string | null;
         setSelectedColor: (color: string) => void;
     }
-    
+
     const ColorDropdown: React.FC<ColorDropdownProps> = ({ selectedColor, setSelectedColor }) => {
-    
+
         const colors = [
             { name: "Rojo", value: "#FF0000" },
             { name: "Azul", value: "#0000FF" },
@@ -128,8 +128,8 @@ export default function CreatePlaylistScreen() {
                             onChangeText={setplaylistName}
                         />
                         <ColorDropdown selectedColor={selectedColor} setSelectedColor={setSelectedColor} />
-                        
-                        <TouchableOpacity style={styles.addButton} onPress={async () => {const username = await getData("username"); handleGuardar( username, "canciones")}}>
+
+                        <TouchableOpacity style={styles.addButton} onPress={async () => { const username = await getData("username"); handleGuardar(username, "canciones") }}>
                             <Ionicons name="add" size={24} color="white" />
                         </TouchableOpacity>
                     </View>
@@ -145,13 +145,13 @@ export default function CreatePlaylistScreen() {
                                 onChangeText={setplaylistName}
                             />
                             <ColorDropdown selectedColor={selectedColor} setSelectedColor={setSelectedColor} />
-                            
+
                         </ScrollView>
-                        <TouchableOpacity style={styles.addButton} onPress={async () => {const username = await getData("username"); handleGuardar( username, "episodios")}}>
+                        <TouchableOpacity style={styles.addButton} onPress={async () => { const username = await getData("username"); handleGuardar(username, "episodios") }}>
                             <Ionicons name="add" size={24} color="white" />
                         </TouchableOpacity>
                     </View>
-                ); 
+                );
             default:
                 return <Text style={styles.sectionText}>Selecciona una sección</Text>;
         }
@@ -163,13 +163,16 @@ export default function CreatePlaylistScreen() {
 
     return (
         <View style={styles.container}>
+            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                <Ionicons name="arrow-back" size={28} color="#fff" />
+            </TouchableOpacity>
             {/* Encabezado */}
             <View style={styles.header}>
                 <Ionicons name="library-outline" size={28} color="white" />
                 <Text style={styles.title}>Crea una Playlist</Text>
             </View>
 
-        {/* Tabs de navegación */}
+            {/* Tabs de navegación */}
             <View style={styles.tabsContainer}>
                 {tabs.map((tab) => (
                     <TouchableOpacity
@@ -216,7 +219,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginLeft: 10,
     },
-    // Barre de recherche
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -240,7 +242,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
     },
-    // Tabs de navigation
     tabsContainer: {
         flexDirection: 'row',
         justifyContent: 'flex-start',
@@ -265,7 +266,6 @@ const styles = StyleSheet.create({
         color: '#000',
         fontWeight: 'bold',
     },
-    // Contenu
     content: {
         flex: 1,
         marginHorizontal: 16,
@@ -275,7 +275,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginTop: 20,
     },
-    // Liste d'artistes ou chansons
     artistasContainer: {
         marginTop: 10,
     },
@@ -296,7 +295,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    // Barre de navigation inférieure
+    backButton: {
+        marginBottom: 20,
+    },
     bottomBar: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -312,7 +313,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 2,
     },
-    // Styles pour les playlists dans l'onglet "Listas"
     playlistItem: {
         backgroundColor: "#222",
         padding: 15,
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     favItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#9400D3', // Violet
+        backgroundColor: '#9400D3',
         padding: 12,
         borderRadius: 8,
         marginBottom: 8,
@@ -351,16 +351,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     podcastItem: {
-        flexDirection: 'row', 
-        alignItems: 'center', 
+        flexDirection: 'row',
+        alignItems: 'center',
         paddingVertical: 10,
         paddingHorizontal: 15,
     },
     podcastImage: {
-        width: 80, 
+        width: 80,
         height: 80,
-        borderRadius: 25, 
-        marginRight: 15, 
+        borderRadius: 25,
+        marginRight: 15,
     },
     podcastText: {
         fontSize: 16,
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         margin: 5,
-        borderRadius: 20, // Hace que sea un círculo
+        borderRadius: 20,
         borderWidth: 2,
         borderColor: "#ddd",
     },
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     selectedColorCircle: {
         width: 30,
         height: 30,
-        borderRadius: 15, // Círculo pequeño para mostrar el color seleccionado
+        borderRadius: 15,
         borderWidth: 2,
         borderColor: "#000",
     },
