@@ -326,7 +326,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
     },
-    // Tabs de navigation
     tabsContainer: {
         flexDirection: 'row',
         justifyContent: 'flex-start',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
@@ -41,6 +41,14 @@ export default function PlaylistDetailScreen() {
                     <Text style={styles.bigCoverText}>a la ducha</Text>
                 </View>
                 <Text style={styles.playlistInfo}>Pública | 5 canciones | 15 mins 18 s</Text>
+            </View>
+            <View style={styles.searchContainer}>
+                <Ionicons name="search" size={20} color="#888" style={styles.iconLeft} />
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Buscar"
+                    placeholderTextColor="#888"
+                />
             </View>
 
             {/* Barre d’actions (shuffle, add, menu) */}
@@ -182,5 +190,25 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 12,
         marginTop: 2,
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#111',
+        borderColor: '#9400D3',
+        borderWidth: 1,
+        borderRadius: 20,
+        paddingHorizontal: 12,
+        height: 40,
+        marginHorizontal: 16,
+        marginBottom: 10,
+    },
+    searchInput: {
+        flex: 1,
+        color: '#fff',
+        fontSize: 16,
+    },
+    iconLeft: {
+        marginRight: 8,
     },
 });
