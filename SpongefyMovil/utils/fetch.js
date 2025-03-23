@@ -31,7 +31,7 @@ export const fetchAndSaveAllPlaylists = async (nombre_usuario) => {
 export const fetchAndSaveLibrary = async (nombre_usuario) => {
     try {
         const response = await fetch(
-            `https://spongefy-back-end.onrender.com/get-lists?nombre_usuario=${nombre_usuario}`
+            `https://spongefy-back-end.onrender.com/get-user-library?nombre_usuario=${nombre_usuario}`
         );
   
         if (!response.ok) {
@@ -44,7 +44,7 @@ export const fetchAndSaveLibrary = async (nombre_usuario) => {
   
         await saveData("library", library);
   
-        console.log("Datos biblioteca guardados correctamente:", library);
+        //console.log("Datos biblioteca guardados correctamente:", library);
     } catch (error) {
         console.error("Error en fetchAndSaveLibrary:", error);
     }
@@ -113,5 +113,29 @@ export const fetchAndSaveHomePodcastData = async () => {
         //console.log("Datos de Home Podcast guardados correctamente:", homePodcastData);
     } catch (error) {
         console.error("Error en fetchAndSaveHomePodcastData:", error);
+    }
+};
+
+//busqueda general en home
+export const fetchAndSaveSearchHomeAll = async (cadena) => {
+    console.log("fetchAndSaveSearchHomeAll se ejecuta con cadena:", cadena);
+    try {
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/search?cadena=${cadena}`
+        );
+  
+        if (!response.ok) {
+            const errorResponse = await response.text(); 
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al obtener las playlists: ${response.status} - ${response.statusText}`);
+        }
+  
+        const busqueda_general = await response.json();
+        console.log("Respuesta de la API:", busqueda_general);
+        await saveData("searchGlobal", busqueda_general);
+  
+        console.log("Resultados de búsqueda guardados correctamente:", busqueda_general);
+    } catch (error) {
+        console.error("Error en fetchAndSaveSearchHomeAll:", error);
     }
 };

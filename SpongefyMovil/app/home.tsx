@@ -11,7 +11,7 @@ import {View,
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { saveData, getData, removeData } from "../utils/storage";
-import { fetchAndSaveHomeData, fetchAndSaveHomeMusicData, fetchAndSaveHomePodcastData } from "../utils/fetch";
+import { fetchAndSaveHomeData, fetchAndSaveHomeMusicData, fetchAndSaveHomePodcastData, fetchAndSaveSearchHomeAll } from "../utils/fetch";
 
 //Todo
 interface Artista {
@@ -37,6 +37,62 @@ interface Podcast {
     id_podcast: number;
     link_imagen: string;
     nombre: string;
+}
+
+//Todo Search
+
+interface MultimediaSearch {
+    id_cm: number;
+    titulo: string;
+    link_imagen: string;
+    similitud: number;
+    tipo: string;
+}
+
+interface CreadorSearch {
+    nombre_creador: string;
+    link_imagen: string;
+    similitud: number;
+    tipo: string;
+}
+
+interface AlbumSearch {
+    id_album: number;
+    nombre_album: string;
+    link_imagen: string;
+    artista: string;
+    similitud: number;
+}
+
+interface Podcast {
+    id_podcast: number;
+    nombre: string;
+    link_imagen: string;
+    similitud: number;
+}
+
+interface Usuario {
+    nombre_usuario: string;
+    correo: string;
+    similitud: number;
+}
+
+interface Lista {
+    id_lista: number;
+    nombre: string;
+    color: string;
+    link_compartir: string;
+    similitud: number;
+    tipo: string;
+}
+
+interface SearchResults {
+    multimedia: Multimedia[];
+    creadores: Creador[];
+    albumes: Album[];
+    podcasts: Podcast[];
+    usuarios: Usuario[];
+    listas: Lista[];
 }
 
 //Musica
@@ -112,6 +168,9 @@ interface PodcastListaAleatorioInfo {
 export default function HomeScreen() {
     const router = useRouter();
     const [selectedTab, setSelectedTab] = useState('Todo');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
+    const [isSearching, setIsSearching] = useState(false);
     const tabs = ['Todo', 'Musica', 'Podcasts'];
 
     //Todo
@@ -181,20 +240,60 @@ export default function HomeScreen() {
         }
     };
 
+    const handleSearch = async () => {
+
+
+        if (searchQuery.trim() === '') return;
+    
+   
+        switch (selectedTab) {
+            case 'Todo':
+                await fetchAndSaveSearchHomeAll(searchQuery);
+                const searchGlobalData = await getData("searchGlobal");
+
+                if (searchGlobalData) {
+                    setSearchResults({
+                        multimedia: searchData.multimedia || [],
+                        creadores: searchData.creadores || [],
+                        albumes: searchData.albumes || [],
+                        podcasts: searchData.podcasts || [],
+                        usuarios: searchData.usuarios || [],
+                        listas: searchData.listas || [],
+                    });
+                }
+                break;
+            case 'Musica':
+    
+                break;
+            case 'Podcasts':
+                
+                break;
+            default:
+                return;
+        }
+
+    };
+
     const SearchBar = () => {
-        const handleMoreOptions = () => {
-            console.log("Plus d'options");
-        };
         return (
             <View style={styles.searchContainer}>
+                {/* Icono de búsqueda a la izquierda */}
                 <Ionicons name="search" size={20} color="#fff" style={styles.iconLeft} />
+                
+                {/* Input de búsqueda */}
                 <TextInput
                     style={styles.searchInput}
                     placeholder="Buscar"
                     placeholderTextColor="#888"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    onSubmitEditing={handleSearch} // Ejecuta al presionar Enter
+                    returnKeyType="search" // Hace que el botón de teclado muestre "Buscar"
                 />
-                <TouchableOpacity onPress={handleMoreOptions}>
-                    <Ionicons name="ellipsis-vertical" size={20} color="#fff" style={styles.iconRight} />
+                
+                {/* Botón de búsqueda visible y funcional */}
+                <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+                    <Ionicons name="arrow-forward-circle" size={24} color="#fff" />
                 </TouchableOpacity>
             </View>
         );
@@ -395,15 +494,19 @@ export default function HomeScreen() {
                 <Text style={styles.title}>Home</Text>
             </View>
         
-            {/* Barra de búsqueda */}
-            <View style={styles.searchContainer}>
-                <Ionicons name="search" size={20} color="#888" style={styles.iconLeft} />
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Buscar"
-                    placeholderTextColor="#888"
-                />
-            </View>
+            {/* Barra de búsqueda conectada */}
+        <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color="#888" style={styles.iconLeft} />
+            <TextInput
+                style={styles.searchInput}
+                placeholder="Buscar"
+                placeholderTextColor="#888"
+                value={searchQuery} // Conectar con estado
+                onChangeText={setSearchQuery} // Actualizar estado al escribir
+                onSubmitEditing={handleSearch} // Ejecutar búsqueda al presionar "Enter"
+                returnKeyType="search" // Mostrar botón "Buscar" en teclado
+            />
+        </View>
         
             {/* Tabs de navegación */}
             <View style={styles.tabsContainer}>

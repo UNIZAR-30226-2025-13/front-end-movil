@@ -17,6 +17,7 @@ home                  datos de la pestaña "Todo" de home
 homeMusic             datos de la pestaña "Musica" de home
 homePodcast           datos de la pestaña "Podcast" de home
 library               datos de la blbioteca
+searchGlobal          resultados de la ultima busqueda global en home
 
 */
 
