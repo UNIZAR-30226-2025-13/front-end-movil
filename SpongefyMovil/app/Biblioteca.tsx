@@ -113,15 +113,15 @@ export default function BibliotecaScreen() {
                     <View style={{ flex: 1 }}>
                         <ScrollView style={styles.scrollView}>
                             {/* Favoris */}
-                            <TouchableOpacity style={styles.favItem} onPress={() => router.push('./PlaylistDetail')}>
+                            {/* <TouchableOpacity style={styles.favItem} onPress={() => router.push('./PlaylistDetail')}>
                                 <Text style={styles.favItemText}>Tus canciones favoritas</Text>
                                 <Ionicons name="heart" size={16} color="#fff" />
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.favItem} onPress={() => router.push('./PlaylistDetail')}>
                                 <Text style={styles.favItemText}>Tus episodios favoritos</Text>
                                 <Ionicons name="heart" size={16} color="#fff" />
-                            </TouchableOpacity>
-                            {/* Playlists statiques */}
+                            </TouchableOpacity> */}
+                            
 
                             {Array.isArray(listas) ? listas.map((lista, index) => (
                                 <TouchableOpacity
@@ -131,18 +131,16 @@ export default function BibliotecaScreen() {
                                 >
                                     <Text style={styles.playlistText}>{lista.nombre}</Text>
                                 </TouchableOpacity>
-                            )) : <Text style={styles.playlistText}>No hay listas disponibles</Text>}
+                            )) : <Text style={styles.playlistText}>No tienes listas</Text>}
 
                             {Array.isArray(carpetas) ? carpetas.map((carpeta, index) => (
-                                <TouchableOpacity
-                                    key={index}
-                                    style={styles.playlistItem}
-                                >
+                                <TouchableOpacity key={index} style={styles.folderItem}>
                                     <Text style={styles.playlistText}>{carpeta.nombre}</Text>
+                                    <Ionicons name="folder" size={20} color="#fff" style={styles.folderIcon} />
                                 </TouchableOpacity>
                             )) : <Text style={styles.playlistText}>No tienes carpetas</Text>}
 
-
+                            {/* Playlists statiques
                             <TouchableOpacity
                                 style={styles.playlistItem}
                                 onPress={() => router.push('./PlaylistDetail')}
@@ -178,7 +176,7 @@ export default function BibliotecaScreen() {
                                 onPress={() => router.push('./PlaylistDetail')}
                             >
                                 <Text style={styles.playlistText}>Camino uni</Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         </ScrollView>
                         <TouchableOpacity style={styles.addButton} onPress={handleAddPlaylist}>
                             <Ionicons name="add" size={24} color="white" />
@@ -350,7 +348,6 @@ const styles = StyleSheet.create({
         color: '#000',
         fontWeight: 'bold',
     },
-    // Contenu
     content: {
         flex: 1,
         marginHorizontal: 16,
@@ -403,6 +400,18 @@ const styles = StyleSheet.create({
         padding: 15,
         marginVertical: 5,
         borderRadius: 10,
+    },
+    folderItem: {
+        backgroundColor: "#222",
+        padding: 15,
+        marginVertical: 5,
+        borderRadius: 10,
+        flexDirection: "row",  // Organiza los elementos en fila
+        justifyContent: "space-between", // Separa el texto y el icono
+        alignItems: "center", // Centra verticalmente los elementos 
+    },
+    folderIcon: {
+        marginLeft: 10,
     },
     playlistText: {
         color: "#fff",
