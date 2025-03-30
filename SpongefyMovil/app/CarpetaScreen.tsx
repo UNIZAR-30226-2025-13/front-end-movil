@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput 
+    View, Text, StyleSheet, TouchableOpacity, ScrollView 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -12,27 +12,22 @@ interface PlaylistLista {
     nombre: string;
     color: string;
 }
-interface Carpeta {
-    nombre_carpeta: string;
-    listas: PlaylistLista[];
-}
 
 export default function CarpetaScreen() {
     const router = useRouter();
     const [listas, setListas] = useState<PlaylistLista[]>([]);
-    const [nombreCarpeta, setNombreCarpeta] = useState<string>(""); 
-    const [showOptions, setShowOptions] = useState<boolean>(false); 
+    const [nombreCarpeta, setNombreCarpeta] = useState<string>("");
+    const [showOptions, setShowOptions] = useState<boolean>(false);
 
     useEffect(() => {
         const loadPlaylists = async () => {
             const id_carpeta = await getData("id_folder");
-            console.log("ID carpeta:", id_carpeta);
             if (id_carpeta) {
                 await fetchAndSaveFolder(id_carpeta);
                 const datosCarpeta = await getData("folder");
                 if (datosCarpeta) {
                     setListas(datosCarpeta.listas || []);
-                    setNombreCarpeta(datosCarpeta.nombre_carpeta || ""); 
+                    setNombreCarpeta(datosCarpeta.nombre_carpeta || "");
                 }
             }
         };
@@ -40,33 +35,45 @@ export default function CarpetaScreen() {
     }, []);
 
     const handleAddPlaylist = () => {
-        console.log("Botón añadir playlist pulsado");
         router.push('/AddPlaylistToFolder');
     };
 
-    const handleBiblioteca = () => {
-        router.push('/Biblioteca');
-    };
+    const handleDeleteFolder = async () => {
+        try {
+            const id_carpeta = await getData("id_folder");
+            const nombre_usuario = await getData("username");
 
-    const handleDeleteFolder = () => {
-        console.log("Eliminar carpeta pulsado");
-        setShowOptions(false);
-        // Aquí puedes llamar a la API para eliminar la carpeta
-    };
+            if (!id_carpeta || !nombre_usuario) {
+                console.error("Error: faltan datos necesarios.");
+                return;
+            }
 
-    const handleDeletePlaylists = () => {
-        console.log("Eliminar todas las playlists de la carpeta");
-        setShowOptions(false);
-        // Aquí puedes agregar la lógica para eliminar playlists
+            const response = await fetch("https://spongefy-back-end.onrender.com/remove-folder", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nombre_usuario, id_carpeta }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                console.log("Carpeta eliminada con éxito:", data);
+                router.push("/Biblioteca");
+            } else {
+                console.error("Error al eliminar la carpeta:", data.message);
+                alert(`Error: ${data.message}`);
+            }
+        } catch (error) {
+            console.error("Error en la solicitud:", error);
+            alert("Error de conexión con el servidor");
+        }
     };
 
     return (
         <View style={styles.container}>
             {/* Encabezado */}
             <View style={styles.header}>
-                <View style={{ flex: 1, alignItems: 'center' }}>
-                    <Text style={styles.title}>{nombreCarpeta}</Text>
-                </View>
+                <Text style={styles.title}>{nombreCarpeta}</Text>
 
                 {/* Menú hamburguesa */}
                 <TouchableOpacity onPress={() => setShowOptions(!showOptions)}>
@@ -79,7 +86,7 @@ export default function CarpetaScreen() {
                         <TouchableOpacity style={styles.optionButton} onPress={handleDeleteFolder}>
                             <Text style={styles.optionText}>Eliminar carpeta</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.optionButton} onPress={handleDeletePlaylists}>
+                        <TouchableOpacity style={styles.optionButton} onPress={() => console.log("Eliminar playlists")}>
                             <Text style={styles.optionText}>Eliminar playlists</Text>
                         </TouchableOpacity>
                     </View>
@@ -116,7 +123,7 @@ export default function CarpetaScreen() {
                     <Text style={styles.bottomBarText}>Home</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.bottomBarItem} onPress={handleBiblioteca}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/Biblioteca')}>
                     <Ionicons name="library" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Tu biblioteca</Text>
                 </TouchableOpacity>
@@ -145,8 +152,10 @@ const styles = StyleSheet.create({
     },
     title: {
         color: '#fff',
-        fontSize: 30,
+        fontSize: 22,
         fontWeight: 'bold',
+        textAlign: 'center', // Centra el texto horizontalmente
+        flex: 1, // Asegura que ocupe todo el espacio disponible
     },
     content: {
         flex: 1,
@@ -193,11 +202,13 @@ const styles = StyleSheet.create({
     },
     optionsContainer: {
         position: 'absolute',
-        top: 35,
+        top: 40, 
         right: 10,
         backgroundColor: '#333',
         borderRadius: 10,
         padding: 10,
+        zIndex: 10, // Eleva el menú sobre otros elementos
+        elevation: 5, // Eleva el menú en Android
     },
     optionButton: {
         paddingVertical: 10,
@@ -208,4 +219,3 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
 });
-
