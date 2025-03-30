@@ -83,6 +83,15 @@ export default function BibliotecaScreen() {
         console.log("Boton Artista pulsado para:", nombre_artista);
         router.push(`/artista/${nombre_artista}`);
     };
+
+    const handleGoToFolder = async (id_folder: number) => {
+        await saveData("id_folder", id_folder);
+        console.log("Carpeta seleccionada con id:", id_folder);
+        router.push('/CarpetaScreen');
+    };
+    
+
+
     const SearchBar = () => {
         const handleMoreOptions = () => {
             console.log("Plus d'options");
@@ -130,7 +139,11 @@ export default function BibliotecaScreen() {
                             )) : <Text style={styles.playlistText}>No tienes listas</Text>}
 
                             {Array.isArray(carpetas) ? carpetas.map((carpeta, index) => (
-                                <TouchableOpacity key={index} style={styles.folderItem}>
+                                <TouchableOpacity 
+                                    key={index}
+                                    style={styles.folderItem}
+                                    onPress={() => handleGoToFolder(carpeta.id_carpeta)} 
+                                >
                                     <Text style={styles.playlistText}>{carpeta.nombre}</Text>
                                     <Ionicons name="folder" size={20} color="#fff" style={styles.folderIcon} />
                                 </TouchableOpacity>

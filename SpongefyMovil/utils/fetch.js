@@ -139,3 +139,31 @@ export const fetchAndSaveSearchHomeAll = async (cadena) => {
         console.error("Error en fetchAndSaveSearchHomeAll:", error);
     }
 };
+
+
+//todas las playlist de una carpeta
+export const fetchAndSaveFolder = async (id_carpeta) => {
+    try {
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/get-folder?id_carpeta=${id_carpeta}`
+        );
+  
+        if (!response.ok) {
+            const errorResponse = await response.text(); 
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al obtener la carpeta: ${response.status} - ${response.statusText}`);
+        }
+  
+        const folder = await response.json();
+  
+        await saveData("folder", folder);
+  
+        //console.log("Datos carpeta guardados correctamente:", folder);
+    } catch (error) {
+        console.error("Error en fetchAndSaveFolder:", error);
+    }
+  };
+
+
+//   id_folder             id de la ultima carpeta seleccionada
+// folder                playlist de la ultima carpeta seleccionada
