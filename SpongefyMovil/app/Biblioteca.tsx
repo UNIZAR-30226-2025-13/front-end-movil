@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-    Image,
-    Dimensions,
-    TextInput
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, TextInput
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -16,21 +8,21 @@ import { fetchAndSaveLibrary } from "../utils/fetch";
 
 const screenWidth = Dimensions.get('window').width;
 
-const artistsData = [
-    { id: '1', name: 'Bad Bunny' },
-    { id: '2', name: 'Feid' },
-    { id: '3', name: 'Cruz Cafuné' },
-    { id: '4', name: 'Lola Indigo' },
-    { id: '5', name: 'Fernando Costa' },
-];
+// const artistsData = [
+//     { id: '1', name: 'Bad Bunny' },
+//     { id: '2', name: 'Feid' },
+//     { id: '3', name: 'Cruz Cafuné' },
+//     { id: '4', name: 'Lola Indigo' },
+//     { id: '5', name: 'Fernando Costa' },
+// ];
 
-const songsData = [
-    { id: '1', name: 'Song 1' },
-    { id: '2', name: 'Song 2' },
-    { id: '3', name: 'Song 3' },
-    { id: '4', name: 'Song 4' },
-    { id: '5', name: 'Song 5' },
-];
+// const songsData = [
+//     { id: '1', name: 'Song 1' },
+//     { id: '2', name: 'Song 2' },
+//     { id: '3', name: 'Song 3' },
+//     { id: '4', name: 'Song 4' },
+//     { id: '5', name: 'Song 5' },
+// ];
 
 interface BibliotecaLista {
     id_lista: number;
@@ -52,6 +44,7 @@ interface BibliotecaPodcastFavorito {
 export default function BibliotecaScreen() {
     const router = useRouter();
     const [selectedTab, setSelectedTab] = useState('Listas');
+    const [showOptions, setShowOptions] = useState(false);
     const tabs = ['Listas', 'Podcasts', 'Artistas'];
 
     const [listas, setListas] = useState<BibliotecaLista[]>([]);
@@ -81,6 +74,10 @@ export default function BibliotecaScreen() {
     const handleAddPlaylist = async () => {
         console.log("Boton añadir playlist pulsado");
         router.push('/CrearPlaylist');
+    };
+    const handleAddFolder = async () => {
+        console.log("Boton añadir carpeta pulsado");
+        router.push('/CrearCarpeta');
     };
     const handleGoToArtista = (nombre_artista: string) => {
         console.log("Boton Artista pulsado para:", nombre_artista);
@@ -121,7 +118,6 @@ export default function BibliotecaScreen() {
                                 <Text style={styles.favItemText}>Tus episodios favoritos</Text>
                                 <Ionicons name="heart" size={16} color="#fff" />
                             </TouchableOpacity> */}
-                            
 
                             {Array.isArray(listas) ? listas.map((lista, index) => (
                                 <TouchableOpacity
@@ -178,9 +174,21 @@ export default function BibliotecaScreen() {
                                 <Text style={styles.playlistText}>Camino uni</Text>
                             </TouchableOpacity> */}
                         </ScrollView>
-                        <TouchableOpacity style={styles.addButton} onPress={handleAddPlaylist}>
+                        <TouchableOpacity style={styles.addButton} onPress={() => setShowOptions(!showOptions)}>
                             <Ionicons name="add" size={24} color="white" />
                         </TouchableOpacity>
+
+                        {showOptions && (
+                            <View style={styles.optionsContainer}>
+                                <TouchableOpacity style={styles.optionButton} onPress={handleAddPlaylist}>
+                                    <Text style={styles.optionText}>Nueva Playlist</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.optionButton} onPress={handleAddFolder}>
+                                    <Text style={styles.optionText}>Nueva Carpeta</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+
                     </View>
                 );
             case 'Podcasts':
@@ -460,5 +468,23 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: 'white',
         fontWeight: 'bold',
+    },
+    optionsContainer: {
+        position: 'absolute',
+        bottom: 90,
+        right: 20,
+        backgroundColor: '#333',
+        borderRadius: 10,
+        padding: 10,
+    },
+    
+    optionButton: {
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+    },
+    
+    optionText: {
+        color: 'white',
+        fontSize: 16,
     },
 });

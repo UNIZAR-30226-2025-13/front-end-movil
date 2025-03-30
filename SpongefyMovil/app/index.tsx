@@ -10,7 +10,7 @@ export default function Index() {
     console.log("🟢 Pantalla de carga mostrada");
     const timer = setTimeout(() => {
       console.log("🔄 Redirigiendo a LoginScreen...");
-      router.replace('/LoginScreen'); // 🔥 Asegúrate de que la ruta existe
+      router.replace('/LoginScreen'); // Asegúrate de que la ruta existe
     }, 2000);
 
     return () => {
