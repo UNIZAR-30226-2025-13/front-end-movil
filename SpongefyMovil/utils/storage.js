@@ -12,7 +12,7 @@ import { saveData, getData, removeData } from "../utils/storage";
 /* CLAVES USADAS:
 
 username              nombre de usuario
-playlists             lista de las playlist y carpetas del usuario
+playlists             lista de las playlist del usuario
 home                  datos de la pestaña "Todo" de home
 homeMusic             datos de la pestaña "Musica" de home
 homePodcast           datos de la pestaña "Podcast" de home

@@ -5,85 +5,87 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { getData } from "../utils/storage";
-import { fetchAndSaveFolder } from "../utils/fetch";
+import { fetchAndSaveAllPlaylists } from "../utils/fetch";
 
-interface PlaylistLista {
+interface Playlist {
     id_lista: number;
     nombre: string;
-    color: string;
 }
-interface Carpeta {
-    nombre_carpeta: string;
-    listas: PlaylistLista[];
+interface ListaPlaylists {
+    listas: Playlist[];
 }
 
 export default function CarpetaScreen() {
     const router = useRouter();
-    const [listas, setListas] = useState<PlaylistLista[]>([]);
-    const [nombreCarpeta, setNombreCarpeta] = useState<string>(""); 
-    const [showOptions, setShowOptions] = useState<boolean>(false); 
+    const [listas, setListas] = useState<Playlist[]>([]);
 
     useEffect(() => {
-        const loadPlaylists = async () => {
-            const id_carpeta = await getData("id_folder");
-            console.log("ID carpeta:", id_carpeta);
-            if (id_carpeta) {
-                await fetchAndSaveFolder(id_carpeta);
-                const datosCarpeta = await getData("folder");
-                if (datosCarpeta) {
-                    setListas(datosCarpeta.listas || []);
-                    setNombreCarpeta(datosCarpeta.nombre_carpeta || ""); 
+        const loadLibrary = async () => {
+            const username = await getData("username");
+            console.log(username);
+            if (username) {
+                await fetchAndSaveAllPlaylists(username);
+                const datosPlaylists = await getData("playlists");
+
+                if (datosPlaylists) {
+                    setListas(datosPlaylists); 
                 }
             }
         };
-        loadPlaylists();
+
+        loadLibrary();
     }, []);
 
-    const handleAddPlaylist = () => {
-        console.log("Botón añadir playlist pulsado");
-        router.push('/AddPlaylistToFolder');
+    const handleAddPlaylist = async (id_playlist: number) => {
+        try {
+            const id_carpeta = await getData("id_folder");
+            const nombre_usuario = await getData("username");
+    
+            if (!id_carpeta || !nombre_usuario) {
+                console.error("No se pudo obtener id_carpeta o nombre_usuario");
+                return;
+            }
+    
+            const response = await fetch("https://spongefy-back-end.onrender.com/add-list-to-folder", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    nombre_usuario,
+                    id_carpeta: Number(id_carpeta),
+                    id_lista: id_playlist,
+                }),
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                console.log("Playlist añadida con éxito:", data);
+                router.push('/CarpetaScreen');
+            } else {
+                console.error("Error al añadir la playlist:", data.message);
+
+            }
+        } catch (error) {
+            console.error("Error al conectar con la API:", error);
+            alert("Error de conexión con el servidor");
+        }
     };
 
     const handleBiblioteca = () => {
         router.push('/Biblioteca');
     };
 
-    const handleDeleteFolder = () => {
-        console.log("Eliminar carpeta pulsado");
-        setShowOptions(false);
-        // Aquí puedes llamar a la API para eliminar la carpeta
-    };
-
-    const handleDeletePlaylists = () => {
-        console.log("Eliminar todas las playlists de la carpeta");
-        setShowOptions(false);
-        // Aquí puedes agregar la lógica para eliminar playlists
-    };
 
     return (
         <View style={styles.container}>
             {/* Encabezado */}
             <View style={styles.header}>
                 <View style={{ flex: 1, alignItems: 'center' }}>
-                    <Text style={styles.title}>{nombreCarpeta}</Text>
+                    <Text style={styles.title}>{"Añadir playlists"}</Text>
                 </View>
 
-                {/* Menú hamburguesa */}
-                <TouchableOpacity onPress={() => setShowOptions(!showOptions)}>
-                    <Ionicons name="ellipsis-vertical" size={24} color="#fff" />
-                </TouchableOpacity>
-
-                {/* Opciones del menú */}
-                {showOptions && (
-                    <View style={styles.optionsContainer}>
-                        <TouchableOpacity style={styles.optionButton} onPress={handleDeleteFolder}>
-                            <Text style={styles.optionText}>Eliminar carpeta</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.optionButton} onPress={handleDeletePlaylists}>
-                            <Text style={styles.optionText}>Eliminar playlists</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
             </View>
 
             {/* Contenido */}
@@ -94,19 +96,16 @@ export default function CarpetaScreen() {
                             <TouchableOpacity
                                 key={index}
                                 style={styles.playlistItem}
-                                onPress={() => router.push('./PlaylistDetail')}
+                                onPress={() => handleAddPlaylist(lista.id_lista)}
                             >
                                 <Text style={styles.playlistText}>{lista.nombre}</Text>
                             </TouchableOpacity>
                         ))
                     ) : (
-                        <Text style={styles.playlistText}>Esta carpeta no tiene listas</Text>
+                        <Text style={styles.playlistText}>No tienes playlists</Text>
                     )}
                 </ScrollView>
 
-                <TouchableOpacity style={styles.addButton} onPress={handleAddPlaylist}>
-                    <Ionicons name="add" size={24} color="white" />
-                </TouchableOpacity>
             </View>
 
             {/* Barra de navegación inferior */}
