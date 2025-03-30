@@ -69,6 +69,37 @@ export default function CarpetaScreen() {
         }
     };
 
+    const handleDeletePlaylist = async (id_lista: number) => {
+        try {
+            const id_carpeta = await getData("id_folder");
+            const nombre_usuario = await getData("username");
+    
+            if (!id_carpeta || !nombre_usuario) {
+                console.error("Error: faltan datos necesarios.");
+                return;
+            }
+    
+            const response = await fetch("https://spongefy-back-end.onrender.com/remove-list-from-folder", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nombre_usuario, id_carpeta, id_lista }),
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                console.log("Playlist eliminada con éxito:", data);
+                setListas(prevListas => prevListas.filter(lista => lista.id_lista !== id_lista));
+            } else {
+                console.error("Error al eliminar la playlist:", data.message);
+                alert(`Error: ${data.message}`);
+            }
+        } catch (error) {
+            console.error("Error en la solicitud:", error);
+            alert("Error de conexión con el servidor");
+        }
+    };
+
     return (
         <View style={styles.container}>
             {/* Encabezado */}
@@ -86,9 +117,7 @@ export default function CarpetaScreen() {
                         <TouchableOpacity style={styles.optionButton} onPress={handleDeleteFolder}>
                             <Text style={styles.optionText}>Eliminar carpeta</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.optionButton} onPress={() => console.log("Eliminar playlists")}>
-                            <Text style={styles.optionText}>Eliminar playlists</Text>
-                        </TouchableOpacity>
+
                     </View>
                 )}
             </View>
@@ -96,16 +125,27 @@ export default function CarpetaScreen() {
             {/* Contenido */}
             <View style={styles.content}>
                 <ScrollView style={styles.scrollView}>
+
                     {listas.length > 0 ? (
-                        listas.map((lista, index) => (
+                    listas.map((lista, index) => (
+                        <View key={index} style={styles.playlistContainer}>
                             <TouchableOpacity
-                                key={index}
                                 style={styles.playlistItem}
                                 onPress={() => router.push('./PlaylistDetail')}
                             >
                                 <Text style={styles.playlistText}>{lista.nombre}</Text>
                             </TouchableOpacity>
-                        ))
+                    
+                            {/* Botón de opciones */}
+                            <TouchableOpacity 
+                                style={styles.optionsButton} 
+                                onPress={() => handleDeletePlaylist(lista.id_lista)}
+                            >
+                                <Ionicons name="trash" size={20} color="#fff" />
+                            </TouchableOpacity>
+                        </View>
+                    ))
+
                     ) : (
                         <Text style={styles.playlistText}>Esta carpeta no tiene listas</Text>
                     )}
@@ -152,10 +192,10 @@ const styles = StyleSheet.create({
     },
     title: {
         color: '#fff',
-        fontSize: 22,
+        fontSize: 30,
         fontWeight: 'bold',
-        textAlign: 'center', // Centra el texto horizontalmente
-        flex: 1, // Asegura que ocupe todo el espacio disponible
+        textAlign: 'center', 
+        flex: 1,
     },
     content: {
         flex: 1,
@@ -170,6 +210,17 @@ const styles = StyleSheet.create({
     playlistText: {
         color: "#fff",
         fontSize: 16,
+    },
+    playlistContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        backgroundColor: "#222",
+        marginVertical: 5,
+        borderRadius: 10,
+    },
+    optionsButton: {
+        padding: 10,
     },
     scrollView: {
         flex: 1,
