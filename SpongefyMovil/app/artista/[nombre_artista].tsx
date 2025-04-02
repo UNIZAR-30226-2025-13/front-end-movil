@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Pressable, Modal } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import BaseLayout from '../BaseLayout';
 import { fetchArtistByName } from '../songService';
 import { usePlayer } from '../PlayerContext';
+import { getData } from '../../utils/storage';
 
 const ArtistScreen = () => {
+  const [modalVisible, setModalVisible] = useState(false);
   const { nombre_artista } = useLocalSearchParams<{ nombre_artista: string | string[] }>();
   console.log("Pantalla Artista para:", nombre_artista);
   const { fetchAndPlaySong } = usePlayer();
-
+  
   const [artistData, setArtistData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const [cancion, setCancion] = useState<any>(null); // Estado para la canción seleccionada
   useEffect(() => {
     const fetchArtistInfo = async () => {
       if (nombre_artista) {
@@ -38,9 +40,90 @@ const ArtistScreen = () => {
       }
     };
 
+
     fetchArtistInfo();
   }, [nombre_artista]);
-
+  const handleLongPress = (cancion: any) => {
+    console.log("Manteniendo pulsado:", cancion);
+    setCancion(cancion); // Guardar la canción seleccionada en el estado
+    //Abrir Desplegable de opciones con Añadir a la cola o añadir a playlist
+    setModalVisible(true);
+  }
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+  const onAddToQueue = async(cancion: any) => {
+    console.log("Añadir a la cola:", cancion);
+    // Aquí puedes implementar la lógica para añadir a la cola
+    try {
+      const username = await getData("username");
+      console.log("👤 Usuario obtenido:", username);
+      const bodyData = {
+        "id_cm": cancion,
+        "nombre_usuario": username, // Cambia esto por el nombre de usuario real
+      }
+      const url = `https://spongefy-back-end.onrender.com/queue/add`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", 
+        },
+        body: JSON.stringify(bodyData),
+      });
+      const data = await response.json();
+      console.log("Respuesta de la API:", data);
+      if (response.ok) {
+        console.log("Cancion añadida:", cancion); // Puedes hacer algo con las playlists si es necesario
+      }
+    } catch (error) {
+      console.error("⚠️ Error en la solicitud:", error);
+    }
+  };
+  const clearQueue = async () => {
+      try {
+        const username = await getData("username");
+        const url = `https://spongefy-back-end.onrender.com/queue/clear`;
+        const bodyData = {
+          "nombre_usuario": username // Cambia esto por el nombre de usuario real
+        }
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bodyData),
+        });
+        const data = await response.json();
+        console.log("Respuesta de la API:", data);
+      } catch (error) {
+        console.error("❌ Error al borrar cola:", error);
+      }
+    }
+    const iniQueue = async (id: string) => {
+        try {
+          const username = await getData("username");
+          console.log("👤 Usuario obtenido:", username);
+          const bodyData = {
+            "id_cm": id,
+            "nombre_usuario": username, // Cambia esto por el nombre de usuario real
+          }
+          const url = `https://spongefy-back-end.onrender.com/queue/add`;
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json", 
+            },
+            body: JSON.stringify(bodyData),
+          });
+          const data = await response.json();
+          console.log("Respuesta de la API:", data);
+          if (response.ok) {
+            console.log("Cancion añadida:", id); // Puedes hacer algo con las playlists si es necesario
+          }
+        } catch (error) {
+          console.error("⚠️ Error en la solicitud:", error);
+        }
+      };
   return (
     <BaseLayout>
       <View style={styles.container}>
@@ -89,14 +172,15 @@ const ArtistScreen = () => {
               <Text style={styles.section2Title}>Canciones</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.songsContainer}>
                 {artistData.canciones?.map((cancion: any) => (
-                  console.log('Datos de la canción:', cancion),
+                  //console.log('Datos de la canción:', cancion),
                   <Pressable
                     key={cancion.id}
                     style={({ pressed }) => [
                       styles.songCard,
                       pressed && { opacity: 0.7 } // 🔥 Efecto visual al presionar
                     ]}
-                    onPress={() => fetchAndPlaySong(cancion.id_cancion)}
+                    onPress={() => {fetchAndPlaySong(cancion.id_cancion); clearQueue();iniQueue(cancion.id_cancion);}} // 🔥 Reproduce la canción al presionar
+                    onLongPress={() => handleLongPress(cancion.id_cancion)} // 🔥 Abre menú al mantener pulsado
                   >
                     <Image source={{ uri: cancion.link_imagen }} style={styles.songImage} />
                     <Text style={styles.songTitle}>{cancion.titulo}</Text>
@@ -105,6 +189,46 @@ const ArtistScreen = () => {
                 ))}
               </ScrollView>
             </View>
+            {/* Modal con opciones */}
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={closeModal} // Cierra el modal si se presiona el botón de atrás
+            >
+              <View style={styles.modalBackground}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>Opciones</Text>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => {
+                      onAddToQueue(cancion); // Llama a la función para añadir a la cola
+                      closeModal(); // Cierra el Modal después de seleccionar una opción
+                    }}
+                  >
+                    <Text style={styles.modalButtonText}>Añadir a la cola</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => {
+                      console.log("Añadir a playlist:", cancion);
+                      //onAddToPlaylist(cancion); // Llama a la función para añadir a la playlist
+                      closeModal(); // Cierra el Modal después de seleccionar una opción
+                    }}
+                  >
+                    <Text style={styles.modalButtonText}>Añadir a una playlist</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={closeModal} // Cierra el Modal si se presiona Cancelar
+                  >
+                    <Text style={styles.modalButtonText}>Cancelar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
           </>
         ) : (
           <Text style={styles.errorText}>{error}</Text>
@@ -268,6 +392,37 @@ const styles = StyleSheet.create({
   },
   songsContainer: {
     flexDirection: 'row',
+  },
+  // Estilos para el Modal
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semitransparente
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    width: 300,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: "#A200F4",
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 10,
+    width: "100%",
+    alignItems: "center",
+  },
+  modalButtonText: {
+    color: "white",
+    fontSize: 16,
   },
 });
 

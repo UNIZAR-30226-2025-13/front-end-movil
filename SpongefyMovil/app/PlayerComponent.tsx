@@ -11,7 +11,9 @@ const PlayerComponent = () => {
   const [progress, setProgress] = useState(0); // Estado para la barra de progreso
   const audioPlayer = useRef<Audio.Sound | null>(null);
   const rotation = useRef(new Animated.Value(0)).current;
-
+  const { fetchAndPlaySong } = usePlayer();
+  //indice de la cola
+  const [queueIndex, setQueueIndex] = useState(0);
   // Listado de playlists estáticas (puedes agregar más si lo necesitas)
   /*
   const playlists = [
@@ -65,11 +67,50 @@ const PlayerComponent = () => {
       }
     };
   }, [currentSong]);
-
+  const handleSongEnd = async () => {
+    //aumentar el indice de la cola
+    setQueueIndex(prevIndex => {
+      const newIndex = prevIndex + 1;
+      console.log("Nuevo índice:", newIndex);
+      fetchNextSong(newIndex); // Llamar a la función con el índice actualizado
+      return newIndex;
+    });
+    //console.log("Índice de cola actualizado:", queueIndex);
+    
+    //reproducir esa posicion de cola
+  }
+  const fetchNextSong = async (index: number) => {
+    try {
+      const username = await getData("username");
+      console.log("👤 Usuario obtenido:", username);
+      const url = `https://spongefy-back-end.onrender.com/queue/get-cm?nombre_usuario=${username}&posicion=${index}`;
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Respuesta de la API:", data);
+        // Aquí puedes reproducir la canción obtenida
+        audioPlayer.current?.unloadAsync(); // Descargar la canción actual
+        audioPlayer.current = null; // Limpiar el audio actual
+        fetchAndPlaySong(data.id_cm); // Llama a la función para reproducir la canción
+      }
+    } catch (error) {
+      console.error("⚠️ Error en la solicitud:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
   // Función para actualizar la barra de progreso
   const updateProgress = async (status: any) => {
     if (status.isLoaded && status.durationMillis) {
       setProgress(status.positionMillis / status.durationMillis);
+    }
+    // Verificar si la canción ha terminado
+    if (status.positionMillis === status.durationMillis) {
+      console.log("La canción ha terminado");
+      // Aquí puedes realizar la acción que desees cuando termine la canción
+      
+      handleSongEnd(); // Función que manejaría la acción al terminar la canción
     }
   };
 
@@ -162,6 +203,108 @@ const PlayerComponent = () => {
       
       
     };
+    type Content = {
+      titulo: string;
+      duracion: string;
+      link_imagen: string;
+      fecha_pub: string;
+      posicion: number;
+      artista: string;
+      featurings: string[];
+      podcast: string;
+    };
+    //Modal de la cola
+
+    const [queueModalVisible, setQueueModalVisible] = useState(false);
+    const [queue, setQueue] = useState<Content[]>([]);
+    const toggleQueue = () => {
+      
+      const fetchQueue = async () => {
+        try {
+          const username = await getData("username");
+          console.log("👤 Usuario obtenido:", username);
+          const url = `https://spongefy-back-end.onrender.com/queue/show?nombre_usuario=${username}&posicion=0`;
+          const response = await fetch(url);
+          const data = await response.json();
+          console.log("Respuesta de la API:", data);
+          if (response.ok) {
+            setQueue(data.cola);
+            console.log("Cola obtenida:", queue); // Puedes hacer algo con las playlists si es necesario
+          }
+        } catch (error) {
+          console.error("⚠️ Error en la solicitud:", error);
+        }
+      };
+      fetchQueue();
+      setQueueModalVisible(true);
+    }
+    const toggleBorrarQueue = async (borrar: boolean) => {
+      const clearQueue = async () => {
+        try {
+          const username = await getData("username");
+          const url = `https://spongefy-back-end.onrender.com/queue/clear`;
+          const bodyData = {
+            "nombre_usuario": username // Cambia esto por el nombre de usuario real
+          }
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(bodyData),
+          });
+          const data = await response.json();
+          console.log("Respuesta de la API:", data);
+        } catch (error) {
+          console.error("❌ Error al borrar cola:", error);
+        }
+
+      }
+      clearQueue();
+      setQueue([]);
+    };
+    const toggleRandomQueue = async (aleatorio: boolean) => {
+      const randomQueue = async () => {
+        try {
+          const username = await getData("username");
+          const url = `https://spongefy-back-end.onrender.com/queue/shuffle`;
+          const bodyData = {
+            "nombre_usuario": username, // Cambia esto por el nombre de usuario real
+            "posicion": 0
+          }
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(bodyData),
+          });
+          const data = await response.json();
+          console.log("Respuesta de la API:", data);
+        } catch (error) {
+          console.error("❌ Error al aleatorizar cola:", error);
+        }
+
+      }
+      randomQueue();
+      const fetchQueue = async () => {
+        try {
+          const username = await getData("username");
+          console.log("👤 Usuario obtenido:", username);
+          const url = `https://spongefy-back-end.onrender.com/queue/show?nombre_usuario=${username}&posicion=0`;
+          const response = await fetch(url);
+          const data = await response.json();
+          console.log("Respuesta de la API:", data);
+          if (response.ok) {
+            setQueue(data.cola);
+            console.log("Cola obtenida:", queue); // Puedes hacer algo con las playlists si es necesario
+          }
+        } catch (error) {
+          console.error("⚠️ Error en la solicitud:", error);
+        }
+      };
+      fetchQueue();
+    };
 
   if (isLoading) {
     return <Text>Cargando canción...</Text>;
@@ -194,12 +337,67 @@ const PlayerComponent = () => {
             </Text>
           </View>
         </View>
+        <Pressable onPress={() => toggleQueue()} style={styles.controls}>
+          <Image
+              source={require("../assets/queue.png")}
+              style={styles.icon}
+            />
+          </Pressable>
+        {/* Modal de Queue */}
+        <Modal visible={queueModalVisible} transparent animationType="slide">
+          <View style={styles.modalContainerQueue}>
+            <View style={styles.modalContentQueue}>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+              <Text style={styles.modalTitleQueue}>Cola de Reproducción</Text>
+              {/*Botón para aleatorizar la cola*/}
+              <Pressable onPress={() => toggleRandomQueue(true)} style={styles.controls}>
+                  <Image
+                    source={require("../assets/aleatorio.png")}
+                    style={styles.icon}
+                  />
+                </Pressable>
+              {/* Botón para borrar la cola */}
+              <Pressable onPress={() => toggleBorrarQueue(false)} style={styles.controls}>
+                <Image
+                  source={require("../assets/trash.png")}
+                  style={styles.icon}
+                />
+              </Pressable>
+            </View>
+              
+              <FlatList
+                data={queue} // Excluye la canción actual
+                //keyExtractor={(index) => index.toString()} // Usamos el índice como clave
+                renderItem={({ item, index}) => {
+                  const isCurrentSong = index === queueIndex; // Verifica si es la canción actual usando el índice
+                  return(
+                    <View style={[styles.queueItem, isCurrentSong && styles.currentSong]}>
+                      <Text style={[styles.songTitle]}>
+                        {item.titulo}
+                      </Text>
+                      <Text style={[styles.songArtists]}>
+                        {item.artista}{item.featurings && `, ${item.featurings}`}
+                      </Text>
+                    </View>
+                  );
+                }}
+              />
+              <TouchableOpacity
+                style={styles.closeButtonQueue}
+                onPress={() => setQueueModalVisible(false)}
+              >
+                <Text style={styles.closeButtonTextQueue}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
         <Pressable onPress={() => toggleAddtoPlaylist()} style={styles.controls}>
           <Image
             source={require("../assets/anyadirplaylist.png")}
             style={styles.icon}
           />
         </Pressable>
+        
          {/* Modal con las playlists */}
         <Modal visible={modalVisible} transparent animationType="slide">
           <View style={styles.modalContainer}>
@@ -237,12 +435,12 @@ const PlayerComponent = () => {
             </View>
           </View>
         </Modal>
-
-        <Pressable onPress={togglePlayPause} style={styles.controls}>
-          <Image
+        <Image
             source={require("../assets/heart.png")}
             style={styles.icon}
           />
+        <Pressable onPress={togglePlayPause} style={styles.controls}>
+          
           <Animated.Image
             source={isPlaying ? require("../assets/pause.png") : require("../assets/play.png")}
             style={[styles.icon, { transform: [{ rotate: rotateInterpolate }] }]}
@@ -266,6 +464,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: 10,
     width: "100%",
+    overflow: "hidden",
   },
   controlsContainer: {
     flexDirection: "row",
@@ -338,7 +537,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: 300,
-    backgroundColor: "white",
+    backgroundColor: "#CDCDCD",
     padding: 20,
     borderRadius: 10,
   },
@@ -349,8 +548,10 @@ const styles = StyleSheet.create({
   },
   playlistItem: {
     padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderColor: "#000",
+    borderWidth: 1,
+    borderRadius: 5,
+    marginVertical: 3,
   },
   playlistText: {
     fontSize: 16,
@@ -358,12 +559,58 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: "#FF3B30",
+    backgroundColor: "#000000",
     borderRadius: 5,
     alignItems: "center",
   },
   closeButtonText: {
     color: "white",
+    fontWeight: "bold",
+  },
+  modalContainerQueue: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContentQueue: {
+    width: '100%',
+    height: '60%',
+    backgroundColor: "#232323",
+    padding: 20,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+  },
+  modalTitleQueue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "white",
+  },
+  queueItem: {
+    padding: 10,
+    borderColor: "white",
+    borderWidth: 1,
+    borderRadius: 5,
+    marginVertical: 3,
+  },
+  currentSong: {
+    backgroundColor: "#A200F4",
+    borderColor: "black",
+    borderWidth: 1,
+    borderRadius: 5,
+    marginVertical: 3,
+  },
+  closeButtonQueue: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 5,
+    alignItems: "center",
+
+  },
+  closeButtonTextQueue: {
+    color: "black",
     fontWeight: "bold",
   },
 });

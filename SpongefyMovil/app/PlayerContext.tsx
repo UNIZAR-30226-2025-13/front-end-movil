@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { Song } from "./songService";
 import { fetchSongById } from "./songService";
-
+import { getData } from "../utils/storage";
 interface PlayerContextType {
   currentSong: Song | null;
   isPlaying: boolean;
@@ -18,7 +18,53 @@ interface PlayerProviderProps {
 export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-
+  const clearQueue = async () => {
+    try {
+      const username = await getData("username");
+      const url = `https://spongefy-back-end.onrender.com/queue/clear`;
+      const bodyData = {
+        "nombre_usuario": username // Cambia esto por el nombre de usuario real
+      }
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bodyData),
+      });
+      const data = await response.json();
+      console.log("Respuesta de la API:", data);
+    } catch (error) {
+      console.error("❌ Error al borrar cola:", error);
+    }
+  }
+  //clearQueue();
+  const iniQueue = async () => {
+    try {
+      const username = await getData("username");
+      console.log("👤 Usuario obtenido:", username);
+      const bodyData = {
+        "id_cm": currentSong?.id,
+        "nombre_usuario": username, // Cambia esto por el nombre de usuario real
+      }
+      const url = `https://spongefy-back-end.onrender.com/queue/add`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", 
+        },
+        body: JSON.stringify(bodyData),
+      });
+      const data = await response.json();
+      console.log("Respuesta de la API:", data);
+      if (response.ok) {
+        console.log("Cancion añadida:", currentSong?.id); // Puedes hacer algo con las playlists si es necesario
+      }
+    } catch (error) {
+      console.error("⚠️ Error en la solicitud:", error);
+    }
+  };
+  //iniQueue();
   const fetchAndPlaySong = async (id: string) => {
     console.log("📢 fetchAndPlaySong se está ejecutando con ID:", id);
   
