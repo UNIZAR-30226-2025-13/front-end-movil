@@ -1,33 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, TextInput
+import {
+    View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, TextInput
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { saveData, getData, removeData } from "../utils/storage";
-import { fetchAndSaveLibrary } from "../utils/fetch";
+import { fetchAndSaveLibrary, fetchAndSaveSearchLista } from "../utils/fetch";
 
 const screenWidth = Dimensions.get('window').width;
 
-// const artistsData = [
-//     { id: '1', name: 'Bad Bunny' },
-//     { id: '2', name: 'Feid' },
-//     { id: '3', name: 'Cruz Cafuné' },
-//     { id: '4', name: 'Lola Indigo' },
-//     { id: '5', name: 'Fernando Costa' },
-// ];
 
-// const songsData = [
-//     { id: '1', name: 'Song 1' },
-//     { id: '2', name: 'Song 2' },
-//     { id: '3', name: 'Song 3' },
-//     { id: '4', name: 'Song 4' },
-//     { id: '5', name: 'Song 5' },
-// ];
-
-interface BibliotecaLista {
-    id_lista: number;
-    nombre: string;
-}
 interface BibliotecaCarpeta {
     id_carpeta: number;
     nombre: string;
@@ -41,13 +23,59 @@ interface BibliotecaPodcastFavorito {
     link_imagen: string;
 }
 
+interface MusicaListaGenero {
+    id_lista: number;
+    nombre: string;
+    color: string;
+}
+
+interface MusicaListaIdioma {
+    id_lista: number;
+    nombre: string;
+    color: string;
+}
+
+interface MusicaListaArtistas {
+    id_lista: number;
+    nombre: string;
+    nombre_creador: string;
+    link_imagen: string;
+}
+
+interface MusicaListaAleatorio {
+    id_lista: number;
+    nombre: string;
+    color: string;
+}
+
+interface Lista {
+    id_lista: number;
+    nombre: string;
+    color: string;
+    link_compartir: string;
+    similitud: number;
+    tipo: string;
+}
+interface MusicaListaArtistas {
+    id_lista: number;
+    nombre: string;
+    nombre_creador: string;
+    link_imagen: string;
+}
+
+interface SearchResults {
+    listas: Lista[];
+}
+
 export default function BibliotecaScreen() {
     const router = useRouter();
     const [selectedTab, setSelectedTab] = useState('Listas');
     const [showOptions, setShowOptions] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
     const tabs = ['Listas', 'Podcasts', 'Artistas'];
 
-    const [listas, setListas] = useState<BibliotecaLista[]>([]);
+    const [listas, setListas] = useState<Lista[]>([]);
     const [carpetas, setCarpetas] = useState<BibliotecaCarpeta[]>([]);
     const [artistasFavoritos, setArtistasFavoritos] = useState<BibliotecaArtistaFavorito[]>([]);
     const [podcastsFavoritos, setPodcastsFavoritos] = useState<BibliotecaPodcastFavorito[]>([]);
@@ -89,25 +117,56 @@ export default function BibliotecaScreen() {
         console.log("Carpeta seleccionada con id:", id_folder);
         router.push('/CarpetaScreen');
     };
-    
 
+    const handleSearch = async () => {
+
+
+        if (searchQuery.trim() === '') {
+            setSearchResults(null);
+            return;
+        }
+
+
+        switch (selectedTab) {
+            case 'Listas':
+                await fetchAndSaveSearchLista(searchQuery);
+                const searchGlobalData = await getData("searchGlobal");
+
+                if (searchGlobalData) {
+                    setSearchResults({
+                        listas: searchGlobalData.listas || [],
+                    });
+                }
+                break;
+
+            default:
+                return;
+        }
+
+    };
 
     const SearchBar = () => {
-        const handleMoreOptions = () => {
-            console.log("Plus d'options");
-        };
-
         return (
             <View style={styles.searchContainer}>
+                {/* Icono de búsqueda a la izquierda */}
                 <Ionicons name="search" size={20} color="#fff" style={styles.iconLeft} />
+
+                {/* Input de búsqueda */}
                 <TextInput
                     style={styles.searchInput}
                     placeholder="Buscar"
                     placeholderTextColor="#888"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    onSubmitEditing={handleSearch} // Ejecuta al presionar Enter
+                    returnKeyType="search" // Hace que el botón de teclado muestre "Buscar"
                 />
-                <TouchableOpacity onPress={handleMoreOptions}>
-                    <Ionicons name="ellipsis-vertical" size={20} color="#fff" style={styles.iconRight} />
-                </TouchableOpacity>
+
+                {/*    
+                    <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+                        <Ionicons name="arrow-forward-circle" size={24} color="#fff" />
+                    </TouchableOpacity> */}
+
             </View>
         );
     };
@@ -128,21 +187,25 @@ export default function BibliotecaScreen() {
                                 <Ionicons name="heart" size={16} color="#fff" />
                             </TouchableOpacity> */}
 
-                            {Array.isArray(listas) ? listas.map((lista, index) => (
-                                <TouchableOpacity
-                                    key={index}
-                                    style={styles.playlistItem}
-                                    onPress={() => router.push('./PlaylistDetail')}
-                                >
-                                    <Text style={styles.playlistText}>{lista.nombre}</Text>
-                                </TouchableOpacity>
-                            )) : <Text style={styles.playlistText}>No tienes listas</Text>}
+
+                            <ScrollView style={styles.scrollView}>
+                                {Array.isArray(listas) ? listas.map((lista, index) => (
+                                    <TouchableOpacity
+                                        key={index}
+                                        style={styles.playlistItem}
+                                        onPress={() => router.push('./PlaylistDetail')}
+                                    >
+                                        <Text style={styles.playlistText}>{lista.nombre}</Text>
+                                    </TouchableOpacity>
+                                )) : <Text style={styles.playlistText}>No tienes listas</Text>}
+                            </ScrollView>
+
 
                             {Array.isArray(carpetas) ? carpetas.map((carpeta, index) => (
-                                <TouchableOpacity 
+                                <TouchableOpacity
                                     key={index}
                                     style={styles.folderItem}
-                                    onPress={() => handleGoToFolder(carpeta.id_carpeta)} 
+                                    onPress={() => handleGoToFolder(carpeta.id_carpeta)}
                                 >
                                     <Text style={styles.playlistText}>{carpeta.nombre}</Text>
                                     <Ionicons name="folder" size={20} color="#fff" style={styles.folderIcon} />
@@ -490,14 +553,17 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 10,
     },
-    
+
     optionButton: {
         paddingVertical: 10,
         paddingHorizontal: 15,
     },
-    
+
     optionText: {
         color: 'white',
         fontSize: 16,
     },
+    itemContainer: { marginRight: 10, alignItems: 'center' },
+    itemImage: { width: 80, height: 80, borderRadius: 10 },
+    itemText: { color: '#fff', fontSize: 11, marginTop: 8, textAlign: 'center', width: 80 },
 });
