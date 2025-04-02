@@ -8,11 +8,11 @@ export default function PlaylistDetailScreen() {
 
     // Liste de chansons statiques
     const songs = [
-        { id: 1, title: 'A quién le importa', artist: 'Alaska y Dinarama', cover: require('../assets/exemple_song_1.png') },
-        { id: 2, title: 'Ave María', artist: 'David Bisbal', cover: require('../assets/exemple_song_1.png') },
-        { id: 3, title: 'Chiquilla', artist: 'Seguridad Social', cover: require('../assets/exemple_song_1.png') },
-        { id: 4, title: 'Zapatillas', artist: 'El Canto Del Loco', cover: require('../assets/exemple_song_1.png') },
-        { id: 5, title: 'Devuélveme a mi chica', artist: 'Hombres G', cover: require('../assets/exemple_song_1.png') },
+        { id: 1, title: 'A quién le importa', artist: 'Alaska y Dinarama', cover: require('../../assets/exemple_song_1.png') },
+        { id: 2, title: 'Ave María', artist: 'David Bisbal', cover: require('../../assets/exemple_song_1.png') },
+        { id: 3, title: 'Chiquilla', artist: 'Seguridad Social', cover: require('../../assets/exemple_song_1.png') },
+        { id: 4, title: 'Zapatillas', artist: 'El Canto Del Loco', cover: require('../../assets/exemple_song_1.png') },
+        { id: 5, title: 'Devuélveme a mi chica', artist: 'Hombres G', cover: require('../../assets/exemple_song_1.png') },
     ];
 
     const handleShuffle = () => {

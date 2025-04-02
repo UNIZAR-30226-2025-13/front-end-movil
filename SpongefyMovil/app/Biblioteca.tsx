@@ -63,8 +63,32 @@ interface MusicaListaArtistas {
     link_imagen: string;
 }
 
+interface CreadorSearch {
+    nombre_creador: string;
+    link_imagen: string;
+    similitud: number;
+    tipo: string;
+}
+
+interface AlbumSearch {
+    id_album: number;
+    nombre_album: string;
+    link_imagen: string;
+    artista: string;
+    similitud: number;
+}
+
+interface Podcast {
+    id_podcast: number;
+    nombre: string;
+    link_imagen: string;
+    similitud: number;
+}
+
 interface SearchResults {
     listas: Lista[];
+    creadores: CreadorSearch[];
+    podcasts: Podcast[];
 }
 
 export default function BibliotecaScreen() {
@@ -112,6 +136,11 @@ export default function BibliotecaScreen() {
         router.push(`/artista/${nombre_artista}`);
     };
 
+    const handleGoToPlaylist = (id_lista: number) => {
+        console.log("Boton Playlist pulsado para:", id_lista);
+        router.push(`/playlist/${id_lista}`);
+    };
+
     const handleGoToFolder = async (id_folder: number) => {
         await saveData("id_folder", id_folder);
         console.log("Carpeta seleccionada con id:", id_folder);
@@ -135,6 +164,8 @@ export default function BibliotecaScreen() {
                 if (searchGlobalData) {
                     setSearchResults({
                         listas: searchGlobalData.listas || [],
+                        creadores: [],
+                        podcasts: [],
                     });
                 }
                 break;
@@ -193,9 +224,10 @@ export default function BibliotecaScreen() {
                                     <TouchableOpacity
                                         key={index}
                                         style={styles.playlistItem}
-                                        onPress={() => router.push('./PlaylistDetail')}
+                                        onPress={() => handleGoToPlaylist(lista.id_lista)}
                                     >
                                         <Text style={styles.playlistText}>{lista.nombre}</Text>
+                                        <Text style={styles.playlistText}>{lista.id_lista}</Text>
                                     </TouchableOpacity>
                                 )) : <Text style={styles.playlistText}>No tienes listas</Text>}
                             </ScrollView>
