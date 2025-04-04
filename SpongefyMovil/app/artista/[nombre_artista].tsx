@@ -124,6 +124,26 @@ const ArtistScreen = () => {
           console.error("⚠️ Error en la solicitud:", error);
         }
       };
+
+      const handleFollow = async () => {
+      
+        const nombre_artista = await getData("artist");
+
+      /*
+
+
+      se puede hacer la funcion en el useEffect para saber de primeras si lo sigue
+      para controlar el boton de seguir/ dejar de seguir
+
+      if (is_following) {
+        petiicon dejar de seguir
+      }
+      else {
+        peticion seguir
+      }
+      */
+      }
+
   return (
     <BaseLayout>
       <View style={styles.container}>
@@ -140,7 +160,8 @@ const ArtistScreen = () => {
                 </View>
                 <Text style={styles.artistName}>{artistData.nombre_artista}</Text>
                 <View style={styles.followContainer}>
-                  <TouchableOpacity style={styles.followButton}>
+                  <TouchableOpacity style={styles.followButton} onPress={() => {
+                      handleFollow();}}>
                     <Text style={styles.followText}>+ Seguir</Text>
                   </TouchableOpacity>
                   <Text style={styles.followers}>{artistData.seguidores} seguidores</Text>

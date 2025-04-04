@@ -131,8 +131,9 @@ export default function BibliotecaScreen() {
         console.log("Boton añadir carpeta pulsado");
         router.push('/CrearCarpeta');
     };
-    const handleGoToArtista = (nombre_artista: string) => {
+    const handleGoToArtista = async (nombre_artista: string) => {
         console.log("Boton Artista pulsado para:", nombre_artista);
+        await saveData("artist", nombre_artista);
         router.push(`/artista/${nombre_artista}`);
     };
 
@@ -227,7 +228,6 @@ export default function BibliotecaScreen() {
                                         onPress={() => handleGoToPlaylist(lista.id_lista)}
                                     >
                                         <Text style={styles.playlistText}>{lista.nombre}</Text>
-                                        <Text style={styles.playlistText}>{lista.id_lista}</Text>
                                     </TouchableOpacity>
                                 )) : <Text style={styles.playlistText}>No tienes listas</Text>}
                             </ScrollView>
