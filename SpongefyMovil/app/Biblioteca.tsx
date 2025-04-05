@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { saveData, getData, removeData } from "../utils/storage";
 import { fetchAndSaveLibrary, fetchAndSaveSearchLista } from "../utils/fetch";
+import { goToPerfil } from '../utils/navigation';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -330,6 +331,12 @@ export default function BibliotecaScreen() {
         router.push('/Biblioteca');
     };
 
+    const handlePerfilPropio = async () => {
+        const username = await getData("username");
+        goToPerfil(username);
+    };
+
+
     return (
         <View style={styles.container}>
             {/* Encabezado */}
@@ -388,7 +395,7 @@ export default function BibliotecaScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/perfil')}
+                    onPress={handlePerfilPropio}
                 >
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>

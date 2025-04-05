@@ -164,25 +164,46 @@ export const fetchAndSaveFolder = async (id_carpeta) => {
     }
   };
 
-  //los datos de perfil de un usuario
-  export const fetchAndSaveProfile = async (nombre_usuario) => {
-        try {
-        const response = await fetch(
-            `https://spongefy-back-end.onrender.com/perfil?nombre_usuario=${nombre_usuario}`
-        );
+//   //los datos de perfil del propio usuario
+//export const fetchAndSaveProfile = async (nombre_usuario) => {
+//         try {
+//         const response = await fetch(
+//             `https://spongefy-back-end.onrender.com/perfil?nombre_usuario=${nombre_usuario}`
+//         );
   
+//         if (!response.ok) {
+//             const errorResponse = await response.text(); 
+//             console.error("Error en la respuesta del servidor:", errorResponse);
+//             throw new Error(`Error al obtener el perfil: ${response.status} - ${response.statusText}`);
+//         }
+  
+//         const userProfile = await response.json();
+  
+//         await saveData("profile", userProfile);
+  
+//         console.log("Datos perfil usuario guardados correctamente:", userProfile);
+//     } catch (error) {
+//         console.error("Error en fetchAndSaveProfile:", error);
+//     }
+//};
+
+
+  //las playlist publicas que aparecen en el perfil de un usuario
+export const fetchAndSavePublicPlaylists = async (nombre_usuario) => {
+    try {
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/get-public-lists?nombre_usuario=${nombre_usuario}`
+        );
         if (!response.ok) {
             const errorResponse = await response.text(); 
             console.error("Error en la respuesta del servidor:", errorResponse);
-            throw new Error(`Error al obtener el perfil: ${response.status} - ${response.statusText}`);
+            throw new Error(`Error al obtener las listas del perfil: ${response.status} - ${response.statusText}`);
         }
-  
-        const userProfile = await response.json();
-  
-        await saveData("profile", userProfile);
-  
-        console.log("Datos perfil usuario guardados correctamente:", userProfile);
+        const publicPlaylists = await response.json();
+        await saveData("public_playlists", publicPlaylists);
+        console.log("Playlist publicas del usuario guardadas correctamente:", publicPlaylists);
     } catch (error) {
-        console.error("Error en fetchAndSaveProfile:", error);
+        console.error("Error en fetchAndSavePublicPlaylists:", error);
     }
-  };
+};
+
