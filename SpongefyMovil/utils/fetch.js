@@ -66,7 +66,7 @@ export const fetchAndSaveHomeData = async () => {
 
         await saveData("home", homeData);
 
-        //console.log("Datos de Home guardados correctamente:", homeData);
+        // console.log("Datos de Home guardados correctamente:", homeData);
 
     } catch (error) {
         console.error("Error en fetchAndSaveHomeData:", error);

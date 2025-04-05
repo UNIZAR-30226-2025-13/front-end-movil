@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Pressable, Modal } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import BaseLayout from '../BaseLayout';
 import { fetchArtistByName } from '../songService';
 import { usePlayer } from '../PlayerContext';
@@ -209,118 +211,120 @@ useEffect(() => {
     };
 
   return (
-    <BaseLayout>
-      <View style={styles.container}>
-        {isLoading ? (
-          <ActivityIndicator size="large" color="#8A2BE2" />
-        ) : artistData ? (
-          <>
-            <View style={styles.header}>
-              <Image source={{ uri: artistData.link_imagen }} style={styles.artistImage} />
-              <View style={styles.artistInfo}>
-                <View style={styles.artistLabel}>
-                  <Text style={styles.artistLabelText}>Artista</Text>
-                  <Image source={require("../../assets/certification.png")} style={styles.icon} />
-                </View>
-                <Text style={styles.artistName}>{artistData.nombre_artista}</Text>
-                <View style={styles.followContainer}>
-                  <TouchableOpacity style={styles.followButton} onPress={handleFollow}>
-                    <Text style={styles.followText}>
-                      {isFollowing === true ? "Siguiendo" : "+ Seguir"}
-                    </Text>
-                  </TouchableOpacity>
-                  <Text style={styles.followers}>{artistData.seguidores} seguidores</Text>
-                </View>
+<BaseLayout>
+  <View style={styles.container}>
+    {isLoading ? (
+      <ActivityIndicator size="large" color="#8A2BE2" />
+    ) : artistData ? (
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+        {/* Cabecera del artista */}
+        <View style={styles.header}>
+          <Image source={{ uri: artistData.link_imagen }} style={styles.artistImage} />
+          <View style={styles.artistInfo}>
+            <View style={styles.artistLabel}>
+              <Text style={styles.artistLabelText}>Artista</Text>
+              <Image source={require("../../assets/certification.png")} style={styles.icon} />
+            </View>
+            <Text style={styles.artistName}>{artistData.nombre_artista}</Text>
+            <View style={styles.followContainer}>
+              <TouchableOpacity style={styles.followButton} onPress={handleFollow}>
+                <Text style={styles.followText}>
+                  {isFollowing === true ? "Siguiendo" : "+ Seguir"}
+                </Text>
+              </TouchableOpacity>
+              <Text style={styles.followers}>{artistData.seguidores} seguidores</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Sección de favoritas */}
+        <View style={styles.favoriteSection}>
+          <Text style={styles.sectionTitle}>Todas las canciones</Text>
+          <View style={styles.favoriteImageContainer}>
+            <Image source={{ uri: artistData.link_imagen }} style={styles.favoriteArtistImage} />
+            <Image source={require("../../assets/heart.png")} style={styles.heartIcon} />
+          </View>
+        </View>
+
+        {/* Álbumes */}
+        <View style={styles.albumsWrapper}>
+          <Text style={styles.section2Title}>Álbumes</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.albumsContainer}>
+            {artistData.albumes?.map((album: any) => (
+              <View key={album.id} style={styles.albumCard}>
+                <Image source={{ uri: album.link_imagen }} style={styles.albumImage} />
+                <Text style={styles.albumTitle}>{album.nombre_album}</Text>
               </View>
-            </View>
+            ))}
+          </ScrollView>
+        </View>
 
-            <View style={styles.favoriteSection}>
-              <Text style={styles.sectionTitle}>Todas las canciones</Text>
-              <View style={styles.favoriteImageContainer}>
-                <Image source={{ uri: artistData.link_imagen }} style={styles.favoriteArtistImage} />
-                <Image source={require("../../assets/heart.png")} style={styles.heartIcon} />
-              </View>
-            </View>
+        {/* Canciones */}
+        <View style={styles.songsWrapper}>
+          <Text style={styles.section2Title}>Canciones</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.songsContainer}>
+            {artistData.canciones?.map((cancion: any) => (
+              <Pressable
+                key={cancion.id}
+                style={({ pressed }) => [
+                  styles.songCard,
+                  pressed && { opacity: 0.7 }
+                ]}
+                onPress={() => {
+                  fetchAndPlaySong(cancion.id_cancion);
+                  clearQueue();
+                  iniQueue(cancion.id_cancion);
+                }}
+                onLongPress={() => handleLongPress(cancion.id_cancion)}
+              >
+                <Image source={{ uri: cancion.link_imagen }} style={styles.songImage} />
+                <Text style={styles.songTitle}>{cancion.titulo}</Text>
+                <Text style={styles.artistTitle}>{cancion.nombre_artista}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      </ScrollView>
+    ) : (
+      <Text style={styles.errorText}>{error}</Text>
+    )}
 
-            <View style={styles.albumsWrapper}>
-              <Text style={styles.section2Title}>Álbumes</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.albumsContainer}>
-                {artistData.albumes?.map((album: any) => (
-                  <View key={album.id} style={styles.albumCard}>
-                    <Image source={{ uri: album.link_imagen }} style={styles.albumImage} />
-                    <Text style={styles.albumTitle}>{album.nombre_album}</Text>
-                  </View>
-                ))}
-              </ScrollView>
-            </View>
-
-            <View style={styles.songsWrapper}>
-              <Text style={styles.section2Title}>Canciones</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.songsContainer}>
-                {artistData.canciones?.map((cancion: any) => (
-                  //console.log('Datos de la canción:', cancion),
-                  <Pressable
-                    key={cancion.id}
-                    style={({ pressed }) => [
-                      styles.songCard,
-                      pressed && { opacity: 0.7 } // 🔥 Efecto visual al presionar
-                    ]}
-                    onPress={() => {fetchAndPlaySong(cancion.id_cancion); clearQueue();iniQueue(cancion.id_cancion);}} // 🔥 Reproduce la canción al presionar
-                    onLongPress={() => handleLongPress(cancion.id_cancion)} // 🔥 Abre menú al mantener pulsado
-                  >
-                    <Image source={{ uri: cancion.link_imagen }} style={styles.songImage} />
-                    <Text style={styles.songTitle}>{cancion.titulo}</Text>
-                    <Text style={styles.artistTitle}>{cancion.nombre_artista}</Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
-            </View>
-            {/* Modal con opciones */}
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={modalVisible}
-              onRequestClose={closeModal} // Cierra el modal si se presiona el botón de atrás
-            >
-              <View style={styles.modalBackground}>
-                <View style={styles.modalContent}>
-                  <Text style={styles.modalTitle}>Opciones</Text>
-                  <TouchableOpacity
-                    style={styles.modalButton}
-                    onPress={() => {
-                      onAddToQueue(cancion); // Llama a la función para añadir a la cola
-                      closeModal(); // Cierra el Modal después de seleccionar una opción
-                    }}
-                  >
-                    <Text style={styles.modalButtonText}>Añadir a la cola</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={styles.modalButton}
-                    onPress={() => {
-                      console.log("Añadir a playlist:", cancion);
-                      //onAddToPlaylist(cancion); // Llama a la función para añadir a la playlist
-                      closeModal(); // Cierra el Modal después de seleccionar una opción
-                    }}
-                  >
-                    <Text style={styles.modalButtonText}>Añadir a una playlist</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={styles.modalButton}
-                    onPress={closeModal} // Cierra el Modal si se presiona Cancelar
-                  >
-                    <Text style={styles.modalButtonText}>Cancelar</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </Modal>
-          </>
-        ) : (
-          <Text style={styles.errorText}>{error}</Text>
-        )}
+    {/* Modal fuera del ScrollView */}
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={modalVisible}
+      onRequestClose={closeModal}
+    >
+      <View style={styles.modalBackground}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Opciones</Text>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              onAddToQueue(cancion);
+              closeModal();
+            }}
+          >
+            <Text style={styles.modalButtonText}>Añadir a la cola</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              console.log("Añadir a playlist:", cancion);
+              closeModal();
+            }}
+          >
+            <Text style={styles.modalButtonText}>Añadir a una playlist</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.modalButton} onPress={closeModal}>
+            <Text style={styles.modalButtonText}>Cancelar</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </BaseLayout>
+    </Modal>
+  </View>
+</BaseLayout>
   );
 };
 
@@ -338,6 +342,21 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     alignItems: 'flex-start',
     width: '100%',
+  },
+  bottomBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    backgroundColor: '#111',
+    paddingVertical: 8,
+},
+  bottomBarItem: {
+    alignItems: 'center',
+  },
+  bottomBarText: {
+      color: '#fff',
+      fontSize: 12,
+      marginTop: 2,
   },
   artistImage: {
     width: 150,
