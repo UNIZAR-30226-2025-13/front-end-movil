@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { saveData, getData, removeData } from "../utils/storage";
 import { fetchAndSaveHomeData, fetchAndSaveHomeMusicData, fetchAndSaveHomePodcastData, fetchAndSaveSearchHomeAll } from "../utils/fetch";
+import { goToPerfil } from '../utils/navigation';
 
 const SIMILARITY_THRESHOLD = 1;
 
@@ -227,6 +228,11 @@ export default function HomeScreen() {
         fetchData();
     }, []);
     
+    const handlePerfilPropio = async () => {
+        const username = await getData("username");
+        goToPerfil(username);
+    };
+
     const handleDebug = async () => {
         console.log("DEBUG");
         const username = await getData("username"); 
@@ -661,7 +667,7 @@ export default function HomeScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/perfil')}
+                    onPress={handlePerfilPropio}
                 >
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>

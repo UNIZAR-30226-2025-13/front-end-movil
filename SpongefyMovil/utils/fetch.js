@@ -207,3 +207,8 @@ export const fetchAndSavePublicPlaylists = async (nombre_usuario) => {
     }
 };
 
+
+export const fetchAndSaveSearchLista = async (nombre_usuario) => {
+};
+
+

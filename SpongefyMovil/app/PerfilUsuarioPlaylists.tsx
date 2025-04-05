@@ -5,23 +5,47 @@ import { Ionicons } from '@expo/vector-icons';
 import { getData } from '../utils/storage';
 import { fetchAndSavePublicPlaylists } from '@/utils/fetch';
 
-const ArtistScreen = () => {
+interface Playlist {
+  id_lista: number;
+  nombre: string;
+  color?: string;
+}
+
+export default function PerfilUsuarioPlaylists() {
     
     const router = useRouter();
-    const [playlists, setPlaylists] = useState(null);
-    const [artistData, setArtistData] = useState<any>(null);
-    const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
+    const [playlists, setPlaylists] = useState<Playlist[]>([]);    
+    const [userName, setUser] = useState<any>(null);
+    const [profileUsername, setProfileUsername] = useState<any>(null);
+
 
     useEffect(() => {
         const loadProfile = async () => {
-            const nombre_usuario = await getData("user");
-            await fetchAndSavePublicPlaylists(nombre_usuario); 
+
+        const nombre_perfil = await getData("user");
+        const nombre_usuario = await getData("username");
+
+        setUser(nombre_usuario);
+        setProfileUsername(nombre_perfil);
+
+            await fetchAndSavePublicPlaylists(nombre_perfil); 
             const datosPlaylistsPublicas = await getData("public_playlists");
-        
+            console.log(datosPlaylistsPublicas);
+
+            // if (username) {
+            //     await fetchAndSaveLibrary(username);
+            //     const datosBiblioteca = await getData("library");
+            //     if (datosBiblioteca) {
+            //         setListas(datosBiblioteca.listas || []);
+            //         setCarpetas(datosBiblioteca.carpetas || []);
+            //         setArtistasFavoritos(datosBiblioteca.artistas_favoritos || []);
+            //         setPodcastsFavoritos(datosBiblioteca.podcasts_favoritos || []);
+            //     }
+
             if (datosPlaylistsPublicas) {
-                const playlistsObj = JSON.parse(datosPlaylistsPublicas);
-                setPlaylists(playlistsObj);
+              setPlaylists(datosPlaylistsPublicas.listas || []);
             }
+
         };
     
         loadProfile();
@@ -124,17 +148,23 @@ const ArtistScreen = () => {
             {/* Cabecera */}
             <View style={styles.header}>
               <Text style={styles.label}>Usuario</Text>
-              <Text style={styles.username}>{artistData?.nombre_usuario || "nombre_usuario"}</Text>
+              <Text style={styles.username}>{userName}</Text>
       
               <View style={styles.avatar}>
                 <Text style={styles.avatarText}>
-                  {(artistData?.nombre_usuario || "mario")[0].toUpperCase()}
+                  {userName?.charAt(0).toUpperCase() ?? ''}
                 </Text>
               </View>
       
-              <TouchableOpacity style={styles.friendButton}>
-                <Text style={styles.friendButtonText}>+ Solicitud de amistad</Text>
-              </TouchableOpacity>
+              {userName === profileUsername ? (
+                <TouchableOpacity style={styles.friendButton}>
+                  <Text style={styles.friendButtonText}>Editar perfil</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity style={styles.friendButton}>
+                  <Text style={styles.friendButtonText}>+ Solicitud de amistad</Text>
+                </TouchableOpacity>
+              )}
             </View>
       
             {/* Grid de playlists */}
@@ -142,7 +172,7 @@ const ArtistScreen = () => {
               {playlists?.map((playlist, index) => (
                 <TouchableOpacity key={index} style={[styles.playlistCard, { backgroundColor: playlist.color || '#ccc' }]}>
                   <Text style={styles.playlistTitle}>{playlist.nombre}</Text>
-                  <Text style={styles.playlistSubtitle}>Mi playlist</Text>
+                  <Text style={styles.playlistSubtitle}>Playlists publicas</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -159,12 +189,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#666',
     padding: 20,
     borderRadius: 40,
-    alignItems: 'flex-start',
+    alignItems: 'center', 
     width: '100%',
   },
   container: {
     flex: 1,
-    backgroundColor: '#4B2E83', // morado oscuro
+    backgroundColor: '#4B2E83',
   },
   scrollContent: {
     paddingBottom: 40,
@@ -182,7 +212,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   username: {
-    fontSize: 28,
+    fontSize: 40,
     color: '#fff',
     fontWeight: 'bold',
     marginBottom: 20,
@@ -424,4 +454,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ArtistScreen;
+
+
