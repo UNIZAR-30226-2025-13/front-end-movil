@@ -21,6 +21,7 @@ searchGlobal          resultados de la ultima busqueda global en home
 id_folder             id de la ultima carpeta seleccionada
 folder                playlist de la ultima carpeta seleccionada
 artist                nombre del ultimo artista seleccionado
+profile               guarda el perfil del usuario
 
 
 */

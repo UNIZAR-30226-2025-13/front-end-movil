@@ -164,6 +164,25 @@ export const fetchAndSaveFolder = async (id_carpeta) => {
     }
   };
 
-
-//   id_folder             id de la ultima carpeta seleccionada
-// folder                playlist de la ultima carpeta seleccionada
+  //los datos de perfil de un usuario
+  export const fetchAndSaveProfile = async (nombre_usuario) => {
+        try {
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/perfil?nombre_usuario=${nombre_usuario}`
+        );
+  
+        if (!response.ok) {
+            const errorResponse = await response.text(); 
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al obtener el perfil: ${response.status} - ${response.statusText}`);
+        }
+  
+        const userProfile = await response.json();
+  
+        await saveData("profile", userProfile);
+  
+        console.log("Datos perfil usuario guardados correctamente:", userProfile);
+    } catch (error) {
+        console.error("Error en fetchAndSaveProfile:", error);
+    }
+  };
