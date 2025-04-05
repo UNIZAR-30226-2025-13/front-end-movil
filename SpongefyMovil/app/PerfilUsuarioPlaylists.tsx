@@ -8,7 +8,7 @@ import { fetchAndSavePublicPlaylists } from '@/utils/fetch';
 interface Playlist {
   id_lista: number;
   nombre: string;
-  color?: string;
+  color: string;
 }
 
 export default function PerfilUsuarioPlaylists() {
@@ -30,111 +30,16 @@ export default function PerfilUsuarioPlaylists() {
 
             await fetchAndSavePublicPlaylists(nombre_perfil); 
             const datosPlaylistsPublicas = await getData("public_playlists");
-            console.log(datosPlaylistsPublicas);
-
-            // if (username) {
-            //     await fetchAndSaveLibrary(username);
-            //     const datosBiblioteca = await getData("library");
-            //     if (datosBiblioteca) {
-            //         setListas(datosBiblioteca.listas || []);
-            //         setCarpetas(datosBiblioteca.carpetas || []);
-            //         setArtistasFavoritos(datosBiblioteca.artistas_favoritos || []);
-            //         setPodcastsFavoritos(datosBiblioteca.podcasts_favoritos || []);
-            //     }
 
             if (datosPlaylistsPublicas) {
-              setPlaylists(datosPlaylistsPublicas.listas || []);
+              setPlaylists(datosPlaylistsPublicas || []);
+
             }
 
         };
     
         loadProfile();
     }, []);
-
-//   const checkIfFollowing = async () => {
-//     try {
-//       const nombre_usuario = await getData("username");
-//       const nombre_creador = await getData("artist");
-  
-//       if (!nombre_usuario || !nombre_creador) return;
-  
-//       const response = await fetch(
-//         `https://spongefy-back-end.onrender.com/is-a-follower-of-creator?nombre_usuario=${nombre_usuario}&nombre_creador=${nombre_creador}`
-//       );
-  
-//       if (!response.ok) {
-//         const errorResponse = await response.text();
-//         console.error("Error al comprobar si sigue:", errorResponse);
-//         return;
-//       }
-  
-//       const result = await response.json();
-
-//       console.log("¿Sigue al artista?:", result.es_seguidor);
-
-//       setIsFollowing(result.es_seguidor);
-  
-//     } catch (error) {
-//       console.error("Error en checkIfFollowing:", error);
-//     }
-//   };
-
-//   fetchArtistInfo();
-//   checkIfFollowing();
-// }, [nombre_artista]);
-
-
-
-    // const handleFollow = async () => {
-    //   const nombre_usuario = await getData("username");
-    //   const nombre_creador = await getData("artist");
-    
-    //   if (isFollowing) {
-    //     try {
-    //       const response = await fetch("https://spongefy-back-end.onrender.com/unfollow-creator", {
-    //         method: "POST",
-    //         headers: { "Content-Type": "application/json" },
-    //         body: JSON.stringify({
-    //           nombre_usuario,
-    //           nombre_creador,
-    //         }),
-    //       });
-    
-    //       const data = await response.json();
-    
-    //       if (response.ok) {
-    //         console.log("Ya no sigues al creador:", data);
-    //         setIsFollowing(false);
-    //       } else {
-    //         console.error("Error al dejar de seguir al creador:", data);
-    //       }
-    //     } catch (error) {
-    //       console.error("Error en handleFollow:", error);
-    //     }
-    //   } else {
-    //     try {
-    //       const response = await fetch("https://spongefy-back-end.onrender.com/follow-creator", {
-    //         method: "POST",
-    //         headers: { "Content-Type": "application/json" },
-    //         body: JSON.stringify({
-    //           nombre_usuario,
-    //           nombre_creador,
-    //         }),
-    //       });
-    
-    //       const data = await response.json();
-    
-    //       if (response.ok) {
-    //         console.log("Ahora sigues al creador:", data);
-    //         setIsFollowing(true);
-    //       } else {
-    //         console.error("Error al seguir al creador:", data);
-    //       }
-    //     } catch (error) {
-    //       console.error("Error en handleFollow:", error);
-    //     }
-    //   }
-    // };
 
     return (
         <View style={styles.container}>
@@ -169,12 +74,12 @@ export default function PerfilUsuarioPlaylists() {
       
             {/* Grid de playlists */}
             <View style={styles.playlistGrid}>
-              {playlists?.map((playlist, index) => (
+              {Array.isArray(playlists) ? playlists.map((playlist, index) => (
                 <TouchableOpacity key={index} style={[styles.playlistCard, { backgroundColor: playlist.color || '#ccc' }]}>
                   <Text style={styles.playlistTitle}>{playlist.nombre}</Text>
                   <Text style={styles.playlistSubtitle}>Playlists publicas</Text>
                 </TouchableOpacity>
-              ))}
+              ))  : <Text style={styles.playlistTitle}>Este usuario no tiene listas</Text> }
             </View>
       
           </ScrollView>
