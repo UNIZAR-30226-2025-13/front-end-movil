@@ -75,9 +75,8 @@ export default function PerfilUsuarioPlaylists() {
             {/* Grid de playlists */}
             <View style={styles.playlistGrid}>
               {Array.isArray(playlists) ? playlists.map((playlist, index) => (
-                <TouchableOpacity key={index} style={[styles.playlistCard, { backgroundColor: playlist.color || '#ccc' }]}>
-                  <Text style={styles.playlistTitle}>{playlist.nombre}</Text>
-                  <Text style={styles.playlistSubtitle}>Playlists publicas</Text>
+                <TouchableOpacity key={index} style={[styles.genreItem, { backgroundColor: playlist.color || '#ccc' }]}>
+                  <Text style={styles.playlistText}>{playlist.nombre}</Text>
                 </TouchableOpacity>
               ))  : <Text style={styles.playlistTitle}>Este usuario no tiene listas</Text> }
             </View>
@@ -149,6 +148,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   playlistGrid: {
+    paddingVertical: 20,
+    paddingHorizontal: 14,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
@@ -166,11 +167,16 @@ const styles = StyleSheet.create({
     color: '#000',
     fontWeight: 'bold',
   },
-  playlistSubtitle: {
-    fontSize: 14,
-    color: '#000',
-    opacity: 0.7,
-  },
+  playlistText: { color: '#fff', fontSize: 14, fontWeight: 'bold', textAlign: 'center' },
+
+  genreItem: { 
+    width: 80, 
+    height: 80, 
+    borderRadius: 10, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginRight: 10 
+},
   bottomBar: {
     flexDirection: 'row',
     alignItems: 'center',
