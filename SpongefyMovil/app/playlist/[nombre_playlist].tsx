@@ -69,7 +69,7 @@ export default function PlaylistDetailScreen() {
                     <TouchableOpacity
                         key={song.id}
                         style={styles.songRow}
-                        onPress={() => router.push('/SongDetail')} // <-- Navigation
+                        onPress={() => router.push('/PlaySong')} // <-- Navigation
                     >
                         <Image source={song.cover} style={styles.artistAvatar} />
                         <View style={styles.songInfo}>
