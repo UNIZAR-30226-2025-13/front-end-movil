@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { saveData, getData, removeData } from "../utils/storage";
-import { fetchAndSaveLibrary } from "../utils/fetch";
+import { saveData, getData, removeData } from "../../utils/storage";
+import { fetchAndSaveLibrary } from "../../utils/fetch";
 
 const screenWidth = Dimensions.get('window').width;
 

@@ -4,11 +4,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { saveData, getData, removeData } from "../utils/storage";
-import { fetchAndSaveLibrary, fetchAndSaveSearchLista } from "../utils/fetch";
+import { saveData, getData, removeData } from "../../utils/storage" ;
+import { fetchAndSaveLibrary, fetchAndSaveSearchLista } from "../../utils/fetch";
 
 const screenWidth = Dimensions.get('window').width;
-
 
 interface BibliotecaCarpeta {
     id_carpeta: number;
@@ -125,15 +124,15 @@ export default function BibliotecaScreen() {
 
     const handleAddPlaylist = async () => {
         console.log("Boton añadir playlist pulsado");
-        router.push('/CrearPlaylist');
+        router.push('/baseLayoutPages/CrearPlaylist');
     };
     const handleAddFolder = async () => {
         console.log("Boton añadir carpeta pulsado");
-        router.push('/CrearCarpeta');
+        router.push('/baseLayoutPages/CrearCarpeta');
     };
     const handleGoToArtista = (nombre_artista: string) => {
         console.log("Boton Artista pulsado para:", nombre_artista);
-        router.push(`/artista/${nombre_artista}`);
+        router.push({ pathname: '/baseLayoutPages/artista/[nombre_artista]', params: { nombre_artista } });
     };
 
     const handleGoToPlaylist = (id_lista: number) => {
@@ -144,7 +143,7 @@ export default function BibliotecaScreen() {
     const handleGoToFolder = async (id_folder: number) => {
         await saveData("id_folder", id_folder);
         console.log("Carpeta seleccionada con id:", id_folder);
-        router.push('/CarpetaScreen');
+        router.push('/baseLayoutPages/CarpetaScreen');
     };
 
     const handleSearch = async () => {
@@ -327,10 +326,11 @@ export default function BibliotecaScreen() {
     };
 
     const handleBiblioteca = () => {
-        router.push('/Biblioteca');
+        router.push('/baseLayoutPages/Biblioteca');
     };
 
     return (
+        
         <View style={styles.container}>
             {/* Encabezado */}
             <View style={styles.header}>
@@ -366,33 +366,6 @@ export default function BibliotecaScreen() {
             {/* Contenu de la section sélectionnée */}
             <View style={styles.content}>
                 {renderSectionContent()}
-            </View>
-
-            {/* Barre de navigation inférieure */}
-            <View style={styles.bottomBar}>
-                <TouchableOpacity
-                    style={styles.bottomBarItem}
-                    onPress={() => router.push('/home')}
-                >
-                    <Ionicons name="home" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Home</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.bottomBarItem}
-                    onPress={handleBiblioteca}
-                >
-                    <Ionicons name="library" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Tu biblioteca</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.bottomBarItem}
-                    onPress={() => router.push('/perfil')}
-                >
-                    <Ionicons name="person" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Perfil</Text>
-                </TouchableOpacity>
             </View>
         </View>
     );

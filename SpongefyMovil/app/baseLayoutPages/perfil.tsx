@@ -13,11 +13,11 @@ export default function ProfileScreen() {
     const router = useRouter();
 
     const handleBack = () => {
-        router.push('/home');
+        router.push('/baseLayoutPages/home');
     };
 
     const handleEditProfile = () => {
-        router.push('/editPerfil');
+        router.push('/baseLayoutPages/EditPerfil');
     };
 
     const handleLogout = () => {
@@ -29,13 +29,13 @@ export default function ProfileScreen() {
     };
 
     const handleBiblioteca = () => {
-        router.push('/Biblioteca');
+        router.push('/baseLayoutPages/Biblioteca');
     };
 
     return (
         <View style={styles.container}>
             <ImageBackground
-                source={require('../assets/logo.png')}
+                source={require('../../assets/logo.png')}
                 style={styles.background}
                 resizeMode="cover"
             >
@@ -75,7 +75,7 @@ export default function ProfileScreen() {
             </ImageBackground>
 
             <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/home')}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/baseLayoutPages/home')}>
                     <Ionicons name="home" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Home</Text>
                 </TouchableOpacity>
@@ -87,7 +87,7 @@ export default function ProfileScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/perfil')}
+                    onPress={() => router.push('../perfil')}
                 >
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>

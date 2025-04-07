@@ -4,8 +4,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { getData } from "../utils/storage";
-import { fetchAndSaveFolder } from "../utils/fetch";
+import { getData } from "../../utils/storage";
+import { fetchAndSaveFolder } from "../../utils/fetch";
 
 interface PlaylistLista {
     id_lista: number;

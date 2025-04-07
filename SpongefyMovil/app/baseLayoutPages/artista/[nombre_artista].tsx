@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Pressable, Modal } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import BaseLayout from '../BaseLayout';
 import { fetchArtistByName } from '../songService';
 import { usePlayer } from '../PlayerContext';
-import { getData } from '../../utils/storage';
+import { getData } from '../../../utils/storage';
 
 const ArtistScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -125,7 +124,6 @@ const ArtistScreen = () => {
         }
       };
   return (
-    <BaseLayout>
       <View style={styles.container}>
         {isLoading ? (
           <ActivityIndicator size="large" color="#8A2BE2" />
@@ -136,7 +134,7 @@ const ArtistScreen = () => {
               <View style={styles.artistInfo}>
                 <View style={styles.artistLabel}>
                   <Text style={styles.artistLabelText}>Artista</Text>
-                  <Image source={require("../../assets/certification.png")} style={styles.icon} />
+                  <Image source={require("../../../assets/certification.png")} style={styles.icon} />
                 </View>
                 <Text style={styles.artistName}>{artistData.nombre_artista}</Text>
                 <View style={styles.followContainer}>
@@ -152,7 +150,7 @@ const ArtistScreen = () => {
               <Text style={styles.sectionTitle}>Todas las canciones</Text>
               <View style={styles.favoriteImageContainer}>
                 <Image source={{ uri: artistData.link_imagen }} style={styles.favoriteArtistImage} />
-                <Image source={require("../../assets/heart.png")} style={styles.heartIcon} />
+                <Image source={require("../../../assets/heart.png")} style={styles.heartIcon} />
               </View>
             </View>
 
@@ -234,7 +232,6 @@ const ArtistScreen = () => {
           <Text style={styles.errorText}>{error}</Text>
         )}
       </View>
-    </BaseLayout>
   );
 };
 
@@ -245,6 +242,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     padding: 20,
     overflowY: 'scroll',
+    width: '100%',
+    height: 'auto',
+
   },
   header: {
     backgroundColor: '#666',

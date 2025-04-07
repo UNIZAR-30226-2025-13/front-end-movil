@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { getData } from "../utils/storage";
+import { getData } from "../../utils/storage";
 
 export default function CreateCarpetaScreen() {
     const router = useRouter();

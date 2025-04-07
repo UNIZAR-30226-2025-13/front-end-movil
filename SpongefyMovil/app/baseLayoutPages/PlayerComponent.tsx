@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Image, StyleSheet, Animated, Pressable, Modal, FlatList, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, Animated, Pressable, Modal, FlatList, TouchableOpacity, Alert } from "react-native";
 import { Audio } from "expo-av";
 import { usePlayer } from "./PlayerContext";
 import { Ionicons } from "@expo/vector-icons";
-import { getData } from "../utils/storage";
+import { getData } from "../../utils/storage";
 
 const PlayerComponent = () => {
   const { currentSong, isPlaying, setIsPlaying } = usePlayer();
@@ -194,6 +194,10 @@ const PlayerComponent = () => {
             });
             const data = await response.json();
             console.log("Respuesta de la API:", data);
+            Alert.alert("Canción añadida a la playlist.");
+            if (data.success) {
+              
+            }
           } catch (error) {
             console.error("❌ Error al añadir canción a playlist:", error);
           }  
@@ -306,176 +310,251 @@ const PlayerComponent = () => {
       fetchQueue();
     };
 
+    const rotateInterpolate = rotation.interpolate({
+      inputRange: [0, 1],
+      outputRange: ["0deg", "45deg"],
+    });
+
   if (isLoading) {
-    return <Text>Cargando canción...</Text>;
+    return (
+      <View style={styles.container}>
+        <View style={styles.controlsContainer}>
+          <View style={styles.songInfo}>
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+            <Pressable style={styles.controls}>
+              <Image
+                  source={require("../../assets/queue.png")}
+                  style={styles.icon}
+                />
+            </Pressable>      
+            <Pressable style={styles.controls}>
+              <Image
+                source={require("../../assets/anyadirplaylist.png")}
+                style={styles.icon}
+              />
+            </Pressable>
+            <Image
+                source={require("../../assets/heart.png")}
+                style={styles.icon}
+              />
+            <Pressable style={styles.controls}>
+              
+              <Animated.Image
+                source={isPlaying ? require("../../assets/pause.png") : require("../../assets/play.png")}
+                style={[styles.icon, { transform: [{ rotate: rotateInterpolate }] }]}
+                fadeDuration={2}
+                />
+            </Pressable>
+          </View>
+        </View>
+        <View style={styles.progressBarContainer}>
+          <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
+        </View>
+      </View>
+    );
   }
 
   if (!currentSong) {
-    return <Text>No se pudo cargar la canción.</Text>;
+    return (
+      <View style={styles.container}>
+        <View style={styles.controlsContainer}>
+          <View style={styles.songInfo}>
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+            <Pressable style={styles.controls}>
+              <Image
+                  source={require("../../assets/queue.png")}
+                  style={styles.icon}
+                />
+            </Pressable>      
+            <Pressable style={styles.controls}>
+              <Image
+                source={require("../../assets/anyadirplaylist.png")}
+                style={styles.icon}
+              />
+            </Pressable>
+            <Image
+                source={require("../../assets/heart.png")}
+                style={styles.icon}
+              />
+            <Pressable style={styles.controls}>
+              
+              <Animated.Image
+                source={isPlaying ? require("../../assets/pause.png") : require("../../assets/play.png")}
+                style={[styles.icon, { transform: [{ rotate: rotateInterpolate }] }]}
+                fadeDuration={2}
+                />
+            </Pressable>
+          </View>
+        </View>
+        <View style={styles.progressBarContainer}>
+          <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
+        </View>
+      </View>
+    );
   }
 
   const featuringArtists = currentSong.artistas_featuring
     ? currentSong.artistas_featuring.split(',').join(', ')
     : '';
 
-  const rotateInterpolate = rotation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "45deg"],
-  });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.controlsContainer}>
-        <View style={styles.songInfo}>
-          {currentSong.link_imagen && (
-            <Image source={{ uri: currentSong.link_imagen }} style={styles.songImage} />
-          )}
-          <View>
-            <Text style={styles.songTitle}>{currentSong.titulo}</Text>
-            <Text style={styles.songArtists}>
-              {currentSong.autor}{featuringArtists && `, ${featuringArtists}`}
-            </Text>
+      <View style={styles.container}>
+        <View style={styles.controlsContainer}>
+          <View style={styles.songInfo}>
+            {currentSong.link_imagen && (
+              <Image source={{ uri: currentSong.link_imagen }} style={styles.songImage} />
+            )}
+            <View>
+              <Text style={styles.songTitle}>{currentSong.titulo}</Text>
+              <Text style={styles.songArtists}>
+                {currentSong.autor}{featuringArtists && `, ${featuringArtists}`}
+              </Text>
+            </View>
           </View>
-        </View>
-        <Pressable onPress={() => toggleQueue()} style={styles.controls}>
-          <Image
-              source={require("../assets/queue.png")}
-              style={styles.icon}
-            />
-          </Pressable>
-        {/* Modal de Queue */}
-        <Modal visible={queueModalVisible} transparent animationType="slide">
-          <View style={styles.modalContainerQueue}>
-            <View style={styles.modalContentQueue}>
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-              <Text style={styles.modalTitleQueue}>Cola de Reproducción</Text>
-              {/*Botón para aleatorizar la cola*/}
-              <Pressable onPress={() => toggleRandomQueue(true)} style={styles.controls}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+          <Pressable onPress={() => toggleQueue()} style={styles.controls}>
+            <Image
+                source={require("../../assets/queue.png")}
+                style={styles.icon}
+              />
+            </Pressable>
+          {/* Modal de Queue */}
+          <Modal visible={queueModalVisible} transparent animationType="slide">
+            <View style={styles.modalContainerQueue}>
+              <View style={styles.modalContentQueue}>
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                <Text style={styles.modalTitleQueue}>Cola de Reproducción</Text>
+                {/*Botón para aleatorizar la cola*/}
+                <Pressable onPress={() => toggleRandomQueue(true)} style={styles.controls}>
+                    <Image
+                      source={require("../../assets/aleatorio.png")}
+                      style={styles.icon}
+                    />
+                  </Pressable>
+                {/* Botón para borrar la cola */}
+                <Pressable onPress={() => toggleBorrarQueue(false)} style={styles.controls}>
                   <Image
-                    source={require("../assets/aleatorio.png")}
+                    source={require("../../assets/trash.png")}
                     style={styles.icon}
                   />
                 </Pressable>
-              {/* Botón para borrar la cola */}
-              <Pressable onPress={() => toggleBorrarQueue(false)} style={styles.controls}>
-                <Image
-                  source={require("../assets/trash.png")}
-                  style={styles.icon}
-                />
-              </Pressable>
-            </View>
-              
-              <FlatList
-                data={queue} // Excluye la canción actual
-                //keyExtractor={(index) => index.toString()} // Usamos el índice como clave
-                renderItem={({ item, index}) => {
-                  const isCurrentSong = index === queueIndex; // Verifica si es la canción actual usando el índice
-                  return(
-                    <View style={[styles.queueItem, isCurrentSong && styles.currentSong]}>
-                      <Text style={[styles.songTitle]}>
-                        {item.titulo}
-                      </Text>
-                      <Text style={[styles.songArtists]}>
-                        {item.artista}{item.featurings && `, ${item.featurings}`}
-                      </Text>
-                    </View>
-                  );
-                }}
-              />
-              <TouchableOpacity
-                style={styles.closeButtonQueue}
-                onPress={() => setQueueModalVisible(false)}
-              >
-                <Text style={styles.closeButtonTextQueue}>Cerrar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-        <Pressable onPress={() => toggleAddtoPlaylist()} style={styles.controls}>
-          <Image
-            source={require("../assets/anyadirplaylist.png")}
-            style={styles.icon}
-          />
-        </Pressable>
-        
-         {/* Modal con las playlists */}
-        <Modal visible={modalVisible} transparent animationType="slide">
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Añadir a Playlist</Text>
-              {loading ? (
-                <Text>Cargando listas...</Text>
-              ) : (
+              </View>
+                
                 <FlatList
-                  data={playlists}
-                  keyExtractor={(item) => item.id_lista ? item.id_lista.toString() : String(item.nombre)}  // Usa 'id_lista' en lugar de 'id'
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      style={styles.playlistItem}
-                      onPress={() => {
-                        if (item.id_lista) {
-                          console.log("ID de la playlist:", item.id_lista);  // Verifica que id_lista es el valor correcto
-                          selectPlaylist(item.id_lista);  // Usa 'id_lista' para pasar el valor correcto
-                        } else {
-                          console.error("No se encontró un ID para este item:", item);
-                        }
-                      }}
-                    >
-                      <Text style={styles.playlistText}>{item.nombre}</Text>
-                    </TouchableOpacity>
-                  )}
+                  data={queue} // Excluye la canción actual
+                  //keyExtractor={(index) => index.toString()} // Usamos el índice como clave
+                  renderItem={({ item, index}) => {
+                    const isCurrentSong = index === queueIndex; // Verifica si es la canción actual usando el índice
+                    return(
+                      <View style={[styles.queueItem, isCurrentSong && styles.currentSong]}>
+                        <Text style={[styles.songTitle]}>
+                          {item.titulo}
+                        </Text>
+                        <Text style={[styles.songArtists]}>
+                          {item.artista}{item.featurings && `, ${item.featurings}`}
+                        </Text>
+                      </View>
+                    );
+                  }}
                 />
-              )}
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.closeButtonText}>Cancelar</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.closeButtonQueue}
+                  onPress={() => setQueueModalVisible(false)}
+                >
+                  <Text style={styles.closeButtonTextQueue}>Cerrar</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </Modal>
-        <Image
-            source={require("../assets/heart.png")}
-            style={styles.icon}
-          />
-        <Pressable onPress={togglePlayPause} style={styles.controls}>
-          
-          <Animated.Image
-            source={isPlaying ? require("../assets/pause.png") : require("../assets/play.png")}
-            style={[styles.icon, { transform: [{ rotate: rotateInterpolate }] }]}
-            fadeDuration={2}
+          </Modal>
+          <Pressable onPress={() => toggleAddtoPlaylist()} style={styles.controls}>
+            <Image
+              source={require("../../assets/anyadirplaylist.png")}
+              style={styles.icon}
             />
-        </Pressable>
+          </Pressable>
+          
+          {/* Modal con las playlists */}
+          <Modal visible={modalVisible} transparent animationType="slide">
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Añadir a Playlist</Text>
+                {loading ? (
+                  <Text>Cargando listas...</Text>
+                ) : (
+                  <FlatList
+                    data={playlists}
+                    keyExtractor={(item) => item.id_lista ? item.id_lista.toString() : String(item.nombre)}  // Usa 'id_lista' en lugar de 'id'
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        style={styles.playlistItem}
+                        onPress={() => {
+                          if (item.id_lista) {
+                            console.log("ID de la playlist:", item.id_lista);  // Verifica que id_lista es el valor correcto
+                            selectPlaylist(item.id_lista);  // Usa 'id_lista' para pasar el valor correcto
+                          } else {
+                            console.error("No se encontró un ID para este item:", item);
+                          }
+                        }}
+                      >
+                        <Text style={styles.playlistText}>{item.nombre}</Text>
+                      </TouchableOpacity>
+                    )}
+                  />
+                )}
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.closeButtonText}>Cancelar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+          <Image
+              source={require("../../assets/heart.png")}
+              style={styles.icon}
+            />
+          <Pressable onPress={togglePlayPause} style={styles.controls}>
+            
+            <Animated.Image
+              source={isPlaying ? require("../../assets/pause.png") : require("../../assets/play.png")}
+              style={[styles.icon, { transform: [{ rotate: rotateInterpolate }] }]}
+              fadeDuration={2}
+              />
+          </Pressable>
+        </View>
+        </View>
+        <View style={styles.progressBarContainer}>
+          <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
+        </View>
       </View>
-      <View style={styles.progressBarContainer}>
-        <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
-      </View>
-    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#A200F4",
-    padding: 15,
+    padding: 8,
     borderRadius: 50,
     flexDirection: "column",
     alignItems: "center",
-    margin: 10,
     width: "100%",
-    overflow: "hidden",
   },
   controlsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    paddingHorizontal: 15,
+    paddingHorizontal: 10
   },
   songInfo: {
     flexDirection: "row",
     alignItems: "center",
+    minWidth: 1,
+    minHeight: 39,
   },
   songImage: {
     width: 30,
@@ -508,11 +587,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 2,
+    gap: 0,
   },
   icon: {
-    width: 25,
-    height: 25,
+    width: 15,
+    height: 15,
     tintColor: "white",
   },
   container2: {
@@ -596,7 +675,7 @@ const styles = StyleSheet.create({
   },
   currentSong: {
     backgroundColor: "#A200F4",
-    borderColor: "black",
+    borderColor: "000",
     borderWidth: 1,
     borderRadius: 5,
     marginVertical: 3,
@@ -610,7 +689,7 @@ const styles = StyleSheet.create({
 
   },
   closeButtonTextQueue: {
-    color: "black",
+    color: "000",
     fontWeight: "bold",
   },
 });

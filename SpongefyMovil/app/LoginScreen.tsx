@@ -88,9 +88,7 @@ export default function LoginScreen() {
         <TouchableOpacity style={styles.button2} onPress={handlePressForgot}>
           <Text style={styles.buttonText2}>He olvidado mi contraseña</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleDebug}>
-          <Text style={styles.buttonText}>DEBUG</Text>
-        </TouchableOpacity>
+        
       </View>
     </ImageBackground>
   );
@@ -101,6 +99,7 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: "cover",
     justifyContent: "center",
+    backgroundColor: "#000"
   },
   container: {
     flex: 1,

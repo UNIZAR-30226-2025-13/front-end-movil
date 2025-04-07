@@ -4,8 +4,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { getData } from "../utils/storage";
-import { fetchAndSaveAllPlaylists } from "../utils/fetch";
+import { getData } from "../../utils/storage";
+import { fetchAndSaveAllPlaylists } from "../../utils/fetch";
 
 interface Playlist {
     id_lista: number;
@@ -62,7 +62,7 @@ export default function CarpetaScreen() {
     
             if (response.ok) {
                 console.log("Playlist añadida con éxito:", data);
-                router.push('/CarpetaScreen');
+                router.push('/baseLayoutPages/CarpetaScreen');
             } else {
                 console.error("Error al añadir la playlist:", data.message);
 
@@ -74,7 +74,7 @@ export default function CarpetaScreen() {
     };
 
     const handleBiblioteca = () => {
-        router.push('/Biblioteca');
+        router.push('/baseLayoutPages/Biblioteca');
     };
 
 
@@ -110,7 +110,7 @@ export default function CarpetaScreen() {
 
             {/* Barra de navegación inferior */}
             <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/home')}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/baseLayoutPages/home')}>
                     <Ionicons name="home" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Home</Text>
                 </TouchableOpacity>
@@ -120,7 +120,7 @@ export default function CarpetaScreen() {
                     <Text style={styles.bottomBarText}>Tu biblioteca</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/perfil')}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('../perfil')}>
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>
                 </TouchableOpacity>

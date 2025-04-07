@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { PlayerProvider } from './PlayerContext';
 
 export default function Index() {
   const router = useRouter();

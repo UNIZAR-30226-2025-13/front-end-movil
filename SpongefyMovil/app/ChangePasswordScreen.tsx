@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: "cover",
     justifyContent: "center",
+    backgroundColor: "#000",
   },
   container: {
     flex: 1,

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { Song } from "./songService";
 import { fetchSongById } from "./songService";
-import { getData } from "../utils/storage";
+import { getData } from "../../utils/storage";
 interface PlayerContextType {
   currentSong: Song | null;
   isPlaying: boolean;
