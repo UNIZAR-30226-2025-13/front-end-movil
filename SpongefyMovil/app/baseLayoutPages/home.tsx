@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-    Image,
-    Dimensions,
-    TextInput
+import {View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, TextInput
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { saveData, getData, removeData } from "../../utils/storage";
-import { fetchAndSaveHomeData, fetchAndSaveHomeMusicData, fetchAndSaveHomePodcastData, fetchAndSaveSearchHomeAll } from "../../utils/fetch";
+import { saveData, getData, removeData } from "../utils/storage";
+import { fetchAndSaveHomeData, fetchAndSaveHomeMusicData, fetchAndSaveHomePodcastData, fetchAndSaveSearchHomeAll } from "../utils/fetch";
+import { goToPerfil } from '../utils/navigation';
 
-const SIMILARITY_THRESHOLD = 0;
+const SIMILARITY_THRESHOLD = 1;
 
 //Todo
 interface Artista {
@@ -234,6 +228,11 @@ export default function HomeScreen() {
         fetchData();
     }, []);
     
+    const handlePerfilPropio = async () => {
+        const username = await getData("username");
+        goToPerfil(username);
+    };
+
     const handleDebug = async () => {
         console.log("DEBUG");
         const username = await getData("username"); 
@@ -243,6 +242,8 @@ export default function HomeScreen() {
     };
 
     const handleSearch = async () => {
+
+
         if (searchQuery.trim() === ''){
             setSearchResults(null); 
             return;
@@ -279,7 +280,6 @@ export default function HomeScreen() {
 
     const SearchBar = () => {
         return (
-            
             <View style={styles.searchContainer}>
                 {/* Icono de búsqueda a la izquierda */}
                 <Ionicons name="search" size={20} color="#fff" style={styles.iconLeft} />
@@ -386,7 +386,7 @@ export default function HomeScreen() {
                                 .filter(item => item.similitud >= SIMILARITY_THRESHOLD)
                                 .map((item, index) => (
                                     <TouchableOpacity key={index} style={styles.itemContainer}>
-                                        <Image style={styles.itemImage} />
+                                        <Image source={{ uri: item.link_imagen }} style={styles.itemImage} />
                                         <Text style={styles.itemText}>{item.nombre_usuario}</Text>
                                     </TouchableOpacity>
                                 ))}
@@ -404,7 +404,7 @@ export default function HomeScreen() {
                                 .map((item, index) => (
                                     <TouchableOpacity key={index} style={[styles.itemContainer ]}> {/* , { backgroundColor: item.color } */}
                                         
-                                        <Image style={styles.itemImage} />
+                                        <Image source={{ uri: item.link_imagen }} style={styles.itemImage} />
                                         <Text style={styles.itemText}>{item.nombre}</Text>
                                         
                                     </TouchableOpacity>
@@ -602,12 +602,11 @@ export default function HomeScreen() {
     };
 
     return (
-        
         <View style={styles.container}>
             
                 {/* Encabezado */}
             <View style={styles.header}>
-                <Image source={require("../../assets/home.png")} style={{ width: 30, height: 30 }}/>
+                <Ionicons name="library-outline" size={28} color="white" />
                 <Text style={styles.title}>Home</Text>
             </View>
         
@@ -640,11 +639,40 @@ export default function HomeScreen() {
                 ))}
             </View>
 
+
+
             <View style={styles.content}>
                 {renderSectionContent()}
             </View>
-        
+
+
             
+
+            {/* Barre de navigation inférieure */}
+            <View style={styles.bottomBar}>
+                <TouchableOpacity
+                    style={styles.bottomBarItem}
+                >
+                    <Ionicons name="home" size={24} color="#fff" />
+                    <Text style={styles.bottomBarText}>Home</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.bottomBarItem}
+                    onPress={() => router.push('/Biblioteca')}
+                >
+                    <Ionicons name="library" size={24} color="#fff" />
+                    <Text style={styles.bottomBarText}>Tu biblioteca</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.bottomBarItem}
+                    onPress={handlePerfilPropio}
+                >
+                    <Ionicons name="person" size={24} color="#fff" />
+                    <Text style={styles.bottomBarText}>Perfil</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
@@ -756,6 +784,21 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    bottomBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        backgroundColor: '#111',
+        paddingVertical: 8,
+    },
+    bottomBarItem: {
+        alignItems: 'center',
+    },
+    bottomBarText: {
+        color: '#fff',
+        fontSize: 12,
+        marginTop: 2,
+    },
     playlistItem: {
         backgroundColor: "#222",
         padding: 15,
@@ -791,26 +834,16 @@ const styles = StyleSheet.create({
     itemContainer: { marginRight: 10, alignItems: 'center' },
     itemImage: { width: 80, height: 80, borderRadius: 10 },
     artistaImage: { width: 100, height: 100, borderRadius: 10 },
-    itemText: { color: '#fff', fontSize: 11, marginTop: 8, textAlign: 'center', width: 80, fontWeight: 'semibold'},
+    itemText: { color: '#fff', fontSize: 11, marginTop: 8, textAlign: 'center', width: 80 },
     genreItem: { 
         width: 80, 
         height: 80, 
         borderRadius: 10, 
-        justifyContent: 'flex-end', 
-        alignItems: 'flex-start', 
-        marginRight: 10 ,
-        marginBottom: 5,
-        
-        
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        marginRight: 10 
     },
-    genreText: { 
-        color: '#000', 
-        fontSize: 14, 
-        fontWeight: 'bold', 
-        textAlign: 'left',
-        alignItems: 'flex-end'
-
-    },
+    genreText: { color: '#fff', fontSize: 14, fontWeight: 'bold', textAlign: 'center' },
     artistaContainer: {
         marginBottom: 20,
     },

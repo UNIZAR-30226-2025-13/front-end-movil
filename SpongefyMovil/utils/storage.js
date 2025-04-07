@@ -11,7 +11,7 @@ import { saveData, getData, removeData } from "../utils/storage";
 
 /* CLAVES USADAS:
 
-username              nombre de usuario
+username              nombre del usuario
 playlists             lista de las playlist del usuario
 home                  datos de la pestaña "Todo" de home
 homeMusic             datos de la pestaña "Musica" de home
@@ -20,7 +20,10 @@ library               datos de la blbioteca
 searchGlobal          resultados de la ultima busqueda global en home
 id_folder             id de la ultima carpeta seleccionada
 folder                playlist de la ultima carpeta seleccionada
-
+artist                nombre del ultimo artista seleccionado
+profile               guarda los datos del perfil del usuario
+user                  guarda el nombre del ultimo usuario a cuyo perfil se ha accedido (puede ser el propio usuario)
+public_playlists      guarda las playlist publicas del ultimo perfil de usuario al que se accede
 
 */
 

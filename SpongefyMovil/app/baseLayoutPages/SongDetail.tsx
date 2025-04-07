@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     bigCover: {
         width: 300,
         height: 300,
-        backgroundColor: '#2F4F4F', 
+        backgroundColor: '#2F4F4F',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 10,
@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         backgroundColor: '#111',
         paddingVertical: 8,
+        marginTop: 'auto',
     },
     bottomBarItem: {
         alignItems: 'center',
