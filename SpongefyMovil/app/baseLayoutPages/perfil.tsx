@@ -2,8 +2,8 @@ import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react
 import React, { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { fetchAndSaveProfile } from '../utils/fetch';
-import { saveData, getData, removeData } from "../utils/storage";
+//import { fetchAndSaveProfile } from '../../utils/fetch';
+import { saveData, getData, removeData } from "../../utils/storage";
 
 export default function ProfileScreen() {
     const router = useRouter();
@@ -12,7 +12,7 @@ export default function ProfileScreen() {
     useEffect(() => {
         const loadProfile = async () => {
             const nombre_usuario = await getData("username");
-            await fetchAndSaveProfile(nombre_usuario); 
+            //await fetchAndSaveProfile(nombre_usuario); 
             const datosPerfil = await getData("profile");
 
             if (datosPerfil) {
@@ -26,11 +26,11 @@ export default function ProfileScreen() {
 
 
     const handleBack = () => {
-        router.push('/home');
+        router.push('/baseLayoutPages/home');
     };
 
     const handleEditProfile = () => {
-        router.push('/EditPerfil');
+        router.push('/baseLayoutPages/EditPerfil');
     };
 
     const handleLogout = () => {
@@ -42,13 +42,13 @@ export default function ProfileScreen() {
     };
 
     const handleBiblioteca = () => {
-        router.push('/Biblioteca');
+        router.push('/baseLayoutPages/Biblioteca');
     };
 
     return (
         <View style={styles.container}>
             <ImageBackground
-                source={require('../assets/logo.png')}
+                source={require('../../assets/logo.png')}
                 style={styles.background}
                 resizeMode="cover"
             >
@@ -60,10 +60,8 @@ export default function ProfileScreen() {
                     <Text style={styles.profileTitle}>Tu perfil</Text>
                     <Text style={styles.subtitle}>Datos personales</Text>
 
-                    <Text style={styles.username}>{perfil?.nombre_usuario || "Cargando..."}</Text>
 
-                    <Text style={styles.label}>Correo electrónico</Text>
-                    <Text style={styles.value}>{perfil?.correo || "Cargando..."}</Text>
+            
                         
                     <Text style={styles.label}>Contraseña</Text>
                     <Text style={styles.value}>********</Text>
@@ -88,7 +86,7 @@ export default function ProfileScreen() {
             </ImageBackground>
 
             <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/home')}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/baseLayoutPages/home')}>
                     <Ionicons name="home" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Home</Text>
                 </TouchableOpacity>
@@ -100,7 +98,7 @@ export default function ProfileScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/perfil')}
+                    onPress={() => router.push('/baseLayoutPages/perfil')}
                 >
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>

@@ -3,9 +3,9 @@ import {View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { saveData, getData, removeData } from "../utils/storage";
-import { fetchAndSaveHomeData, fetchAndSaveHomeMusicData, fetchAndSaveHomePodcastData, fetchAndSaveSearchHomeAll } from "../utils/fetch";
-import { goToPerfil } from '../utils/navigation';
+import { saveData, getData, removeData } from "../../utils/storage";
+import { fetchAndSaveHomeData, fetchAndSaveHomeMusicData, fetchAndSaveHomePodcastData, fetchAndSaveSearchHomeAll } from "../../utils/fetch";
+import { goToPerfil } from '../../utils/navigation';
 
 const SIMILARITY_THRESHOLD = 1;
 
@@ -386,7 +386,7 @@ export default function HomeScreen() {
                                 .filter(item => item.similitud >= SIMILARITY_THRESHOLD)
                                 .map((item, index) => (
                                     <TouchableOpacity key={index} style={styles.itemContainer}>
-                                        <Image source={{ uri: item.link_imagen }} style={styles.itemImage} />
+                                        <Image source={{ }} style={styles.itemImage} />
                                         <Text style={styles.itemText}>{item.nombre_usuario}</Text>
                                     </TouchableOpacity>
                                 ))}
@@ -404,7 +404,7 @@ export default function HomeScreen() {
                                 .map((item, index) => (
                                     <TouchableOpacity key={index} style={[styles.itemContainer ]}> {/* , { backgroundColor: item.color } */}
                                         
-                                        <Image source={{ uri: item.link_imagen }} style={styles.itemImage} />
+                                        <Image source={{ }} style={styles.itemImage} />
                                         <Text style={styles.itemText}>{item.nombre}</Text>
                                         
                                     </TouchableOpacity>
@@ -659,7 +659,7 @@ export default function HomeScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/Biblioteca')}
+                    onPress={() => router.push('/baseLayoutPages/Biblioteca')}
                 >
                     <Ionicons name="library" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Tu biblioteca</Text>
