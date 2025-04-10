@@ -110,7 +110,7 @@ export const fetchAndSaveHomePodcastData = async () => {
 
         await saveData("homePodcast", homePodcastData);
 
-        //console.log("Datos de Home Podcast guardados correctamente:", homePodcastData);
+        // console.log("Datos de Home Podcast guardados correctamente:", homePodcastData);
     } catch (error) {
         console.error("Error en fetchAndSaveHomePodcastData:", error);
     }
@@ -211,4 +211,29 @@ export const fetchAndSavePublicPlaylists = async (nombre_usuario) => {
 export const fetchAndSaveSearchLista = async (nombre_usuario) => {
 };
 
+
+  //los datos de perfil de un podcaster
+export const fetchAndSavePodcaster = async (nombre_podcaster) => {
+    console.log("podcaster :", nombre_podcaster);
+    
+    try {
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/podcaster?nombre_podcaster =${nombre_podcaster}`
+        );
+  
+        if (!response.ok) {
+            const errorResponse = await response.text(); 
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al obtener el perfil de podcaster: ${response.status} - ${response.statusText}`);
+        }
+  
+        const podcasterProfile = await response.json();
+  
+        await saveData("podcaster_profile", podcasterProfile);
+  
+        console.log("Datos perfil podcaster guardados correctamente:", podcasterProfile);
+    } catch (error) {
+        console.error("Error en fetchAndSavePodcaster:", error);
+    }
+};
 

@@ -24,6 +24,9 @@ artist                nombre del ultimo artista seleccionado
 profile               guarda los datos del perfil del usuario
 user                  guarda el nombre del ultimo usuario a cuyo perfil se ha accedido (puede ser el propio usuario)
 public_playlists      guarda las playlist publicas del ultimo perfil de usuario al que se accede
+podcaster             nombre del ultimo podcaster seleccionado
+podcaster_profile     guarda los datos del perfil del po
+
 
 */
 

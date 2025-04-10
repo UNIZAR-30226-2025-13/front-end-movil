@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { saveData, getData, removeData } from "../../utils/storage";
 import { fetchAndSaveHomeData, fetchAndSaveHomeMusicData, fetchAndSaveHomePodcastData, fetchAndSaveSearchHomeAll } from "../../utils/fetch";
-import { goToPerfil } from '../../utils/navigation';
+import { goToPerfil, goToPodcasterPerfil } from '../../utils/navigation';
 
 const SIMILARITY_THRESHOLD = 1;
 
@@ -230,8 +230,14 @@ export default function HomeScreen() {
     
     const handlePerfilPropio = async () => {
         const username = await getData("username");
+        //llama a goToPerfil con su propio nombre, para acceder a su perfil
         goToPerfil(username);
     };
+
+    const handlePerfilPodcaster = async (nombre_podcaster: string) => {
+        goToPodcasterPerfil(nombre_podcaster);
+    };
+    
 
     const handleDebug = async () => {
         console.log("DEBUG");
@@ -586,7 +592,8 @@ export default function HomeScreen() {
                         <Text style={styles.subtitle}>Los mejores creadores de podcasts</Text>
                         <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
                             {listasPodcastPodcastersInfo.map((podcaster) => (
-                                <TouchableOpacity key={podcaster.id_lista} style={styles.itemContainer}>
+                                <TouchableOpacity key={podcaster.id_lista} style={styles.itemContainer}
+                                 onPress={() => handlePerfilPodcaster(podcaster.nombre_creador)} >
                                     <Image source={{ uri: podcaster.link_imagen }} style={styles.itemImage} />
                                     <Text style={styles.itemText}>{podcaster.nombre}</Text>
                                 </TouchableOpacity>
