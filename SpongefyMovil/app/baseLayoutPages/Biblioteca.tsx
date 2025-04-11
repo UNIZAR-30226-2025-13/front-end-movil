@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { saveData, getData, removeData } from "../../utils/storage";
 import { fetchAndSaveLibrary, fetchAndSaveSearchLista } from "../../utils/fetch";
-import { goToPerfil } from '../../utils/navigation';
+import { goToPerfil, goToPodcasterPerfil } from '../../utils/navigation';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -98,7 +98,7 @@ export default function BibliotecaScreen() {
     const [showOptions, setShowOptions] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
-    const tabs = ['Listas', 'Podcasts', 'Artistas'];
+    const tabs = ['Listas', 'Podcasters', 'Artistas'];
 
     const [listas, setListas] = useState<Lista[]>([]);
     const [carpetas, setCarpetas] = useState<BibliotecaCarpeta[]>([]);
@@ -136,6 +136,10 @@ export default function BibliotecaScreen() {
         console.log("Boton Artista pulsado para:", nombre_artista);
         await saveData("artist", nombre_artista);
         router.push(`/baseLayoutPages/artista/${nombre_artista}`);
+    };
+
+    const handlePerfilPodcaster = async (nombre_podcaster: string) => {
+        goToPodcasterPerfil(nombre_podcaster);
     };
 
     const handleGoToPlaylist = (id_lista: number) => {
@@ -243,7 +247,7 @@ export default function BibliotecaScreen() {
                                     <Text style={styles.playlistText}>{carpeta.nombre}</Text>
                                     <Ionicons name="folder" size={20} color="#fff" style={styles.folderIcon} />
                                 </TouchableOpacity>
-                            )) : <Text style={styles.playlistText}>No tienes carpetas</Text>}
+                            )) : <Text style={styles.playlistText}></Text>}
 
                             {/* Playlists statiques
                             <TouchableOpacity
@@ -300,11 +304,11 @@ export default function BibliotecaScreen() {
 
                     </View>
                 );
-            case 'Podcasts':
+            case 'Podcasters':
                 return (
                     <ScrollView style={styles.artistasContainer}>
                         {Array.isArray(podcastsFavoritos) ? podcastsFavoritos.map((podcast, index) => (
-                            <TouchableOpacity key={index} style={styles.podcastItem}>
+                            <TouchableOpacity key={index} style={styles.podcastItem} onPress={() => handlePerfilPodcaster(podcast.nombre_podcaster)} >
                                 <Image source={{ uri: podcast.link_imagen }} style={styles.podcastImage} />
                                 <Text style={styles.podcastText}>{podcast.nombre_podcaster}</Text>
                             </TouchableOpacity>

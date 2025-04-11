@@ -15,13 +15,12 @@ interface ThisIsList {
     id_lista: number;
     nombre: string;
   }
-  
   interface PodcastInfo {
     id_podcast: number;
     nombre: string;
     link_imagen: string;
   }
-  
+
   interface Episodio {
     nombre: string;
     link_imagen: string;
@@ -54,20 +53,72 @@ export default function PodcasterScreen() {
     const [podcasterData, setPodcasterData] = useState<PodcasterData | null>(null);
 
 
+    const mockPodcasterData: PodcasterData = {
+      nombre_podcaster: "Nombre Ejemplo",
+      biografia: "Esta es una biografía de ejemplo para el podcaster.",
+      link_imagen: "https://placehold.co/300x300", // imagen de prueba
+      seguidores: 1234,
+      lista_this_is: {
+        id_lista: 1,
+        nombre: "This is Nombre Ejemplo"
+      },
+      podcasts_info: [
+        {
+          id_podcast: 1,
+          nombre: "Podcast Uno",
+          link_imagen: "https://placehold.co/100x100"
+        },
+        {
+          id_podcast: 2,
+          nombre: "Podcast Dos",
+          link_imagen: "https://placehold.co/100x100"
+        }
+      ],
+      list_episodios: [
+        {
+          nombre: "Podcast Uno",
+          link_imagen: "https://placehold.co/100x100",
+          id_episodio: 1,
+          titulo_episodio: "Episodio 1"
+        },
+        {
+          nombre: "Podcast Dos",
+          link_imagen: "https://placehold.co/100x100",
+          id_episodio: 2,
+          titulo_episodio: "Episodio 2"
+        }
+      ],
+      ep_mas_reciente: [
+        {
+          id_podcast: 1,
+          nombre: "Podcast Uno",
+          link_imagen: "https://placehold.co/100x100",
+          id_episodio: 3,
+          titulo_episodio: "Episodio Reciente",
+          descripcion: "Este es el episodio más reciente."
+        }
+      ]
+    };
+
     useEffect(() => {
 
       const fetchPodcasterInfo = async () => {
 
-        const nombre_podcaster = await getData("podcaster");
-        setNombrePodcaster(nombre_podcaster);
-        console.log("Nombre del podcaster:", nombre_podcaster);
-        await fetchAndSavePodcaster(nombre_podcaster);
-        const podcasterProfileData = await getData("podcaster_profile");
-        if (podcasterProfileData) {
-            const parsedPodcasterData: PodcasterData = JSON.parse(podcasterProfileData);
-            setPodcasterData(parsedPodcasterData);
-          }
+        // const nombre_podcaster = await getData("podcaster");
+        // setNombrePodcaster(nombre_podcaster);
+        // console.log("Nombre del podcaster:", nombre_podcaster);
+        // await fetchAndSavePodcaster(nombre_podcaster);
+        // const podcasterProfileData = await getData("podcaster_profile");
+        // if (podcasterProfileData) {
+        //     const parsedPodcasterData: PodcasterData = JSON.parse(podcasterProfileData);
+        //     setPodcasterData(parsedPodcasterData);
+        // }
+
+          // DEBUG
+          setPodcasterData(mockPodcasterData);
         }
+
+
 
         //   const checkIfFollowing = async () => {
     //     try {
@@ -166,6 +217,7 @@ export default function PodcasterScreen() {
             <View style={styles.artistInfo}>
               <View style={styles.artistLabel}>
                 <Text style={styles.artistLabelText}>Podcaster</Text>
+                <Image source={require("../../assets/certification.png")} style={styles.icon} />
               </View>
               <Text style={styles.artistName}>{podcasterData.nombre_podcaster}</Text>
               <View style={styles.followContainer}>
@@ -178,25 +230,51 @@ export default function PodcasterScreen() {
               </View>
             </View>
           </View>
-  
-          {/* Biografía */}
-          <Text style={[styles.section2Title, { paddingHorizontal: 20 }]}>Biografía</Text>
-          <Text style={{ color: "#fff", paddingHorizontal: 20 }}>{podcasterData.biografia}</Text>
-  
-          {/* Lista This is */}
-          {podcasterData.lista_this_is && (
-            <View style={styles.favoriteSection}>
-              <Text style={styles.sectionTitle}>This is</Text>
-              <View style={styles.favoriteImageContainer}>
-                <Image
-                  source={{ uri: podcasterData.link_imagen }}
-                  style={styles.favoriteArtistImage}
-                />
-                <Image source={require("../../assets/heart.png")} style={styles.heartIcon} />
-              </View>
-              <Text style={{ color: "#fff" }}>{podcasterData.lista_this_is.nombre}</Text>
+
+
+          <View style={styles.favoriteSection}>
+            <Text style={styles.sectionTitle}>Todos los episodios</Text>
+            <View style={styles.favoriteImageContainer}>
+              <Image source={{ uri: podcasterData.link_imagen }} style={styles.favoriteArtistImage} />
+              <Image source={require("../../assets/heart.png")} style={styles.heartIcon} />
             </View>
-          )}
+          </View>
+
+          {/* Más reciente */}
+          {/* <View style={styles.songsWrapper}>
+            <Text style={styles.section2Title}>Más reciente</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.songsContainer}>
+              {podcasterData.ep_mas_reciente?.map((ep) => (
+                <View key={ep.id_episodio} style={styles.songCard}>
+                  <Image source={{ uri: ep.link_imagen }} style={styles.songImage} />
+                  <Text style={styles.songTitle}>{ep.titulo_episodio}</Text>
+                  <Text style={styles.artistTitle}>{ep.nombre}</Text>
+                </View>
+              ))}
+            </ScrollView>
+          </View> */}
+
+          {/* Más reciente */}
+          <View style={styles.songsWrapper}>
+            <Text style={styles.section2Title}>Más reciente</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.songsContainer}>
+              {podcasterData.ep_mas_reciente?.map((ep) => (
+                <Pressable
+                  key={ep.id_episodio}
+                  style={({ pressed }) => [ styles.recentEpisodeCard, pressed && { opacity: 0.7 }
+                  ]} >
+                  <Image source={{ uri: ep.link_imagen }} style={styles.songImage} />
+                  <View style={styles.recentEpisodeTextContainer}>
+                    <Text style={styles.songTitle}>{ep.titulo_episodio}</Text>
+                    <Text style={styles.artistTitle}>{ep.nombre}</Text>
+                    <Text style={styles.artistTitle}>{ep.descripcion}</Text>
+                  </View>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+
+          
   
           {/* Podcasts */}
           <View style={styles.albumsWrapper}>
@@ -222,9 +300,7 @@ export default function PodcasterScreen() {
                     styles.songCard,
                     pressed && { opacity: 0.7 }
                   ]}
-                  onPress={() => {
-                    // Aquí podrías poner lógica para reproducir o navegar al episodio
-                  }}
+                  onPress={() => { }}
                 >
                   <Image source={{ uri: ep.link_imagen }} style={styles.songImage} />
                   <Text style={styles.songTitle}>{ep.titulo_episodio}</Text>
@@ -234,19 +310,7 @@ export default function PodcasterScreen() {
             </ScrollView>
           </View>
   
-          {/* Más reciente */}
-          <View style={styles.songsWrapper}>
-            <Text style={styles.section2Title}>Más reciente</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.songsContainer}>
-              {podcasterData.ep_mas_reciente?.map((ep) => (
-                <View key={ep.id_episodio} style={styles.songCard}>
-                  <Image source={{ uri: ep.link_imagen }} style={styles.songImage} />
-                  <Text style={styles.songTitle}>{ep.titulo_episodio}</Text>
-                  <Text style={styles.artistTitle}>{ep.nombre}</Text>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
+
         </ScrollView>
       )}
     </View>
@@ -260,7 +324,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
-    alignItems: 'flex-start',
     padding: 20,
     // overflow: 'scroll',
   },
@@ -406,10 +469,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
   },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
-  },
   icon: {
     width: 15,
     height: 15,
@@ -426,36 +485,18 @@ const styles = StyleSheet.create({
   songsContainer: {
     flexDirection: 'row',
   },
-  // Estilos para el Modal
-  modalBackground: {
+  recentEpisodeTextContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semitransparente
+    flexDirection: 'column',
   },
-  modalContent: {
-    backgroundColor: "white",
-    padding: 20,
+  recentEpisodeCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#111',
     borderRadius: 10,
-    width: 300,
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  modalButton: {
-    backgroundColor: "#A200F4",
     padding: 10,
-    borderRadius: 5,
-    marginVertical: 10,
-    width: "100%",
-    alignItems: "center",
-  },
-  modalButtonText: {
-    color: "white",
-    fontSize: 16,
+    marginRight: 10,
+    width: 300,
   },
 });
 
