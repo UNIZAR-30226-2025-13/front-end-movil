@@ -4,8 +4,20 @@ import { View, StyleSheet, Text, ScrollView, TouchableOpacity } from "react-nati
 import { Ionicons } from "@expo/vector-icons";
 import { Slot, router } from "expo-router";
 import PlayerComponent from "./PlayerComponent"; // Asegúrate de que esta ruta es correcta
+import { getData } from "@/utils/storage";
+import { goToPerfil } from "@/utils/navigation";
+
+
 
 const Layout = () => {
+
+  const handlePerfilPropio = async () => {
+    const username = await getData("username");
+    //llama a goToPerfil con su propio nombre, para acceder a su perfil
+    goToPerfil(username);
+};
+
+
   return (
     <View style={styles.container}>
       {/* Contenido dinámico */}
@@ -37,7 +49,7 @@ const Layout = () => {
 
           <TouchableOpacity
             style={styles.bottomBarItem}
-            onPress={() => router.push('/baseLayoutPages/perfil')}
+            onPress={handlePerfilPropio}
           >
             <Ionicons name="person" size={24} color="#fff" />
             <Text style={styles.bottomBarText}>Perfil</Text>
