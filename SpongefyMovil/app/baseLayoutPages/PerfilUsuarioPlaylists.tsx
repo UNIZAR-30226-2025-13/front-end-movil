@@ -73,15 +73,22 @@ export default function PerfilUsuarioPlaylists() {
       
             {/* Grid de playlists */}
             <View style={styles.playlistGrid}>
-              {Array.isArray(playlists) ? playlists.map((playlist, index) => (
-                <TouchableOpacity key={index} style={[styles.genreItem, { backgroundColor: playlist.color || '#ccc' }]}>
-                  <Text style={styles.playlistCardText}>{playlist.nombre}</Text>
+            {Array.isArray(playlists) ? playlists.map((playlist, index) => (
+              <View key={index} style={styles.playlistWrapper}>
+                <TouchableOpacity style={[styles.genreItem, { backgroundColor: playlist.color || '#ccc' }]}>
+                  <Text style={styles.playlistCardText}>{playlist.nombre}</Text> {/* Texto negro encima */}
                 </TouchableOpacity>
-              ))  : <Text style={styles.playlistTitle}>Este usuario no tiene listas</Text> }
+                <Text style={styles.playlistText}>{playlist.nombre}</Text> {/* Texto blanco debajo */}
+              </View>
+            )) : (
+              <Text style={styles.playlistTitle}>Este usuario no tiene listas</Text>
+            )}
             </View>
       
           </ScrollView>
+
         </View>
+
       );
 
 
@@ -149,8 +156,7 @@ const styles = StyleSheet.create({
   playlistGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 16,
+    gap: 11,
     paddingVertical: 20,
   },
   
@@ -165,7 +171,7 @@ const styles = StyleSheet.create({
   
   playlistCardText: {
     color: '#000', 
-    fontSize: 16,
+    fontSize: 25,
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -174,202 +180,27 @@ const styles = StyleSheet.create({
     color: '#000',
     fontWeight: 'bold',
   },
-  playlistText: { color: '#fff', fontSize: 14, fontWeight: 'bold', textAlign: 'center' },
-
+  playlistText: { 
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
   genreItem: { 
-    width: 80, 
-    height: 80, 
+    width: 120, 
+    height: 120, 
     borderRadius: 10, 
+    
     justifyContent: 'center', 
     alignItems: 'center', 
     marginRight: 10 
 },
-  bottomBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    backgroundColor: '#111',
-    paddingVertical: 8,
-},
-  bottomBarItem: {
-    alignItems: 'center',
+  playlistWrapper: {
+    width: '48%',           
+    marginBottom: 15,       
+    alignItems: 'center',  
   },
-  bottomBarText: {
-      color: '#fff',
-      fontSize: 12,
-      marginTop: 2,
-  },
-  artistImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 20,
-    marginBottom: 5,
-  },
-  artistInfo: {
-    alignItems: 'flex-start',
-  },
-  artistLabel: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  artistLabelText: {
-    fontSize: 16,
-    color: '#fff',
-    marginRight: 5,
-  },
-  artistName: {
-    fontSize: 35,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 5,
-  },
-  followContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  followButton: {
-    backgroundColor: '#A020F0',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  followText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  followers: {
-    fontSize: 14,
-    color: '#fff',
-  },
-  favoriteSection: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    marginTop: 20,
-  },
-  favoriteImageContainer: {
-    position: 'relative',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  favoriteArtistImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 30,
-  },
-  heartIcon: {
-    width: 80,
-    height: 80,
-    position: 'absolute',
-  },
-  sectionTitle: {
-    fontSize: 30,
-    color: '#fff',
-    textAlign: 'right',
-    width: 150,
-    marginRight: 20,
-    fontWeight: 'bold',
-  },
-  section2Title: {
-    fontSize: 20,
-    color: '#fff',
-    textAlign: 'left',
-    marginTop: 20,
-    marginBottom: 10,
-    fontWeight: 'bold',
-  },
-  albumCard: {
-    width: 100,
-    marginRight: 10,
-  },
-  albumImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-  },
-  albumTitle: {
-    color: '#fff',
-    fontSize: 12,
-    textAlign: 'center',
-    marginTop: 5,
-    fontWeight: 'bold',
-  },
-  songCard: {
-    width: 100,
-    marginRight: 10,
-    marginBottom: 10,
-  },
-  songImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-  },
-  songTitle: {
-    color: '#fff',
-    fontSize: 12,
-    textAlign: 'center',
-    marginTop: 5,
-    fontWeight: 'bold',
-  },
-  artistTitle: {
-    color: '#fff',
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
-  },
-  icon: {
-    width: 15,
-    height: 15,
-  },
-  albumsWrapper: {
-    width: '100%',
-  },
-  albumsContainer: {
-    flexDirection: 'row',
-  },
-  songsWrapper: {
-    width: '100%',
-  },
-  songsContainer: {
-    flexDirection: 'row',
-  },
-  // Estilos para el Modal
-  modalBackground: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semitransparente
-  },
-  modalContent: {
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 10,
-    width: 300,
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  modalButton: {
-    backgroundColor: "#A200F4",
-    padding: 10,
-    borderRadius: 5,
-    marginVertical: 10,
-    width: "100%",
-    alignItems: "center",
-  },
-  modalButtonText: {
-    color: "white",
-    fontSize: 16,
-  },
+  
 });
 
 

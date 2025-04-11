@@ -201,7 +201,7 @@ export const fetchAndSavePublicPlaylists = async (nombre_usuario) => {
         }
         const publicPlaylists = await response.json();
         await saveData("public_playlists", publicPlaylists);
-        console.log("Playlist publicas del usuario guardadas correctamente:", publicPlaylists);
+        //console.log("Playlist publicas del usuario guardadas correctamente:", publicPlaylists);
     } catch (error) {
         console.error("Error en fetchAndSavePublicPlaylists:", error);
     }
