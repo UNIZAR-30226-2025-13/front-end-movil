@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Pressable, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { getData } from '../utils/storage';
+import { getData } from '../../utils/storage';
 import { fetchAndSavePublicPlaylists } from '@/utils/fetch';
 
 interface Playlist {
@@ -33,7 +33,6 @@ export default function PerfilUsuarioPlaylists() {
 
             if (datosPlaylistsPublicas) {
               setPlaylists(datosPlaylistsPublicas || []);
-
             }
 
         };
@@ -76,7 +75,7 @@ export default function PerfilUsuarioPlaylists() {
             <View style={styles.playlistGrid}>
               {Array.isArray(playlists) ? playlists.map((playlist, index) => (
                 <TouchableOpacity key={index} style={[styles.genreItem, { backgroundColor: playlist.color || '#ccc' }]}>
-                  <Text style={styles.playlistText}>{playlist.nombre}</Text>
+                  <Text style={styles.playlistCardText}>{playlist.nombre}</Text>
                 </TouchableOpacity>
               ))  : <Text style={styles.playlistTitle}>Este usuario no tiene listas</Text> }
             </View>
@@ -148,19 +147,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   playlistGrid: {
-    paddingVertical: 20,
-    paddingHorizontal: 14,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: 16,
+    paddingVertical: 20,
   },
+  
   playlistCard: {
     width: '48%',
-    aspectRatio: 1,
-    borderRadius: 12,
-    padding: 10,
-    justifyContent: 'space-between',
+    aspectRatio: 1, 
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 12,
+  },
+  
+  playlistCardText: {
+    color: '#000', 
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   playlistTitle: {
     fontSize: 16,

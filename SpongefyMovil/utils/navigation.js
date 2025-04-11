@@ -4,7 +4,7 @@ import { saveData } from './storage';
 export const goToPerfil = async (nombre) => {
 
     await saveData("user", nombre);
-    router.push('/PerfilUsuarioPlaylists');
+    router.push('/baseLayoutPages/PerfilUsuarioPlaylists');
 };
 
 export const goToPodcasterPerfil = async (nombre_podcaster) => {

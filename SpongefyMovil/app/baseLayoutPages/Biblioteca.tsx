@@ -375,32 +375,6 @@ export default function BibliotecaScreen() {
                 {renderSectionContent()}
             </View>
 
-            {/* Barre de navigation inférieure */}
-            <View style={styles.bottomBar}>
-                <TouchableOpacity
-                    style={styles.bottomBarItem}
-                    onPress={() => router.push('/baseLayoutPages/home')}
-                >
-                    <Ionicons name="home" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Home</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.bottomBarItem}
-                    onPress={handleBiblioteca}
-                >
-                    <Ionicons name="library" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Tu biblioteca</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.bottomBarItem}
-                    onPress={handlePerfilPropio}
-                >
-                    <Ionicons name="person" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Perfil</Text>
-                </TouchableOpacity>
-            </View>
         </View>
     );
 }

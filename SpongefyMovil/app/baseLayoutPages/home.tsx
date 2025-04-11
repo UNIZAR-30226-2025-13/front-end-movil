@@ -238,6 +238,10 @@ export default function HomeScreen() {
         goToPodcasterPerfil(nombre_podcaster);
     };
     
+    const handleGoToArtista = async (nombre_artista: string) => {
+        await saveData("artist", nombre_artista);
+        router.push(`/baseLayoutPages/artista/${nombre_artista}`);
+    };
 
     const handleDebug = async () => {
         console.log("DEBUG");
@@ -297,8 +301,8 @@ export default function HomeScreen() {
                     placeholderTextColor="#888"
                     value={searchQuery}
                     onChangeText={setSearchQuery}
-                    onSubmitEditing={handleSearch} // Ejecuta al presionar Enter
-                    returnKeyType="search" // Hace que el botón de teclado muestre "Buscar"
+                    onSubmitEditing={handleSearch}
+                    returnKeyType="search" 
                 />
                 
              {/*    
@@ -385,19 +389,23 @@ export default function HomeScreen() {
     
                     {/* Resultados de Usuarios */}
                     {searchResults.usuarios.length > 0 && (
-                        <>
-                            <Text style={styles.subtitle}>Usuarios</Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-                                {searchResults.usuarios
-                                .filter(item => item.similitud >= SIMILARITY_THRESHOLD)
-                                .map((item, index) => (
-                                    <TouchableOpacity key={index} style={styles.itemContainer}>
-                                        <Image source={{ }} style={styles.itemImage} />
-                                        <Text style={styles.itemText}>{item.nombre_usuario}</Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
-                        </>
+                    <>
+                        <Text style={styles.subtitle}>Usuarios</Text>
+                        <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+                        {searchResults.usuarios
+                            .filter(item => item.similitud >= SIMILARITY_THRESHOLD)
+                            .map((item, index) => (
+                            <TouchableOpacity key={index} style={styles.itemContainer}>
+                                <View style={styles.userIcon}>
+                                <Text style={styles.userInitial}>
+                                    {item.nombre_usuario?.charAt(0).toUpperCase()}
+                                </Text>
+                                </View>
+                                <Text style={styles.itemText}>{item.nombre_usuario}</Text>
+                            </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+                    </>
                     )}
     
                     {/* Resultados de Listas */}
@@ -407,14 +415,17 @@ export default function HomeScreen() {
                             <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
                                 {searchResults.listas
                                 .filter(item => item.similitud >= SIMILARITY_THRESHOLD)
-                                .map((item, index) => (
-                                    <TouchableOpacity key={index} style={[styles.itemContainer ]}> {/* , { backgroundColor: item.color } */}
-                                        
-                                        <Image source={{ }} style={styles.itemImage} />
-                                        <Text style={styles.itemText}>{item.nombre}</Text>
-                                        
+                                .map((item) => (
+                                    <TouchableOpacity key={item.id_lista} style={[styles.genreItem,{ backgroundColor: item.color }  ]}> {/* , { backgroundColor: index.color } */}
+            
+                                    <Text style={styles.genreText}>{item.nombre}</Text>
+                                    {/* <Text style={styles.itemText}>{item.nombre}</Text> */}
+
                                     </TouchableOpacity>
+                                    
                                 ))}
+                                
+            
                             </ScrollView>
                         </>
                     )}
@@ -487,11 +498,12 @@ export default function HomeScreen() {
                                 <Text style={styles.subtitle}>Lo mejor de {listasMusicaArtista.nombre_artista}</Text>
 
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
-
-                                                            
+            
                                     <View style={styles.itemContainer}>
-                                        <Image source={{ uri: listasMusicaArtista.link_imagen }} style={styles.artistaImage} />
-                                        <Text style={styles.itemText}>{listasMusicaArtista.nombre_artista}</Text>
+                                        <TouchableOpacity onPress={() => handleGoToArtista(listasMusicaArtista.nombre_artista)}>
+                                            <Image source={{ uri: listasMusicaArtista.link_imagen }} style={styles.artistaImage} />
+                                            <Text style={styles.itemText}>{listasMusicaArtista.nombre_artista}</Text>
+                                        </TouchableOpacity>
                                     </View>
                                     {listasMusicaArtista.canciones_albumes.map((cancion, index) => (
                                         <TouchableOpacity key={index} style={styles.cancionItem}>
@@ -652,34 +664,6 @@ export default function HomeScreen() {
                 {renderSectionContent()}
             </View>
 
-
-            
-
-            {/* Barre de navigation inférieure */}
-            <View style={styles.bottomBar}>
-                <TouchableOpacity
-                    style={styles.bottomBarItem}
-                >
-                    <Ionicons name="home" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Home</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.bottomBarItem}
-                    onPress={() => router.push('/baseLayoutPages/Biblioteca')}
-                >
-                    <Ionicons name="library" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Tu biblioteca</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.bottomBarItem}
-                    onPress={handlePerfilPropio}
-                >
-                    <Ionicons name="person" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Perfil</Text>
-                </TouchableOpacity>
-            </View>
         </View>
     );
 }
@@ -863,4 +847,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 10,
     },
+    userIcon: {
+        width: 80,
+        height: 80,
+        borderRadius: 10,
+        backgroundColor: "#fff",
+        justifyContent: "center",
+        alignItems: "center",
+        marginBottom: 8,
+      },
+      
+      userInitial: {
+        color: "#000",
+        fontSize: 40,
+        fontWeight: "bold",
+      },
 });
