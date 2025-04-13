@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Alert, Text, TextInput, TouchableOpacity, ImageBackground, View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { saveData, getData, removeData } from "../utils/storage";
+import { saveData, getData, removeData } from "../../utils/storage";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -61,7 +61,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <ImageBackground source={require("../assets/halfalogo.png")} style={styles.background}>
+    <ImageBackground source={require("../../assets/halfalogo.png")} style={styles.background}>
       <View style={styles.container}>
         <Text style={styles.title}>Iniciar Sesión</Text>
 

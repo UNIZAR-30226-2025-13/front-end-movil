@@ -21,7 +21,7 @@ export default function PlaylistDetailScreen() {
 
     const handleAddMusic = () => {
         // Navigue vers l'écran d'ajout de musiques
-        router.push('/AddMusicToPlaylist');
+        router.push('./AddMusicToPlaylist');
     };
 
     const handleMoreOptions = () => {

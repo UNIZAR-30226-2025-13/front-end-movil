@@ -54,7 +54,7 @@ const SongDetail = () => {
                 </View>
                 <View style={styles.titleRow}>
                     <Text style={styles.songTitle}>{song.title}</Text>
-                    <TouchableOpacity style={styles.moreOptions} onPress={() => router.push('/SongDetail')}>
+                    <TouchableOpacity style={styles.moreOptions} onPress={() => router.push('./SongDetail')}>
                         <Ionicons name="ellipsis-horizontal" size={24} color="#fff" />
                     </TouchableOpacity>
                 </View>
@@ -67,42 +67,42 @@ const SongDetail = () => {
 
             <View style={styles.playerControls}>
                 <TouchableOpacity style={styles.controlButton} onPress={() => console.log("Shuffle")}>
-                    <Image source={require('../assets/aleatorio.png')} style={{ width: 24, height: 24 }} />
+                    <Image source={require('../../assets/aleatorio.png')} style={{ width: 24, height: 24 }} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.controlButton} onPress={() => console.log("Previous")}>
                     <Ionicons name="play-skip-back" size={24} color="#fff" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.playPauseButton} onPress={handlePlayPause}>
-                    <Image source={require('../assets/play.png')} style={{ width: 24, height: 24 }} />
+                    <Image source={require('../../assets/play.png')} style={{ width: 24, height: 24 }} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.controlButton} onPress={() => console.log("Next")}>
-                    <Image source={require('../assets/adelante.png')} style={{ width: 24, height: 24 }} />
+                    <Image source={require('../../assets/adelante.png')} style={{ width: 24, height: 24 }} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.controlButton} onPress={() => console.log("Bucle")}>
-                    <Image source={require('../assets/bucle.png')} style={{ width: 24, height: 24 }} />
+                    <Image source={require('../../assets/bucle.png')} style={{ width: 24, height: 24 }} />
                 </TouchableOpacity>
             </View>
 
             <View style={styles.lyricsRow}>
                 <TouchableOpacity style={styles.controlButton} onPress={() => console.log("Add to playlist")}>
-                    <Image source={require('../assets/anyadirplaylist.png')} style={{ width: 24, height: 24 }} />
+                    <Image source={require('../../assets/anyadirplaylist.png')} style={{ width: 24, height: 24 }} />
                 </TouchableOpacity>
                 <Text style={styles.lyricsButtonText}>Letra</Text>
                 <TouchableOpacity style={styles.controlButton} onPress={() => console.log("Add to playlist")}>
-                    <Image source={require('../assets/heart.png')} style={{ width: 24, height: 24 }} />
+                    <Image source={require('../../assets/heart.png')} style={{ width: 24, height: 24 }} />
                 </TouchableOpacity>
             </View>
 
             <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/home')}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('./home')}>
                     <Ionicons name="home" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Home</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/Biblioteca')}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('./Biblioteca')}>
                     <Ionicons name="library" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Tu biblioteca</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/perfil')}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('./perfil')}>
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>
                 </TouchableOpacity>

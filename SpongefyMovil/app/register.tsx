@@ -41,7 +41,7 @@ export default function RegisterScreen() {
       }
 
       Alert.alert("¡Éxito!", "Cuenta creada exitosamente.");
-      router.push("/LoginScreen");
+      router.push("./LoginScreen");
     } catch (error) {
       Alert.alert("Error", "Error en el registro");
     }
@@ -49,7 +49,7 @@ export default function RegisterScreen() {
 
   const handleBack = () => {
     // Regresa a la pantalla de login
-    router.push('/LoginScreen');
+    router.push('./LoginScreen');
   };
 
   return (
@@ -98,7 +98,7 @@ export default function RegisterScreen() {
         />
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                    <Text style={styles.buttonText}>Registrarse</Text>
+            <Text style={styles.buttonText}>Registrarse</Text>
           </TouchableOpacity>
         </View>
       </View>
