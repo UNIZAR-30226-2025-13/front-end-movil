@@ -1,20 +1,83 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { saveData, getData, removeData } from "../../../utils/storage";
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import { usePlayer } from '../PlayerContext';
 
 export default function PlaylistDetailScreen() {
     const router = useRouter();
-    const [isPlaying, setIsPlaying] = useState(false);
+    const { id_playlist } = useLocalSearchParams<{ id_playlist: string | string[] }>();
+    const { fetchAndPlaySong } = usePlayer(); 
+    console.log("PlaylistDetailScreen: ", id_playlist);
+    // Liste de chansons statiques
+    const [playlistData, setPlaylistData] = useState({
+        nombre: '',
+        color: '',
+        es_playlist: false,
+        es_publica: false,
+        nombre_usuario: '',
+        contenido: []
+    });
+    
+    const [loading, setLoading] = useState(false);
+    useEffect(() => {
+        const getPlaylistData = async () => {
+            //Usar get-list-data para hacer llamada a la API y obtener datos de la playlist con el id correcto
+            setLoading(true);
+            try{
+                const username = await getData("username");
+                console.log("👤 Usuario obtenido:", username);
+                const url = `https://spongefy-back-end.onrender.com/get-list-data?id_lista=${id_playlist}&nombre_usuario=${username}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (response.ok) {
+                    console.log("Respuesta de la API:", data);
+                    setPlaylistData({
+                        nombre: data.nombre,
+                        color: data.color,
+                        es_playlist: data.es_playlist,
+                        es_publica: data.es_publica,
+                        nombre_usuario: data.nombre_usuario,
+                        contenido: data.contenido
+                    });
+                }
+            }catch (error) {
+                console.error("⚠️ Error en la solicitud:", error);
+            } finally{
+                setLoading(false);
+            }
 
-    const songs = [
-        { id: 1, title: 'A quién le importa', artist: 'Alaska y Dinarama', cover: require('../../assets/exemple_song_1.png') },
-        { id: 2, title: 'Ave María', artist: 'David Bisbal', cover: require('../../assets/exemple_song_1.png') },
-        { id: 3, title: 'Chiquilla', artist: 'Seguridad Social', cover: require('../../assets/exemple_song_1.png') },
-        { id: 4, title: 'Zapatillas', artist: 'El Canto Del Loco', cover: require('../../assets/exemple_song_1.png') },
-        { id: 5, title: 'Devuélveme a mi chica', artist: 'Hombres G', cover: require('../../assets/exemple_song_1.png') },
-    ];
+        }
+        getPlaylistData();
+    }, []);
+    
+    // Convertir una duración HH:mm:ss a segundos
+    const convertToSeconds = (duration: string) => {
+        const [hours, minutes, seconds] = duration.split(':').map(Number);
+        return hours * 3600 + minutes * 60 + seconds;
+    };
 
+    // Sumar todas las duraciones
+    const getTotalDuration = (contenido: any[]) => {
+        return contenido.reduce((total, cancion) => {
+        return total + convertToSeconds(cancion.duracion);
+        }, 0);
+    };
+
+    // Convertir los segundos totales a formato HH:mm:ss
+    const convertSecondsToTime = (seconds: number) => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+        
+        return `${String(hours).padStart(2, '0')} h ${String(minutes).padStart(2, '0')} min ${String(remainingSeconds).padStart(2, '0')} s`;
+    };
+
+    // Obtener la duración total de la playlist
+    const totalDuration = getTotalDuration(playlistData.contenido);
+    const formattedDuration = convertSecondsToTime(totalDuration);
     const handleShuffle = () => {
         console.log("Bouton shuffle cliqué");
     };
@@ -38,10 +101,10 @@ export default function PlaylistDetailScreen() {
             </TouchableOpacity>
 
             <View style={styles.coverContainer}>
-                <View style={styles.bigCover}>
-                    <Text style={styles.bigCoverText}>a la ducha</Text>
+                <View style={[styles.bigCover, { backgroundColor: playlistData.color }]}>
+                    <Text style={styles.bigCoverText}>{playlistData.nombre}</Text>
                 </View>
-                <Text style={styles.playlistInfo}>Pública | 5 canciones | 15 mins 18 s</Text>
+                <Text style={styles.playlistInfo}>{playlistData.es_publica ? 'Pública' : 'Privada'} | {playlistData.contenido.length} canciones | {formattedDuration}</Text>
             </View>
             <View style={styles.searchContainer}>
                 <Ionicons name="search" size={20} color="#888" style={styles.iconLeft} />
@@ -69,16 +132,18 @@ export default function PlaylistDetailScreen() {
             </View>
 
             <ScrollView style={styles.songsContainer}>
-                {songs.map((song) => (
+                {playlistData.contenido.map((song) => (
                     <TouchableOpacity
-                        key={song.id}
+                        key={song.id_cm}
                         style={styles.songRow}
-                        onPress={() => router.push('./PlaySong')} 
+                        onPress={() => {
+                            fetchAndPlaySong(song.id_cm);
+                          }}
                     >
-                        <Image source={song.cover} style={styles.artistAvatar} />
+                        <Image source={song.link_imagen} style={styles.artistAvatar} />
                         <View style={styles.songInfo}>
-                            <Text style={styles.songTitle}>{song.title}</Text>
-                            <Text style={styles.songArtist}>{song.artist}</Text>
+                            <Text style={styles.songTitle}>{song.titulo}</Text>
+                            <Text style={styles.songArtist}>{song.nombre_creador}</Text>
                         </View>
                     </TouchableOpacity>
                 ))}
@@ -87,7 +152,7 @@ export default function PlaylistDetailScreen() {
             <View style={styles.bottomBar}>
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('./home')}
+                    onPress={() => router.push('../home')}
                 >
                     <Ionicons name="home" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Home</Text>
@@ -95,7 +160,7 @@ export default function PlaylistDetailScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('./Biblioteca')}
+                    onPress={() => router.push('../Biblioteca')}
                 >
                     <Ionicons name="library" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Tu biblioteca</Text>
@@ -103,7 +168,7 @@ export default function PlaylistDetailScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('./perfil')}
+                    onPress={() => router.push('../perfil')}
                 >
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>

@@ -142,9 +142,9 @@ export default function BibliotecaScreen() {
         goToPodcasterPerfil(nombre_podcaster);
     };
 
-    const handleGoToPlaylist = (id_lista: number) => {
-        console.log("Boton Playlist pulsado para:", id_lista);
-        router.push(`/playlist/${id_lista}`);
+    const handleGoToPlaylist = (id_playlist: number) => {
+        console.log("Boton Playlist pulsado para:", id_playlist);
+        router.push(`./playlist/${id_playlist}`);
     };
 
     const handleGoToFolder = async (id_folder: number) => {
