@@ -29,7 +29,6 @@ const SongDetail = () => {
 
     const handlePlayPause = () => {
         setIsPlaying(!isPlaying);
-        // Ici, vous ajouterez la logique de lecture réelle
     };
 
     // Composant pour afficher la barre de progression

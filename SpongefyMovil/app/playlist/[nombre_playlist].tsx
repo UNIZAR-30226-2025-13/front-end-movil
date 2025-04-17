@@ -5,8 +5,8 @@ import { useRouter } from 'expo-router';
 
 export default function PlaylistDetailScreen() {
     const router = useRouter();
+    const [isPlaying, setIsPlaying] = useState(false);
 
-    // Liste de chansons statiques
     const songs = [
         { id: 1, title: 'A quién le importa', artist: 'Alaska y Dinarama', cover: require('../../assets/exemple_song_1.png') },
         { id: 2, title: 'Ave María', artist: 'David Bisbal', cover: require('../../assets/exemple_song_1.png') },
@@ -20,7 +20,6 @@ export default function PlaylistDetailScreen() {
     };
 
     const handleAddMusic = () => {
-        // Navigue vers l'écran d'ajout de musiques
         router.push('./AddMusicToPlaylist');
     };
 
@@ -28,14 +27,16 @@ export default function PlaylistDetailScreen() {
         console.log("Plus d'options...");
     };
 
+    const handlePlayPause = () => {
+        setIsPlaying(!isPlaying);
+    };
+
     return (
         <View style={styles.container}>
-            {/* Bouton retour */}
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                 <Ionicons name="arrow-back" size={28} color="#fff" />
             </TouchableOpacity>
 
-            {/* Pochette et info */}
             <View style={styles.coverContainer}>
                 <View style={styles.bigCover}>
                     <Text style={styles.bigCoverText}>a la ducha</Text>
@@ -53,8 +54,11 @@ export default function PlaylistDetailScreen() {
 
             {/* Barre d’actions (shuffle, add, menu) */}
             <View style={styles.actionsBar}>
-                <TouchableOpacity onPress={handleShuffle} style={styles.actionButton}>
-                    <Ionicons name="shuffle" size={24} color="#fff" />
+                <TouchableOpacity onPress={handlePlayPause} style={styles.actionButton}>
+                    <Image source={require('../../assets/play.png')} style={{ width: 24, height: 24 }} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => console.log("Shuffle")} style={styles.actionButton}>
+                    <Image source={require('../../assets/aleatorio.png')} style={{ width: 24, height: 24 }} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleAddMusic} style={styles.actionButton}>
                     <Ionicons name="add-circle" size={24} color="#fff" />
@@ -69,7 +73,7 @@ export default function PlaylistDetailScreen() {
                     <TouchableOpacity
                         key={song.id}
                         style={styles.songRow}
-                        onPress={() => router.push('/PlaySong')} // <-- Navigation
+                        onPress={() => router.push('./PlaySong')} 
                     >
                         <Image source={song.cover} style={styles.artistAvatar} />
                         <View style={styles.songInfo}>
@@ -80,11 +84,10 @@ export default function PlaylistDetailScreen() {
                 ))}
             </ScrollView>
 
-            {/* Barre de navigation inférieure */}
             <View style={styles.bottomBar}>
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/home')}
+                    onPress={() => router.push('./home')}
                 >
                     <Ionicons name="home" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Home</Text>
@@ -92,7 +95,7 @@ export default function PlaylistDetailScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/Biblioteca')}
+                    onPress={() => router.push('./Biblioteca')}
                 >
                     <Ionicons name="library" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Tu biblioteca</Text>
@@ -100,7 +103,7 @@ export default function PlaylistDetailScreen() {
 
                 <TouchableOpacity
                     style={styles.bottomBarItem}
-                    onPress={() => router.push('/perfil')}
+                    onPress={() => router.push('./perfil')}
                 >
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>

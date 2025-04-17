@@ -47,17 +47,17 @@ export default function SongDetail() {
             </View>
 
             <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/home')}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('./home')}>
                     <Ionicons name="home" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Home</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/Biblioteca')}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('./Biblioteca')}>
                     <Ionicons name="library" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Tu biblioteca</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/perfil')}>
+                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('./perfil')}>
                     <Ionicons name="person" size={24} color="#fff" />
                     <Text style={styles.bottomBarText}>Perfil</Text>
                 </TouchableOpacity>
