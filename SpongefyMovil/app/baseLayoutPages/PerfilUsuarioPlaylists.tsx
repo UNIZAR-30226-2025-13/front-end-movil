@@ -12,84 +12,88 @@ interface Playlist {
 }
 
 export default function PerfilUsuarioPlaylists() {
-    
-    const router = useRouter();
-    const [playlists, setPlaylists] = useState<Playlist[]>([]);    
-    const [userName, setUser] = useState<any>(null);
-    const [profileUsername, setProfileUsername] = useState<any>(null);
+
+  const router = useRouter();
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [userName, setUser] = useState<any>(null);
+  const [profileUsername, setProfileUsername] = useState<any>(null);
+  const handleGoToPlaylist = (id_playlist: number) => {
+    console.log("Boton Playlist pulsado para:", id_playlist);
+    router.push(`./playlist/${id_playlist}`);
+  };
 
 
-    useEffect(() => {
-        const loadProfile = async () => {
+  useEffect(() => {
+    const loadProfile = async () => {
 
-        const nombre_perfil = await getData("user");
-        const nombre_usuario = await getData("username");
+      const nombre_perfil = await getData("user");
+      const nombre_usuario = await getData("username");
 
-        setUser(nombre_usuario);
-        setProfileUsername(nombre_perfil);
+      setUser(nombre_usuario);
+      setProfileUsername(nombre_perfil);
 
-            await fetchAndSavePublicPlaylists(nombre_perfil); 
-            const datosPlaylistsPublicas = await getData("public_playlists");
+      await fetchAndSavePublicPlaylists(nombre_perfil);
+      const datosPlaylistsPublicas = await getData("public_playlists");
 
-            if (datosPlaylistsPublicas) {
-              setPlaylists(datosPlaylistsPublicas || []);
-            }
+      if (datosPlaylistsPublicas) {
+        setPlaylists(datosPlaylistsPublicas || []);
+      }
 
-        };
-    
-        loadProfile();
-    }, []);
+    };
 
-    return (
-        <View style={styles.container}>
-          <ScrollView contentContainerStyle={styles.scrollContent}>
-      
-            {/* Botón atrás */}
-            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={28} color="#fff" />
+    loadProfile();
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+
+        {/* Botón atrás */}
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={28} color="#fff" />
+        </TouchableOpacity>
+
+        {/* Cabecera */}
+        <View style={styles.header}>
+          <Text style={styles.label}>Usuario</Text>
+          <Text style={styles.username}>{userName}</Text>
+
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>
+              {userName?.charAt(0).toUpperCase() ?? ''}
+            </Text>
+          </View>
+
+          {userName === profileUsername ? (
+            <TouchableOpacity style={styles.friendButton}>
+              <Text style={styles.friendButtonText}>Editar perfil</Text>
             </TouchableOpacity>
-      
-            {/* Cabecera */}
-            <View style={styles.header}>
-              <Text style={styles.label}>Usuario</Text>
-              <Text style={styles.username}>{userName}</Text>
-      
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>
-                  {userName?.charAt(0).toUpperCase() ?? ''}
-                </Text>
-              </View>
-      
-              {userName === profileUsername ? (
-                <TouchableOpacity style={styles.friendButton}>
-                  <Text style={styles.friendButtonText}>Editar perfil</Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity style={styles.friendButton}>
-                  <Text style={styles.friendButtonText}>+ Solicitud de amistad</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-      
-            {/* Grid de playlists */}
-            <View style={styles.playlistGrid}>
-            {Array.isArray(playlists) ? playlists.map((playlist, index) => (
-              <View key={index} style={styles.playlistWrapper}>
-                <TouchableOpacity style={[styles.genreItem, { backgroundColor: playlist.color || '#ccc' }]}>
-                  <Text style={styles.playlistCardText}>{playlist.nombre}</Text> {/* Texto negro encima */}
-                </TouchableOpacity>
-                <Text style={styles.playlistText}>{playlist.nombre}</Text> {/* Texto blanco debajo */}
-              </View>
-            )) : (
-              <Text style={styles.playlistTitle}>Este usuario no tiene listas</Text>
-            )}
-            </View>
-      
-          </ScrollView>
-
+          ) : (
+            <TouchableOpacity style={styles.friendButton}>
+              <Text style={styles.friendButtonText}>+ Solicitud de amistad</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-      );
+        {/* Grid de playlists */}
+        <View style={styles.playlistGrid}>
+          {Array.isArray(playlists) ? playlists.map((playlist, index) => (
+            <View key={index} style={styles.playlistWrapper}>
+              <TouchableOpacity onPress={() => handleGoToPlaylist(playlist.id_lista)} style={[styles.genreItem, { backgroundColor: playlist.color || '#ccc' }]}>
+                <Text style={styles.playlistCardText}>{playlist.nombre}</Text> {/* Texto negro encima */}
+              </TouchableOpacity>
+              <Text style={styles.playlistText}>{playlist.nombre}</Text> {/* Texto blanco debajo */}
+            </View>
+          )) : (
+            <Text style={styles.playlistTitle}>Este usuario no tiene listas</Text>
+          )}
+        </View>
+
+      </ScrollView>
+
+    </View>
+
+  );
 
 
 };
@@ -99,7 +103,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#666',
     padding: 20,
     borderRadius: 40,
-    alignItems: 'center', 
+    alignItems: 'center',
     width: '100%',
   },
   container: {
@@ -159,18 +163,18 @@ const styles = StyleSheet.create({
     gap: 11,
     paddingVertical: 20,
   },
-  
+
   playlistCard: {
     width: '48%',
-    aspectRatio: 1, 
+    aspectRatio: 1,
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 12,
   },
-  
+
   playlistCardText: {
-    color: '#000', 
+    color: '#000',
     fontSize: 25,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -180,27 +184,27 @@ const styles = StyleSheet.create({
     color: '#000',
     fontWeight: 'bold',
   },
-  playlistText: { 
+  playlistText: {
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center'
   },
-  genreItem: { 
-    width: 120, 
-    height: 120, 
-    borderRadius: 10, 
-    
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    marginRight: 10 
-},
-  playlistWrapper: {
-    width: '48%',           
-    marginBottom: 15,       
-    alignItems: 'center',  
+  genreItem: {
+    width: 120,
+    height: 120,
+    borderRadius: 10,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10
   },
-  
+  playlistWrapper: {
+    width: '48%',
+    marginBottom: 15,
+    alignItems: 'center',
+  },
+
 });
 
 
