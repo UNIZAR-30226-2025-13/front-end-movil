@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, TextInput
+import {
+    View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, TextInput
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -188,430 +189,315 @@ export default function HomeScreen() {
 
     const [listasPodcastPodcastersInfo, setListasPodcastPodcastersInfo] = useState<PodcastListaPodcastersInfo[]>([]);
     const [listasPodcastAleatorioInfo, setListasPodcastAleatorioInfo] = useState<PodcastListaAleatorioInfo[]>([]);
-    const [listasPodcastCompleto, setListasPodcastCompleto] = useState<PodcastCompleto[]>([]); 
-    const [podcastCompleto, setPodcastCompleto] = useState<PodcastCompleto | null>(null); 
+    const [listasPodcastCompleto, setListasPodcastCompleto] = useState<PodcastCompleto[]>([]);
+    const [podcastCompleto, setPodcastCompleto] = useState<PodcastCompleto | null>(null);
 
     useEffect(() => {
-        const fetchData = async () => {
-
-            //Todo
+        const fetchAll = async () => {
+            // Todo
             await fetchAndSaveHomeData();
-            const homeData = await getData("home"); 
+            const homeData = await getData('home');
             if (homeData) {
                 setListasArtistas(homeData.listas_artistas_info || []);
                 setListasGeneros(homeData.listas_genero_info || []);
                 setListasIdiomas(homeData.listas_idioma_info || []);
-                setListasPodcast(homeData.podcasts || [])
+                setListasPodcast(homeData.podcasts || []);
             }
 
-            //Musica
+            // Musica
             await fetchAndSaveHomeMusicData();
-            const homeMusicData = await getData("homeMusic");
-            if (homeMusicData) {
-                setListasMusicaGenero(homeMusicData.listas_genero_info || []);
-                setListasMusicaIdioma(homeMusicData.listas_idioma_info || []);
-                setListasMusicaArtistas(homeMusicData.listas_artistas_info || []);
-                setListasMusicaAleatorio(homeMusicData.listas_aleatorio_info || []);
-                setListasMusicaArtista(homeMusicData.artista || null);
+            const homeMusic = await getData('homeMusic');
+            if (homeMusic) {
+                setListasMusicaGenero(homeMusic.listas_genero_info || []);
+                setListasMusicaIdioma(homeMusic.listas_idioma_info || []);
+                setListasMusicaArtistas(homeMusic.listas_artistas_info || []);
+                setListasMusicaAleatorio(homeMusic.listas_aleatorio_info || []);
+                setListasMusicaArtista(homeMusic.artista || null);
             }
 
+            // Podcasts
             await fetchAndSaveHomePodcastData();
-            const homePodcastData = await getData("homePodcast");
-            if (homePodcastData) {
-                setListasPodcastPodcastersInfo(homePodcastData.listas_podcasters_info || []);
-                setListasPodcastAleatorioInfo (homePodcastData.listas_aleatorio_info || []);
-                setListasPodcastCompleto(homePodcastData.podcasts || []);
-                setPodcastCompleto(homePodcastData.podcast || null);
+            const homePodcast = await getData('homePodcast');
+            if (homePodcast) {
+                setListasPodcastPodcastersInfo(homePodcast.listas_podcasters_info || []);
+                setListasPodcastAleatorioInfo(homePodcast.listas_aleatorio_info || []);
+                setListasPodcastCompleto(homePodcast.podcasts || []);
+                setPodcastCompleto(homePodcast.podcast || null);
             }
-
         };
-        fetchData();
+
+        fetchAll();
     }, []);
-    
-    const handlePerfilPropio = async () => {
-        const username = await getData("username");
-        //llama a goToPerfil con su propio nombre, para acceder a su perfil
-        goToPerfil(username);
-    };
-
-    const handlePerfilPodcaster = async (nombre_podcaster: string) => {
-        goToPodcasterPerfil(nombre_podcaster);
-    };
-    
-    const handleGoToArtista = async (nombre_artista: string) => {
-        await saveData("artist", nombre_artista);
-        router.push(`/baseLayoutPages/artista/${nombre_artista}`);
-    };
-
-    const handleDebug = async () => {
-        console.log("DEBUG");
-        const username = await getData("username"); 
-        if (username) {
-            await fetchAndSaveHomePodcastData();
-        }
-    };
 
     const handleSearch = async () => {
-
-
-        if (searchQuery.trim() === ''){
-            setSearchResults(null); 
+        if (!searchQuery.trim()) {
+            setSearchResults(null);
             return;
         }
-    
-   
-        switch (selectedTab) {
-            case 'Todo':
-                await fetchAndSaveSearchHomeAll(searchQuery);
-                const searchGlobalData = await getData("searchGlobal");
-
-                if (searchGlobalData) {
-                    setSearchResults({
-                        multimedia: searchGlobalData.multimedia || [],
-                        creadores: searchGlobalData.creadores || [],
-                        albumes: searchGlobalData.albumes || [],
-                        podcasts: searchGlobalData.podcasts || [],
-                        usuarios: searchGlobalData.usuarios || [],
-                        listas: searchGlobalData.listas || [],
-                    });
-                }
-                break;
-            case 'Musica':
-    
-                break;
-            case 'Podcasts':
-                
-                break;
-            default:
-                return;
+        if (selectedTab === 'Todo') {
+            await fetchAndSaveSearchHomeAll(searchQuery);
+            const data = await getData('searchGlobal');
+            if (data) {
+                setSearchResults({
+                    multimedia: data.multimedia || [],
+                    creadores: data.creadores || [],
+                    albumes: data.albumes || [],
+                    podcasts: data.podcasts || [],
+                    usuarios: data.usuarios || [],
+                    listas: data.listas || []
+                });
+            }
         }
-
     };
 
-    const SearchBar = () => {
-        return (
-            <View style={styles.searchContainer}>
-                {/* Icono de búsqueda a la izquierda */}
-                <Ionicons name="search" size={20} color="#fff" style={styles.iconLeft} />
-                
-                {/* Input de búsqueda */}
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Buscar"
-                    placeholderTextColor="#888"
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    onSubmitEditing={handleSearch}
-                    returnKeyType="search" 
-                />
-                
-             {/*    
-                <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-                    <Ionicons name="arrow-forward-circle" size={24} color="#fff" />
-                </TouchableOpacity> */}
-                
-            </View>
-        );
+    const goToFriends = () => {
+        router.push('/baseLayoutPages/Friends');
     };
+    const handlePerfilPodcaster = (name: string) => {
+        goToPodcasterPerfil(name);
+    };
+    const handleGoToArtista = async (name: string) => {
+        await saveData('artist', name);
+        router.push(`/baseLayoutPages/artista/${name}`);
+    };
+
+    const SearchBar = () => (
+        <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color="#fff" style={styles.iconLeft} />
+            <TextInput
+                style={styles.searchInput}
+                placeholder="Buscar"
+                placeholderTextColor="#888"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                onSubmitEditing={handleSearch}
+                returnKeyType="search"
+            />
+        </View>
+    );
 
     const renderSectionContent = () => {
-        //
         if (searchResults) {
             return (
-                <ScrollView style={styles.containerVerticalScroll} showsVerticalScrollIndicator={false}>    
-                    {/* Resultados de Multimedia */}
-                    {searchResults.multimedia.length > 0 && (
+                <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                    {!!searchResults.multimedia.length && (
                         <>
                             <Text style={styles.subtitle}>Multimedia</Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                                 {searchResults.multimedia
-                                .filter(item => item.similitud >= SIMILARITY_THRESHOLD)
-                                .map((item, index) => (
-                                    <TouchableOpacity key={index} style={styles.itemContainer}>
-                                        <Image source={{ uri: item.link_imagen }} style={styles.itemImage} />
-                                        <Text style={styles.itemText}>{item.titulo}</Text>
-                                    </TouchableOpacity>
-                                ))}
+                                    .filter(x => x.similitud >= SIMILARITY_THRESHOLD)
+                                    .map((item, i) => (
+                                        <TouchableOpacity key={i} style={styles.itemContainer}>
+                                            <Image source={{ uri: item.link_imagen }} style={styles.itemImage} />
+                                            <Text style={styles.itemText}>{item.titulo}</Text>
+                                        </TouchableOpacity>
+                                    ))}
                             </ScrollView>
                         </>
                     )}
-    
-                    {/* Resultados de Creadores */}
-                    {searchResults.creadores.length > 0 && (
+
+                    {/* Creadores */}
+                    {!!searchResults.creadores.length && (
                         <>
                             <Text style={styles.subtitle}>Creadores</Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                                 {searchResults.creadores
-                                .filter(item => item.similitud >= SIMILARITY_THRESHOLD)
-                                .map((item, index) => (
-                                    <TouchableOpacity key={index} style={styles.itemContainer}>
-                                        <Image source={{ uri: item.link_imagen }} style={styles.itemImage} />
-                                        <Text style={styles.itemText}>{item.nombre_creador}</Text>
-                                    </TouchableOpacity>
-                                ))}
+                                    .filter(x => x.similitud >= SIMILARITY_THRESHOLD)
+                                    .map((item, i) => (
+                                        <TouchableOpacity key={i} style={styles.itemContainer} onPress={() => handlePerfilPodcaster(item.nombre_creador)}>
+                                            <Image source={{ uri: item.link_imagen }} style={styles.itemImage} />
+                                            <Text style={styles.itemText}>{item.nombre_creador}</Text>
+                                        </TouchableOpacity>
+                                    ))}
                             </ScrollView>
                         </>
                     )}
-    
-                    {/* Resultados de Álbumes */}
-                    {searchResults.albumes.length > 0 && (
+
+                    {/* Albumes */}
+                    {!!searchResults.albumes.length && (
                         <>
                             <Text style={styles.subtitle}>Álbumes</Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                                 {searchResults.albumes
-                                .filter(item => item.similitud >= SIMILARITY_THRESHOLD)
-                                .map((item, index) => (
-                                    <TouchableOpacity key={index} style={styles.itemContainer}>
-                                        <Image source={{ uri: item.link_imagen }} style={styles.itemImage} />
-                                        <Text style={styles.itemText}>{item.nombre_album}</Text>
-                                    </TouchableOpacity>
-                                ))}
+                                    .filter(x => x.similitud >= SIMILARITY_THRESHOLD)
+                                    .map((item, i) => (
+                                        <TouchableOpacity key={i} style={styles.itemContainer}>
+                                            <Image source={{ uri: item.link_imagen }} style={styles.itemImage} />
+                                            <Text style={styles.itemText}>{item.nombre_album}</Text>
+                                        </TouchableOpacity>
+                                    ))}
                             </ScrollView>
                         </>
                     )}
-    
-                    {/* Resultados de Podcasts */}
-                    {searchResults.podcasts.length > 0 && (
+
+                    {/* Podcasts */}
+                    {!!searchResults.podcasts.length && (
                         <>
                             <Text style={styles.subtitle}>Podcasts</Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                                 {searchResults.podcasts
-                                .filter(item => item.similitud >= SIMILARITY_THRESHOLD)
-                                .map((item, index) => (
-                                    <TouchableOpacity key={index} style={styles.itemContainer}>
-                                        <Image source={{ uri: item.link_imagen }} style={styles.itemImage} />
-                                        <Text style={styles.itemText}>{item.nombre}</Text>
-                                    </TouchableOpacity>
-                                ))}
+                                    .filter(x => x.similitud >= SIMILARITY_THRESHOLD)
+                                    .map((item, i) => (
+                                        <TouchableOpacity key={i} style={styles.itemContainer}>
+                                            <Image source={{ uri: item.link_imagen }} style={styles.itemImage} />
+                                            <Text style={styles.itemText}>{item.nombre}</Text>
+                                        </TouchableOpacity>
+                                    ))}
                             </ScrollView>
                         </>
                     )}
-    
-                    {/* Resultados de Usuarios */}
-                    {searchResults.usuarios.length > 0 && (
-                    <>
-                        <Text style={styles.subtitle}>Usuarios</Text>
-                        <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-                        {searchResults.usuarios
-                            .filter(item => item.similitud >= SIMILARITY_THRESHOLD)
-                            .map((item, index) => (
-                            <TouchableOpacity key={index} style={styles.itemContainer}>
-                                <View style={styles.userIcon}>
-                                <Text style={styles.userInitial}>
-                                    {item.nombre_usuario?.charAt(0).toUpperCase()}
-                                </Text>
-                                </View>
-                                <Text style={styles.itemText}>{item.nombre_usuario}</Text>
-                            </TouchableOpacity>
-                            ))}
-                        </ScrollView>
-                    </>
+
+                    {/* Usuarios */}
+                    {!!searchResults.usuarios.length && (
+                        <>
+                            <Text style={styles.subtitle}>Usuarios</Text>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+                                {searchResults.usuarios
+                                    .filter(x => x.similitud >= SIMILARITY_THRESHOLD)
+                                    .map((u, i) => (
+                                        <TouchableOpacity key={i} style={styles.userContainer}>
+                                            <View style={styles.userIcon}>
+                                                <Text style={styles.userInitial}>{u.nombre_usuario.charAt(0).toUpperCase()}</Text>
+                                            </View>
+                                            <Text style={styles.itemText}>{u.nombre_usuario}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                            </ScrollView>
+                        </>
                     )}
-    
-                    {/* Resultados de Listas */}
-                    {searchResults.listas.length > 0 && (
+
+                    {/* Listas */}
+                    {!!searchResults.listas.length && (
                         <>
                             <Text style={styles.subtitle}>Listas</Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                                 {searchResults.listas
-                                .filter(item => item.similitud >= SIMILARITY_THRESHOLD)
-                                .map((item) => (
-                                    <TouchableOpacity key={item.id_lista} style={[styles.genreItem,{ backgroundColor: item.color }  ]}> {/* , { backgroundColor: index.color } */}
-            
-                                    <Text style={styles.genreText}>{item.nombre}</Text>
-                                    {/* <Text style={styles.itemText}>{item.nombre}</Text> */}
-
-                                    </TouchableOpacity>
-                                    
-                                ))}
-                                
-            
+                                    .filter(x => x.similitud >= SIMILARITY_THRESHOLD)
+                                    .map(l => (
+                                        <TouchableOpacity key={l.id_lista} style={[styles.genreItem, { backgroundColor: l.color }]}>
+                                            <Text style={styles.genreText}>{l.nombre}</Text>
+                                        </TouchableOpacity>
+                                    ))}
                             </ScrollView>
                         </>
                     )}
                 </ScrollView>
             );
         }
-        //
+
         switch (selectedTab) {
             case 'Todo':
                 return (
-                    <ScrollView style={styles.containerVerticalScroll} showsVerticalScrollIndicator={false}>    
-                        
-                            <Text style={styles.subtitle}>Lo mejor de cada artista</Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-                                {listasArtistas.map((artista) => (
-                                    <TouchableOpacity key={artista.id_lista} style={styles.itemContainer}>
-                                        <Image source={{ uri: artista.link_imagen }} style={styles.itemImage} />
-                                        <Text style={styles.itemText}>{artista.nombre}</Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
+                    <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                        <Text style={styles.subtitle}>Lo mejor de cada artista</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+                            {listasArtistas.map(a => (
+                                <TouchableOpacity key={a.id_lista} style={styles.itemContainer}>
+                                    <Image source={{ uri: a.link_imagen }} style={styles.itemImage} />
+                                    <Text style={styles.itemText}>{a.nombre}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
 
-                            <Text style={styles.subtitle}>Descubre musica nueva</Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-                                {listasGeneros.map((genero) => (
-                                    <TouchableOpacity 
-                                        key={genero.id_lista} 
-                                        style={[styles.genreItem, { backgroundColor: genero.color }]}
-                                    >
-                                        <Text style={styles.genreText}>{genero.nombre}</Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
+                        <Text style={styles.subtitle}>Descubre música nueva</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+                            {listasGeneros.map(g => (
+                                <TouchableOpacity key={g.id_lista} style={[styles.genreItem, { backgroundColor: g.color }]}>
+                                    <Text style={styles.genreText}>{g.nombre}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
 
-                            <Text style={styles.subtitle}>Conoce la mejor musica de cada idioma </Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-                                {listasIdiomas.map((idioma) => (
-                                    <TouchableOpacity 
-                                        key={idioma.id_lista} 
-                                        style={[styles.genreItem, { backgroundColor: idioma.color }]}
-                                    >
-                                        <Text style={styles.genreText}>{idioma.nombre}</Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
+                        <Text style={styles.subtitle}>Conoce la mejor música de cada idioma</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+                            {listasIdiomas.map(i => (
+                                <TouchableOpacity key={i.id_lista} style={[styles.genreItem, { backgroundColor: i.color }]}>
+                                    <Text style={styles.genreText}>{i.nombre}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
 
-                            <Text style={styles.subtitle}>Lo mejor en podcasts</Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-                                {listasPodcast.map((artista) => (
-                                    <TouchableOpacity key={artista.id_podcast} style={styles.itemContainer}>
-                                        <Image source={{ uri: artista.link_imagen }} style={styles.itemImage} />
-                                        <Text style={styles.itemText}>{artista.nombre}</Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
-
-                            {/* <TouchableOpacity style={styles.addButton} onPress={handleDebug}>
-                                <Ionicons name="add" size={24} color="white" />
-                            </TouchableOpacity> */}
-                        
+                        <Text style={styles.subtitle}>Lo mejor en podcasts</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+                            {listasPodcast.map(p => (
+                                <TouchableOpacity key={p.id_podcast} style={styles.itemContainer} onPress={() => handlePerfilPodcaster(p.nombre)}>
+                                    <Image source={{ uri: p.link_imagen }} style={styles.itemImage} />
+                                    <Text style={styles.itemText}>{p.nombre}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
                     </ScrollView>
                 );
-            
+
             case 'Musica':
                 return (
-                    <ScrollView style={styles.containerVerticalScroll} showsVerticalScrollIndicator={false}>    
-
+                    <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                         {listasMusicaArtista && (
-                            <View style={styles.artistaContainer}>
+                            <>
                                 <Text style={styles.subtitle}>Lo mejor de {listasMusicaArtista.nombre_artista}</Text>
-
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
-            
-                                    <View style={styles.itemContainer}>
-                                        <TouchableOpacity onPress={() => handleGoToArtista(listasMusicaArtista.nombre_artista)}>
-                                            <Image source={{ uri: listasMusicaArtista.link_imagen }} style={styles.artistaImage} />
-                                            <Text style={styles.itemText}>{listasMusicaArtista.nombre_artista}</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                    {listasMusicaArtista.canciones_albumes.map((cancion, index) => (
-                                        <TouchableOpacity key={index} style={styles.cancionItem}>
-                                            <Image source={{ uri: cancion.link_imagen }} style={styles.itemImage} />
-                                            <Text style={styles.itemText}>{cancion.titulo}</Text>
+                                    <TouchableOpacity onPress={() => handleGoToArtista(listasMusicaArtista.nombre_artista)}>
+                                        <Image source={{ uri: listasMusicaArtista.link_imagen }} style={styles.artistaImage} />
+                                        <Text style={styles.itemText}>{listasMusicaArtista.nombre_artista}</Text>
+                                    </TouchableOpacity>
+                                    {listasMusicaArtista.canciones_albumes.map((c, i) => (
+                                        <TouchableOpacity key={i} style={styles.itemContainer}>
+                                            <Image source={{ uri: c.link_imagen }} style={styles.itemImage} />
+                                            <Text style={styles.itemText}>{c.titulo}</Text>
                                         </TouchableOpacity>
                                     ))}
                                 </ScrollView>
-                            </View>
+                            </>
                         )}
 
+                        <Text style={styles.subtitle}>Spongefy recomienda</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+                            {listasMusicaAleatorio.map(i => (
+                                <TouchableOpacity key={i.id_lista} style={[styles.genreItem, { backgroundColor: i.color }]}>
+                                    <Text style={styles.genreText}>{i.nombre}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
 
-
-                        <Text style={styles.subtitle}>Spongefy recomienda </Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-                                {listasMusicaAleatorio.map((idioma) => (
-                                    <TouchableOpacity 
-                                        key={idioma.id_lista} 
-                                        style={[styles.genreItem, { backgroundColor: idioma.color }]}
-                                    >
-                                        <Text style={styles.genreText}>{idioma.nombre}</Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
-
-                            <Text style={styles.subtitle}>Descubre musica nueva</Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-                                {listasMusicaGenero.map((genero) => (
-                                    <TouchableOpacity 
-                                        key={genero.id_lista} 
-                                        style={[styles.genreItem, { backgroundColor: genero.color }]}
-                                    >
-                                        <Text style={styles.genreText}>{genero.nombre}</Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
-
-                            <Text style={styles.subtitle}>Conoce la mejor musica de cada idioma </Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-                                {listasMusicaIdioma.map((idioma) => (
-                                    <TouchableOpacity 
-                                        key={idioma.id_lista} 
-                                        style={[styles.genreItem, { backgroundColor: idioma.color }]}
-                                    >
-                                        <Text style={styles.genreText}>{idioma.nombre}</Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
-
-                            <Text style={styles.subtitle}>Lo mejor de cada artista</Text>
-                            <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-                                {listasMusicaArtistas.map((artista) => (
-                                    <TouchableOpacity key={artista.id_lista} style={styles.itemContainer}>
-                                        <Image source={{ uri: artista.link_imagen }} style={styles.itemImage} />
-                                        <Text style={styles.itemText}>{artista.nombre}</Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
-                        
                     </ScrollView>
                 );
 
             case 'Podcasts':
                 return (
-                    <ScrollView style={styles.containerVerticalScroll} showsVerticalScrollIndicator={false}>    
-            
-
-            {podcastCompleto && (
-                            <View style={styles.artistaContainer}>
+                    <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                        {podcastCompleto && (
+                            <>
                                 <Text style={styles.subtitle}>Lo mejor de {podcastCompleto.nombre_podcast}</Text>
-
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
-
-                                                            
-                                    <View style={styles.itemContainer}>
-                                        <Image source={{ uri: podcastCompleto.foto_podcast }} style={styles.artistaImage} />
-                                        <Text style={styles.itemText}>{podcastCompleto.nombre_podcast}</Text>
-                                    </View>
-                                    {podcastCompleto.episodios_recientes.map((episodio, index) => (
-                                        <TouchableOpacity key={index} style={styles.cancionItem}>
-                                            <Image source={{ uri: episodio.link_imagen }} style={styles.itemImage} />
-                                            <Text style={styles.itemText}>{episodio.titulo}</Text>
+                                    <Image source={{ uri: podcastCompleto.foto_podcast }} style={styles.artistaImage} />
+                                    {podcastCompleto.episodios_recientes.map((e, i) => (
+                                        <TouchableOpacity key={i} style={styles.itemContainer}>
+                                            <Image source={{ uri: e.link_imagen }} style={styles.itemImage} />
+                                            <Text style={styles.itemText}>{e.titulo}</Text>
                                         </TouchableOpacity>
                                     ))}
                                 </ScrollView>
-                            </View>
+                            </>
                         )}
-            
+
                         <Text style={styles.subtitle}>Spongefy recomienda</Text>
-                        <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-                            {listasPodcastAleatorioInfo.map((item) => (
-                                <TouchableOpacity key={item.id_lista} style={[styles.genreItem, { backgroundColor: item.color }]}>
-                                    <Text style={styles.genreText}>{item.nombre}</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+                            {listasPodcastAleatorioInfo.map(a => (
+                                <TouchableOpacity key={a.id_lista} style={[styles.genreItem, { backgroundColor: a.color }]}>
+                                    <Text style={styles.genreText}>{a.nombre}</Text>
                                 </TouchableOpacity>
                             ))}
                         </ScrollView>
-            
+
                         <Text style={styles.subtitle}>Los mejores creadores de podcasts</Text>
-                        <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-                            {listasPodcastPodcastersInfo.map((podcaster) => (
-                                <TouchableOpacity key={podcaster.id_lista} style={styles.itemContainer}
-                                 onPress={() => handlePerfilPodcaster(podcaster.nombre_creador)} >
-                                    <Image source={{ uri: podcaster.link_imagen }} style={styles.itemImage} />
-                                    <Text style={styles.itemText}>{podcaster.nombre}</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+                            {listasPodcastPodcastersInfo.map(p => (
+                                <TouchableOpacity key={p.id_lista} onPress={() => handlePerfilPodcaster(p.nombre_creador)} style={styles.itemContainer}>
+                                    <Image source={{ uri: p.link_imagen }} style={styles.itemImage} />
+                                    <Text style={styles.itemText}>{p.nombre}</Text>
                                 </TouchableOpacity>
                             ))}
                         </ScrollView>
-            
                     </ScrollView>
                 );
 
@@ -622,30 +508,25 @@ export default function HomeScreen() {
 
     return (
         <View style={styles.container}>
-            
-                {/* Encabezado */}
+            {/* — Header — */}
             <View style={styles.header}>
-                <Ionicons name="library-outline" size={28} color="white" />
-                <Text style={styles.title}>Home</Text>
+                <View style={styles.headerLeft}>
+                    <Ionicons name="library-outline" size={28} color="#fff" />
+                    <Text style={styles.title}>Home</Text>
+                </View>
+                <TouchableOpacity onPress={goToFriends}>
+                    <Image
+                        source={require('../../assets/friends.png')}
+                        style={styles.friendsIcon}
+                    />
+                </TouchableOpacity>
             </View>
-        
-            {/* Barra de búsqueda conectada */}
-        <View style={styles.searchContainer}>
-            <Ionicons name="search" size={20} color="#888" style={styles.iconLeft} />
-            <TextInput
-                style={styles.searchInput}
-                placeholder="Buscar"
-                placeholderTextColor="#888"
-                value={searchQuery} // Conectar con estado
-                onChangeText={setSearchQuery} // Actualizar estado al escribir
-                onSubmitEditing={handleSearch} // Ejecutar búsqueda al presionar "Enter"
-                returnKeyType="search" // Mostrar botón "Buscar" en teclado
-            />
-        </View>
-        
-            {/* Tabs de navegación */}
+
+            {/* — SearchBar — */}
+            <SearchBar />
+
             <View style={styles.tabsContainer}>
-                {tabs.map((tab) => (
+                {tabs.map(tab => (
                     <TouchableOpacity
                         key={tab}
                         style={[styles.tab, selectedTab === tab && styles.tabSelected]}
@@ -658,45 +539,24 @@ export default function HomeScreen() {
                 ))}
             </View>
 
-
-
-            <View style={styles.content}>
-                {renderSectionContent()}
-            </View>
-
+            {renderSectionContent()}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#000',
-        paddingTop: 40,
-    },
-    containerVerticalScroll: {
-        flex: 1,
-        backgroundColor: '#000',
-    },
+    container: { flex: 1, backgroundColor: '#000', paddingTop: 40 },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 16,
-        marginBottom: 10,
+        marginBottom: 10
     },
-    title: {
-        color: '#fff',
-        fontSize: 22,
-        fontWeight: 'bold',
-        marginLeft: 10,
-    },
-    subtitle: {
-        color: '#fff',
-        fontSize: 17,
-        fontWeight: 'bold',
-        marginLeft: 10,
-        margin: 10,
-    },
+    headerLeft: { flexDirection: 'row', alignItems: 'center' },
+    title: { color: '#fff', fontSize: 22, fontWeight: 'bold', marginLeft: 8 },
+    friendsIcon: { width: 24, height: 24 },
+
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -707,159 +567,60 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         height: 40,
         marginHorizontal: 16,
-        marginBottom: 10,
+        marginBottom: 10
     },
-    iconLeft: {
-        marginRight: 8,
-    },
-    iconRight: {
-        marginLeft: 8,
-    },
-    searchInput: {
-        flex: 1,
-        color: '#fff',
-        fontSize: 16,
-    },
-    // Onglets
+    iconLeft: { marginRight: 8 },
+    searchInput: { flex: 1, color: '#fff', fontSize: 16 },
+
     tabsContainer: {
         flexDirection: 'row',
-        justifyContent: 'flex-start',
         paddingHorizontal: 16,
-        marginBottom: 10,
+        marginBottom: 10
     },
     tab: {
         backgroundColor: '#333',
         borderRadius: 20,
         paddingVertical: 6,
         paddingHorizontal: 14,
-        marginRight: 10,
+        marginRight: 10
     },
-    tabSelected: {
-        backgroundColor: '#fff',
-    },
-    tabText: {
-        color: '#fff',
-        fontSize: 14,
-    },
-    tabTextSelected: {
-        color: '#000',
-        fontWeight: 'bold',
-    },
-    // Contenu
-    content: {
-        flex: 1,
-        marginHorizontal: 16,
-    },
-    sectionText: {
-        color: '#fff',
-        fontSize: 16,
-        marginTop: 20,
-    },
-    artistasContainer: {
-        marginTop: 10,
-    },
-    artistRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 16,
-    },
-    artistAvatar: {
+    tabSelected: { backgroundColor: '#fff' },
+    tabText: { color: '#fff', fontSize: 14 },
+    tabTextSelected: { color: '#000', fontWeight: 'bold' },
+
+    content: { flex: 1, marginHorizontal: 16 },
+    subtitle: { color: '#fff', fontSize: 17, fontWeight: 'bold', marginVertical: 8 },
+    scrollView: { marginBottom: 16 },
+
+    itemContainer: { marginRight: 10, alignItems: 'center' },
+    itemImage: { width: 80, height: 80, borderRadius: 10 },
+    itemText: { color: '#fff', fontSize: 11, marginTop: 8, textAlign: 'center', width: 80 },
+
+    // “Usuarios”
+    userContainer: { marginRight: 10, alignItems: 'center' },
+    userIcon: {
         width: 50,
         height: 50,
         borderRadius: 25,
-        marginRight: 12,
-        resizeMode: 'cover',
-    },
-    artistName: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    bottomBar: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        backgroundColor: '#111',
-        paddingVertical: 8,
-    },
-    bottomBarItem: {
-        alignItems: 'center',
-    },
-    bottomBarText: {
-        color: '#fff',
-        fontSize: 12,
-        marginTop: 2,
-    },
-    playlistItem: {
-        backgroundColor: "#222",
-        padding: 15,
-        marginVertical: 5,
-        borderRadius: 10,
-    },
-    playlistText: {
-        color: "#fff",
-        fontSize: 16,
-    },
-    button: {
-        backgroundColor: "#9400D3",
-        padding: 15,
-        borderRadius: 10,
-        marginTop: 10,
-        width: "100%",
-        alignItems: "center",
-      },
-      scrollView: {
-        flex: 1, // Ocupar todo el espacio posible
-    },
-    addButton: {
-        position: 'absolute',
-        bottom: 20,
-        right: 20,
-        backgroundColor: 'purple',
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        backgroundColor: '#fff',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
     },
-    itemContainer: { marginRight: 10, alignItems: 'center' },
-    itemImage: { width: 80, height: 80, borderRadius: 10 },
-    artistaImage: { width: 100, height: 100, borderRadius: 10 },
-    itemText: { color: '#fff', fontSize: 11, marginTop: 8, textAlign: 'center', width: 80 },
-    genreItem: { 
-        width: 80, 
-        height: 80, 
-        borderRadius: 10, 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        marginRight: 10 
-    },
-    genreText: { color: '#fff', fontSize: 14, fontWeight: 'bold', textAlign: 'center' },
-    artistaContainer: {
-        marginBottom: 20,
-    },
-    artistaHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    cancionItem: {
-        alignItems: 'center',
-        marginRight: 10,
-    },
-    userIcon: {
+    userInitial: { color: '#000', fontSize: 24, fontWeight: 'bold' },
+
+    // Genre / Listas
+    genreItem: {
         width: 80,
         height: 80,
         borderRadius: 10,
-        backgroundColor: "#fff",
-        justifyContent: "center",
-        alignItems: "center",
-        marginBottom: 8,
-      },
-      
-      userInitial: {
-        color: "#000",
-        fontSize: 40,
-        fontWeight: "bold",
-      },
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10
+    },
+    genreText: { color: '#fff', fontSize: 14, fontWeight: 'bold', textAlign: 'center' },
+
+    // Artista / Podcast large
+    artistaImage: { width: 100, height: 100, borderRadius: 10 },
+
+    sectionText: { color: '#fff', fontSize: 16, marginTop: 20 }
 });

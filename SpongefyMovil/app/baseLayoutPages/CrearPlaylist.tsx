@@ -70,7 +70,7 @@ export default function CreatePlaylistScreen() {
 
             if (response.ok) {
                 console.log("Playlist creada exitosamente:", data);
-                router.push("/Biblioteca");
+                router.push("../Biblioteca");
             } else {
                 console.error("Error al crear la playlist:", data);
             }
@@ -158,7 +158,7 @@ export default function CreatePlaylistScreen() {
     };
 
     const handleBiblioteca = () => {
-        router.push('/Biblioteca');
+        router.push('../Biblioteca');
     };
 
     return (
