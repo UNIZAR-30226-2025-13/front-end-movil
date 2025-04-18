@@ -10,15 +10,31 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { getData } from '../../utils/storage';
+import { fetchAndSaveFriendsList } from '@/utils/fetch';
 
 export default function FriendsScreen() {
     const router = useRouter();
+    const [friends, setFriends] = useState<string[]>([]);
 
-    const [friends, setFriends] = useState<string[]>([
-        'jorgehache',
-        'marioclavero',
-        'marta_zgz',
-    ]);
+    useEffect(() => {
+        const loadFriends = async () => {
+            const username = await getData('username');
+            if (!username) return;
+
+            await fetchAndSaveFriendsList(username);
+
+            const stored = await getData('friendsList');
+
+            if (Array.isArray(stored)) {
+                setFriends(stored);
+            }
+            else if (stored && Array.isArray((stored as any).amigos)) {
+                setFriends((stored as any).amigos);
+            }
+        };
+        loadFriends();
+    }, []);
 
     const renderItem = ({ item }: { item: string }) => (
         <View style={styles.row}>
@@ -30,18 +46,25 @@ export default function FriendsScreen() {
     );
 
     return (
-        <View style={styles.container}>
-            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <SafeAreaView style={styles.container}>
+            {/* Flèche de retour */}
+            <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => router.back()}
+            >
                 <Ionicons name="arrow-back" size={28} color="#fff" />
             </TouchableOpacity>
+
             <Text style={styles.title}>Tus amigos</Text>
+
             <FlatList
                 data={friends}
                 keyExtractor={(item) => item}
                 renderItem={renderItem}
                 contentContainerStyle={styles.list}
+                showsVerticalScrollIndicator={false}
             />
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -53,13 +76,18 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingBottom: 20,
     },
-    title: { color: '#fff', fontSize: 22, fontWeight: 'bold', marginLeft: 8, marginTop: 50 },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        marginBottom: 10
+    backButton: {
+        position: 'absolute',
+        top: 20,
+        left: 30,
+        zIndex: 10,
+    },
+    title: {
+        color: '#fff',
+        fontSize: 32,
+        fontWeight: 'bold',
+        marginTop: 60,
+        marginBottom: 20,
     },
     list: {
         paddingBottom: 20,
@@ -84,11 +112,5 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    backButton: {
-        position: 'absolute',
-        top: 40,
-        left: 20,
-        zIndex: 10,
     },
 });
