@@ -555,7 +555,7 @@ const styles = StyleSheet.create({
     },
     headerLeft: { flexDirection: 'row', alignItems: 'center' },
     title: { color: '#fff', fontSize: 22, fontWeight: 'bold', marginLeft: 8 },
-    friendsIcon: { width: 24, height: 24 },
+    friendsIcon: { width: 28, height: 28 },
 
     searchContainer: {
         flexDirection: 'row',
