@@ -23,27 +23,30 @@ export default function FriendsScreen() {
             if (!username) return;
 
             await fetchAndSaveFriendsList(username);
-
             const stored = await getData('friendsList');
 
             if (Array.isArray(stored)) {
                 setFriends(stored);
-            }
-            else if (stored && Array.isArray((stored as any).amigos)) {
+            } else if (stored && Array.isArray((stored as any).amigos)) {
                 setFriends((stored as any).amigos);
             }
         };
         loadFriends();
     }, []);
 
-    const renderItem = ({ item }: { item: string }) => (
-        <View style={styles.row}>
-            <Text style={styles.username}>{item}</Text>
-            <TouchableOpacity style={styles.chatButton}>
-                <Ionicons name="chatbubble-outline" size={24} color="#fff" />
-            </TouchableOpacity>
-        </View>
-    );
+    // const renderItem = ({ item }: { item: string }) => (
+    //     <View style={styles.row}>
+    //         <TouchableOpacity
+    //             onPress={() => router.push(`./amigo/${item}`)}
+    //         >
+    //             <Text style={styles.username}>{item}</Text>
+    //         </TouchableOpacity>
+
+    //         <TouchableOpacity style={styles.chatButton}>
+    //             <Ionicons name="chatbubble-outline" size={24} color="#fff" />
+    //         </TouchableOpacity>
+    //     </View>
+    // );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -60,7 +63,6 @@ export default function FriendsScreen() {
             <FlatList
                 data={friends}
                 keyExtractor={(item) => item}
-                renderItem={renderItem}
                 contentContainerStyle={styles.list}
                 showsVerticalScrollIndicator={false}
             />
