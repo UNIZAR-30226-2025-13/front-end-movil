@@ -514,12 +514,6 @@ export default function HomeScreen() {
                     <Ionicons name="library-outline" size={28} color="#fff" />
                     <Text style={styles.title}>Home</Text>
                 </View>
-                <TouchableOpacity onPress={goToFriends}>
-                    <Image
-                        source={require('../../assets/friends.png')}
-                        style={styles.friendsIcon}
-                    />
-                </TouchableOpacity>
             </View>
 
             {/* — SearchBar — */}
