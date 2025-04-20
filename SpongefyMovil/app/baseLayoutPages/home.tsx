@@ -250,15 +250,16 @@ export default function HomeScreen() {
         }
     };
 
-    const goToFriends = () => {
-        router.push('/baseLayoutPages/Friends');
-    };
     const handlePerfilPodcaster = (name: string) => {
         goToPodcasterPerfil(name);
     };
     const handleGoToArtista = async (name: string) => {
         await saveData('artist', name);
         router.push(`/baseLayoutPages/artista/${name}`);
+    };
+
+    const handleGoToUser = async (name: string) => {
+        goToPerfil(name);
     };
 
     const SearchBar = () => (
@@ -355,7 +356,7 @@ export default function HomeScreen() {
                                 {searchResults.usuarios
                                     .filter(x => x.similitud >= SIMILARITY_THRESHOLD)
                                     .map((u, i) => (
-                                        <TouchableOpacity key={i} style={styles.userContainer}>
+                                        <TouchableOpacity key={i} style={styles.userContainer} onPress={() => handleGoToUser(u.nombre_usuario)}>
                                             <View style={styles.userIcon}>
                                                 <Text style={styles.userInitial}>{u.nombre_usuario.charAt(0).toUpperCase()}</Text>
                                             </View>
