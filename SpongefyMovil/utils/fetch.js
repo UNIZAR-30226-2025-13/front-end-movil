@@ -237,29 +237,21 @@ export const fetchAndSavePodcaster = async (nombre_podcaster) => {
     }
 };
 
-
+//la lista de amigos del usuario
 export const fetchAndSaveFriendsList = async (nombre_usuario) => {
     try {
         const response = await fetch(
-            `https://spongefy-back-end.onrender.com/get-friends-list?nombre_usuario=${encodeURIComponent(
-                nombre_usuario
-            )}`
+            `https://spongefy-back-end.onrender.com/get-friends-list?nombre_usuario=${nombre_usuario}`
         );
-
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error(
-                "Error en la respuesta del servidor (friends):",
-                errorText
-            );
-            throw new Error(
-                `Error al obtener friends: ${response.status} ${response.statusText}`
-            );
+            const errorResponse = await response.text();
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al obtener la listas de amigos: ${response.status} - ${response.statusText}`);
         }
-        const friends = await response.json();
-        await saveData("friendsList", friends);
-        console.log("Friends list guardada correctamente:", friends);
-    } catch (err) {
-        console.error("Error en fetchAndSaveFriendsList:", err);
+        const friendList = await response.json();
+        await saveData("friendlist", friendList);
+        console.log("Lista de amigos del usuario guardada correctamente:", friendList);
+    } catch (error) {
+        console.error("Error en fetchAndSaveFriendsList:", error);
     }
 };
