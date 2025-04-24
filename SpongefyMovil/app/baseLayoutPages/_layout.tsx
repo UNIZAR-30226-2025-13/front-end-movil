@@ -2,20 +2,24 @@
 import React from "react";
 import { View, StyleSheet, Text, ScrollView, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Slot, router } from "expo-router";
-import PlayerComponent from "./PlayerComponent"; // Asegúrate de que esta ruta es correcta
+import { Slot, router, useSegments } from "expo-router";
+import PlayerComponent from "./PlayerComponent";
 import { getData } from "@/utils/storage";
 import { goToPerfil } from "@/utils/navigation";
+import { usePlayer } from "./PlayerContext";
 
 
 
 const Layout = () => {
+  const { currentSong, isPlaying } = usePlayer();
+  const segments: string[] = useSegments();
+  const isOnPlaySong = segments.includes("PlaySong");
 
   const handlePerfilPropio = async () => {
     const username = await getData("username");
     //llama a goToPerfil con su propio nombre, para acceder a su perfil
     goToPerfil(username);
-};
+  };
 
 
   return (
@@ -28,8 +32,10 @@ const Layout = () => {
       </View>
 
       {/* 🎵 Player abajo */}
-      <View style={[styles.footer, { backgroundColor: '#111' }]}>
-        <PlayerComponent />
+      <View style={[styles.footer, { backgroundColor: "#111" }]}>
+        {(!isOnPlaySong && currentSong) && (
+          <PlayerComponent />
+        )}
         <View style={styles.bottomBar}>
           <TouchableOpacity
             style={styles.bottomBarItem}
