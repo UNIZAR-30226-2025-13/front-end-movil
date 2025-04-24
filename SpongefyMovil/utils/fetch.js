@@ -255,3 +255,30 @@ export const fetchAndSaveFriendsList = async (nombre_usuario) => {
         console.error("Error en fetchAndSaveFriendsList:", error);
     }
 };
+
+export const fetchAndSaveLyrics = async (id_cancion: string) => {
+    try {
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/song/show-lyrics?id_cancion=${id_cancion}`
+        );
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Error en la respuesta del servidor (letra):", errorText);
+            throw new Error(
+                `Error al obtener las letras: ${response.status} - ${response.statusText}`
+            );
+        }
+
+        // Recibimos { letra: "..." }
+        const json = await response.json();
+        const texto = json.letra ?? "";
+
+        // Ahora guardamos la cadena pura bajo la clave "lyrics"
+        await saveData("lyrics", texto);
+
+        console.log("Letras guardadas correctamente:", texto);
+    } catch (error) {
+        console.error("Error en fetchAndSaveLyrics:", error);
+    }
+};
