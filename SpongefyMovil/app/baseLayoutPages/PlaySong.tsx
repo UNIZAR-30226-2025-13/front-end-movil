@@ -359,7 +359,7 @@ export default function SongDetail() {
 
             {/* Contrôles de lecture */}
             <View style={styles.controlsRow}>
-                <TouchableOpacity onPress={() => console.log('Shuffle')} style={styles.controlBtn}>
+                <TouchableOpacity onPress={() => toggleRandomQueue(true)} style={styles.controlBtn}>
                     <Image source={require('../../assets/aleatorio.png')} style={styles.controlIcon} />
                 </TouchableOpacity>
 
@@ -367,10 +367,13 @@ export default function SongDetail() {
                     <Ionicons name="play-skip-back" size={32} color="#fff" />
                 </TouchableOpacity>
 
-                <Pressable>
+                <Pressable onPress={togglePlayPause} style={styles.controlBtn}>
                     <Animated.Image
                         source={isPlaying ? require("../../assets/pause.png") : require("../../assets/play.png")}
-                        style={[styles.bottomBtn, { transform: [{ rotate: rotateInterpolate }] }]}
+                        style={[
+                            styles.controlIcon,
+                            { transform: [{ rotate: rotateInterpolate }] }
+                        ]}
                         fadeDuration={2}
                     />
                 </Pressable>
@@ -386,7 +389,7 @@ export default function SongDetail() {
 
             {/* Bottom actions */}
             <View style={styles.bottomRow}>
-                <TouchableOpacity style={styles.bottomBtn} onPress={() => console.log('Add to playlist')}>
+                <TouchableOpacity style={styles.bottomBtn} onPress={() => toggleAddtoPlaylist()}>
                     <Image source={require('../../assets/anyadirplaylist.png')} style={styles.controlIcon} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.bottomBtn} onPress={() => router.push(`/baseLayoutPages/lyrics/${currentSong.id}`)}>
@@ -396,6 +399,43 @@ export default function SongDetail() {
                     <Image source={require('../../assets/heart.png')} style={styles.controlIcon} />
                 </TouchableOpacity>
             </View>
+            {/* Modal con las playlists */}
+            <Modal visible={modalVisible} transparent animationType="slide">
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Añadir a Playlist</Text>
+                        {loading ? (
+                            <Text>Cargando listas...</Text>
+                        ) : (
+                            <FlatList
+                                data={playlists}
+                                keyExtractor={(item) => item.id_lista ? item.id_lista.toString() : String(item.nombre)}  // Usa 'id_lista' en lugar de 'id'
+                                renderItem={({ item }) => (
+                                    <TouchableOpacity
+                                        style={styles.playlistItem}
+                                        onPress={() => {
+                                            if (item.id_lista) {
+                                                console.log("ID de la playlist:", item.id_lista);  // Verifica que id_lista es el valor correcto
+                                                selectPlaylist(item.id_lista);  // Usa 'id_lista' para pasar el valor correcto
+                                            } else {
+                                                console.error("No se encontró un ID para este item:", item);
+                                            }
+                                        }}
+                                    >
+                                        <Text style={styles.playlistText}>{item.nombre}</Text>
+                                    </TouchableOpacity>
+                                )}
+                            />
+                        )}
+                        <TouchableOpacity
+                            style={styles.closeButton}
+                            onPress={() => setModalVisible(false)}
+                        >
+                            <Text style={styles.closeButtonText}>Cancelar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </ScrollView>
     );
 }
@@ -418,13 +458,22 @@ const styles = StyleSheet.create({
     backButton: {
         margin: 16,
     },
-
+    playlistItem: {
+        padding: 10,
+        borderColor: "#000",
+        borderWidth: 1,
+        borderRadius: 5,
+        marginVertical: 3,
+    },
+    playlistText: {
+        fontSize: 16,
+    },
     coverContainer: {
         alignItems: 'center',
     },
     coverImage: {
-        width: SCREEN_WIDTH * 0.9,
-        height: SCREEN_HEIGHT * 0.7,       // <-- 70% de la hauteur de l'écran
+        width: SCREEN_WIDTH * 0.7,
+        height: SCREEN_HEIGHT * 0.7,
         borderRadius: 12,
         backgroundColor: '#222',
     },
@@ -449,7 +498,40 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginTop: 4,
     },
-
+    closeButton: {
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: "#000000",
+        borderRadius: 5,
+        alignItems: "center",
+    },
+    closeButtonText: {
+        color: "white",
+        fontWeight: "bold",
+    },
+    Queue: {
+        flex: 1,
+        justifyContent: "flex-end",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+        width: 300,
+        backgroundColor: "#CDCDCD",
+        padding: 20,
+        borderRadius: 10,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        marginBottom: 10,
+    },
     progressBar: {
         height: 4,
         backgroundColor: '#333',
@@ -476,14 +558,6 @@ const styles = StyleSheet.create({
         width: 24,
         height: 24,
         tintColor: '#fff',
-    },
-    playPauseBtn: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
-        alignItems: 'center',
     },
 
     bottomRow: {

@@ -410,7 +410,7 @@ const PlayerComponent = () => {
     <Pressable
       style={styles.container}
       onPress={() => router.push("/baseLayoutPages/PlaySong")}
-    >      <View style={styles.controlsContainer}>
+          >      <View style={styles.controlsContainer}>
         <View style={styles.songInfo}>
           {currentSong.link_imagen && (
             <Image source={{ uri: currentSong.link_imagen }} style={styles.songImage} />
