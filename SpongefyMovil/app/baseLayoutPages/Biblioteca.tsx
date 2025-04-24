@@ -339,24 +339,11 @@ export default function BibliotecaScreen() {
         const username = await getData("username");
         goToPerfil(username);
     };
-    const goToFriends = () => {
-        router.push('/baseLayoutPages/Friends');
-    };
+
 
 
     return (
         <View style={styles.container}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <TouchableOpacity style={styles.friendsIcon} onPress={() => router.back()}>
-                    <Ionicons name="arrow-back" size={28} color="#fff" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={goToFriends}>
-                    <Image
-                        source={require('../../assets/friends.png')}
-                        style={styles.friendsIcon}
-                    />
-                </TouchableOpacity>
-            </View>
             {/* Encabezado */}
             <View style={styles.header}>
                 <Ionicons name="library-outline" size={28} color="white" />

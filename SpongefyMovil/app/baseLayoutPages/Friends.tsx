@@ -1,38 +1,45 @@
 // app/FriendsScreen.tsx
 import React, { useEffect, useState } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    FlatList,
-    TouchableOpacity,
-    SafeAreaView,
-} from 'react-native';
+import { View, Text, StyleSheet,  ScrollView, TouchableOpacity, Pressable, } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { getData } from '../../utils/storage';
 import { fetchAndSaveFriendsList } from '@/utils/fetch';
+import { goToPerfil, goToChat } from '../../utils/navigation';
 
 export default function FriendsScreen() {
     const router = useRouter();
     const [friends, setFriends] = useState<string[]>([]);
+    const [userName, setUserName] = useState<string | null>(null);
+
 
     useEffect(() => {
         const loadFriends = async () => {
-            const username = await getData('username');
-            if (!username) return;
-
-            await fetchAndSaveFriendsList(username);
-            const stored = await getData('friendsList');
-
-            if (Array.isArray(stored)) {
-                setFriends(stored);
-            } else if (stored && Array.isArray((stored as any).amigos)) {
-                setFriends((stored as any).amigos);
-            }
+          const nombre_usuario = await getData("username");
+          await fetchAndSaveFriendsList(nombre_usuario);
+          
+          const data = await getData("friendlist");
+      
+          if (data && Array.isArray(data.amigos)) {
+            setFriends(data.amigos);
+          } else {
+            console.warn("La lista de amigos no es un array:", data);
+            setFriends([]);
+          }
         };
+      
         loadFriends();
-    }, []);
+      }, []);
+
+    const handleUserPress = (username: string) => {
+        console.log('Usuario pulsado:', username);
+        goToPerfil(username);
+      };
+    
+      const handleChatPress = (username: string) => {
+        console.log('Chat con:', username);
+        goToChat(username);
+      };
 
     // const renderItem = ({ item }: { item: string }) => (
     //     <View style={styles.row}>
@@ -49,70 +56,68 @@ export default function FriendsScreen() {
     // );
 
     return (
-        <SafeAreaView style={styles.container}>
-            {/* Flèche de retour */}
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => router.back()}
-            >
-                <Ionicons name="arrow-back" size={28} color="#fff" />
+        <View style={styles.container}>
+          <Text style={styles.title}>Tus amigos</Text>
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {friends.map((friend, index) => (
+          <View key={index} style={styles.friendRow}>
+            <TouchableOpacity onPress={() => handleUserPress(friend)} style={styles.userSection}>
+              <Text style={styles.friendName}>{friend}</Text>
             </TouchableOpacity>
-
-            <Text style={styles.title}>Tus amigos</Text>
-
-            <FlatList
-                data={friends}
-                keyExtractor={(item) => item}
-                contentContainerStyle={styles.list}
-                showsVerticalScrollIndicator={false}
-            />
-        </SafeAreaView>
-    );
+            <Pressable onPress={() => handleChatPress(friend)}>
+              <View style={styles.chatIconContainer}>
+                <Ionicons name="chatbubble-ellipses" size={20} color="#fff" />
+              </View>
+            </Pressable>
+          </View>
+        ))}
+      </ScrollView>
+        </View>
+      );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#000',
-        paddingHorizontal: 30,
-        paddingTop: 20,
-        paddingBottom: 20,
-    },
-    backButton: {
-        position: 'absolute',
-        top: 20,
-        left: 30,
-        zIndex: 10,
+      flex: 1,
+      backgroundColor: '#000',
+      paddingTop: 50,
+      paddingHorizontal: 20,
     },
     title: {
-        color: '#fff',
-        fontSize: 32,
-        fontWeight: 'bold',
-        marginTop: 60,
-        marginBottom: 20,
+      color: '#fff',
+      fontSize: 22,
+      fontWeight: 'bold',
+      marginBottom: 20,
     },
-    list: {
-        paddingBottom: 20,
+    scrollContainer: {
+      paddingBottom: 20,
     },
-    row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 12,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: '#222',
+    friendRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#111',
+      paddingVertical: 15,
+      paddingHorizontal: 10,
+      borderRadius: 10,
+      marginBottom: 10,
+      justifyContent: 'space-between',
     },
-    username: {
-        fontSize: 20,
-        fontWeight: '600',
-        color: '#fff',
+    userSection: {
+      flex: 1,
     },
-    chatButton: {
-        backgroundColor: '#9400D3',
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
+    friendName: {
+      color: '#fff',
+      fontSize: 16,
     },
-});
+    chatIconContainer: {
+      backgroundColor: '#8446cf',
+      borderRadius: 20,
+      padding: 8,
+    },
+    chatIcon: {
+      width: 20,
+      height: 20,
+      tintColor: '#fff',
+    },
+  });
+  

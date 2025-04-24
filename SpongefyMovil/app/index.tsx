@@ -6,14 +6,14 @@ export default function Index() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log("🟢 Pantalla de carga mostrada");
+    console.log("Pantalla de carga mostrada");
     const timer = setTimeout(() => {
-      console.log("🔄 Redirigiendo a LoginScreen...");
-      router.replace('/baseLayoutPages/LoginScreen'); // Asegúrate de que la ruta existe
+      console.log("Redirigiendo a LoginScreen...");
+      router.replace('/LoginScreen'); // Asegúrate de que la ruta existe
     }, 2000);
 
     return () => {
-      console.log("🛑 Temporizador limpiado");
+      console.log("Temporizador limpiado");
       clearTimeout(timer);
     };
   }, []);

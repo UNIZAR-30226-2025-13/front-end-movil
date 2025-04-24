@@ -30,10 +30,12 @@ export default function PerfilUsuarioPlaylists() {
     const loadProfile = async () => {
 
       const nombre_perfil = await getData("user");
-      const nombre_usuario = await getData("username");
-
-      setUser(nombre_usuario);
       setProfileUsername(nombre_perfil);
+
+      const nombre_usuario = await getData("username");
+      setUser(nombre_usuario);
+      
+
 
       await fetchAndSavePublicPlaylists(nombre_perfil);
       const datosPlaylistsPublicas = await getData("public_playlists");
@@ -58,18 +60,22 @@ export default function PerfilUsuarioPlaylists() {
 
         {/* Cabecera */}
         <View style={styles.header}>
+
+        {userName === profileUsername && (
           <TouchableOpacity onPress={goToFriends}>
             <Image
               source={require('../../assets/friends.png')}
               style={styles.friendsIcon}
             />
           </TouchableOpacity>
+        )}
+
           <Text style={styles.label}>Usuario</Text>
-          <Text style={styles.username}>{userName}</Text>
+          <Text style={styles.username}>{profileUsername}</Text>
 
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
-              {userName?.charAt(0).toUpperCase() ?? ''}
+              {profileUsername?.charAt(0).toUpperCase() ?? ''}
             </Text>
           </View>
 
@@ -84,7 +90,6 @@ export default function PerfilUsuarioPlaylists() {
           )}
         </View>
 
-        {/* Grid de playlists */}
         <View style={styles.playlistGrid}>
           {Array.isArray(playlists) ? playlists.map((playlist, index) => (
             <View key={index} style={styles.playlistWrapper}>
