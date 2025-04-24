@@ -30,7 +30,6 @@ const SongDetail = () => {
         setIsPlaying(!isPlaying);
     };
 
-    // Composant pour afficher la barre de progression
     const ProgressBar = ({ progress }) => {
         return (
             <View style={styles.progressBar}>
