@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, Image, StyleSheet, Animated, Pressable, Modal, FlatList, TouchableOpacity, Alert } from "react-native";
 import { Audio } from "expo-av";
+import { useRouter } from 'expo-router';
 import { usePlayer } from "./PlayerContext";
 import { Ionicons } from "@expo/vector-icons";
 import { getData } from "../../utils/storage";
 
 const PlayerComponent = () => {
   const { currentSong, isPlaying, setIsPlaying } = usePlayer();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0); // Estado para la barra de progreso
   const audioPlayer = useRef<Audio.Sound | null>(null);
@@ -76,7 +78,7 @@ const PlayerComponent = () => {
       return newIndex;
     });
     //console.log("Índice de cola actualizado:", queueIndex);
-    
+
     //reproducir esa posicion de cola
   }
   const fetchNextSong = async (index: number) => {
@@ -84,7 +86,7 @@ const PlayerComponent = () => {
       const username = await getData("username");
       console.log("👤 Usuario obtenido:", username);
       const url = `https://spongefy-back-end.onrender.com/queue/get-cm?nombre_usuario=${username}&posicion=${index}`;
-      
+
       const response = await fetch(url);
       const data = await response.json();
       if (response.ok) {
@@ -109,7 +111,7 @@ const PlayerComponent = () => {
     if (status.positionMillis === status.durationMillis) {
       console.log("La canción ha terminado");
       // Aquí puedes realizar la acción que desees cuando termine la canción
-      
+
       handleSongEnd(); // Función que manejaría la acción al terminar la canción
     }
   };
@@ -132,202 +134,204 @@ const PlayerComponent = () => {
 
 
 
-    const [playlists, setPlaylists] = useState<{ id_lista: number; nombre: string }[]>([]);
-    const [modalVisible, setModalVisible] = useState(false);
-    const [loading, setLoading] = useState(false);
-  
-    // Función para abrir el modal y obtener las playlists
-    const toggleAddtoPlaylist = async () => {
-      //await fetchPlaylists(); // Llamamos a la función para obtener las playlists
-      const fetchPlaylists = async () => {
-        setLoading(true);
-        try {
-          const username = await getData("username");
-          console.log("👤 Usuario obtenido:", username);
-          const url = `https://spongefy-back-end.onrender.com/get-playlists?nombre_usuario=${username}`;
-          
-          
-          const response = await fetch(url);
-          const data = await response.json();
-  
-          if (response.ok) {
-            setPlaylists(data);
-            console.log("Playlists obtenidas:", playlists); // Puedes hacer algo con las playlists si es necesario
-          } else {
-            console.error("❌ Error al obtener playlists:", data);
-          }
-        } catch (error) {
-          console.error("⚠️ Error en la solicitud:", error);
-        } finally {
-          setLoading(false);
+  const [playlists, setPlaylists] = useState<{ id_lista: number; nombre: string }[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Función para abrir el modal y obtener las playlists
+  const toggleAddtoPlaylist = async () => {
+    //await fetchPlaylists(); // Llamamos a la función para obtener las playlists
+    const fetchPlaylists = async () => {
+      setLoading(true);
+      try {
+        const username = await getData("username");
+        console.log("👤 Usuario obtenido:", username);
+        const url = `https://spongefy-back-end.onrender.com/get-playlists?nombre_usuario=${username}`;
+
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+          setPlaylists(data);
+          console.log("Playlists obtenidas:", playlists); // Puedes hacer algo con las playlists si es necesario
+        } else {
+          console.error("❌ Error al obtener playlists:", data);
         }
-      };
-  
-      // Ejecutar la consulta
-      fetchPlaylists();
-
-      console.log("Id Cancion actual:", currentSong?.id);
-
-
-      setModalVisible(true);  // Abrimos el modal
-      
+      } catch (error) {
+        console.error("⚠️ Error en la solicitud:", error);
+      } finally {
+        setLoading(false);
+      }
     };
-  
-    // Función para manejar la selección de una playlist
-    const selectPlaylist = (playlistId: number) => {
-      console.log("Playlist seleccionada:", playlistId);
-      //Añadir currentSong.id a la playlist seleccionada
-      
-        const addSongToPlaylist = async () => {
-          try {
-            const url = `https://spongefy-back-end.onrender.com/add-song-playlist`;
-            const bodyData = {
-              "id_cancion": currentSong?.id,
-              "id_playlist": playlistId
-            }
-            const response = await fetch(url, {
-              method: "POST", // Cambiado a POST
-              headers: {
-                  "Content-Type": "application/json",
-              },
-              body: JSON.stringify(bodyData),
-            });
-            const data = await response.json();
-            console.log("Respuesta de la API:", data);
-            Alert.alert("Canción añadida a la playlist.");
-            if (data.success) {
-              
-            }
-          } catch (error) {
-            console.error("❌ Error al añadir canción a playlist:", error);
-          }  
-        };
-        addSongToPlaylist();
-        setModalVisible(false);  // Cerrar el modal después de seleccionar
-      
-      
-    };
-    type Content = {
-      titulo: string;
-      duracion: string;
-      link_imagen: string;
-      fecha_pub: string;
-      posicion: number;
-      artista: string;
-      featurings: string[];
-      podcast: string;
-    };
-    //Modal de la cola
 
-    const [queueModalVisible, setQueueModalVisible] = useState(false);
-    const [queue, setQueue] = useState<Content[]>([]);
-    const toggleQueue = () => {
-      
-      const fetchQueue = async () => {
-        try {
-          const username = await getData("username");
-          console.log("👤 Usuario obtenido:", username);
-          const url = `https://spongefy-back-end.onrender.com/queue/show?nombre_usuario=${username}&posicion=0`;
-          const response = await fetch(url);
-          const data = await response.json();
-          console.log("Respuesta de la API:", data);
-          if (response.ok) {
-            setQueue(data.cola);
-            console.log("Cola obtenida:", queue); // Puedes hacer algo con las playlists si es necesario
-          }
-        } catch (error) {
-          console.error("⚠️ Error en la solicitud:", error);
+    // Ejecutar la consulta
+    fetchPlaylists();
+
+    console.log("Id Cancion actual:", currentSong?.id);
+
+
+    setModalVisible(true);  // Abrimos el modal
+
+  };
+
+  // Función para manejar la selección de una playlist
+  const selectPlaylist = (playlistId: number) => {
+    console.log("Playlist seleccionada:", playlistId);
+    //Añadir currentSong.id a la playlist seleccionada
+
+    const addSongToPlaylist = async () => {
+      try {
+        const url = `https://spongefy-back-end.onrender.com/add-song-playlist`;
+        const bodyData = {
+          "id_cancion": currentSong?.id,
+          "id_playlist": playlistId
         }
-      };
-      fetchQueue();
-      setQueueModalVisible(true);
+        const response = await fetch(url, {
+          method: "POST", // Cambiado a POST
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bodyData),
+        });
+        const data = await response.json();
+        console.log("Respuesta de la API:", data);
+        Alert.alert("Canción añadida a la playlist.");
+        if (data.success) {
+
+        }
+      } catch (error) {
+        console.error("❌ Error al añadir canción a playlist:", error);
+      }
+    };
+    addSongToPlaylist();
+    setModalVisible(false);  // Cerrar el modal después de seleccionar
+
+
+  };
+  type Content = {
+    titulo: string;
+    duracion: string;
+    link_imagen: string;
+    fecha_pub: string;
+    posicion: number;
+    artista: string;
+    featurings: string[];
+    podcast: string;
+  };
+  //Modal de la cola
+
+  const [queueModalVisible, setQueueModalVisible] = useState(false);
+  const [queue, setQueue] = useState<Content[]>([]);
+  const toggleQueue = () => {
+
+    const fetchQueue = async () => {
+      try {
+        const username = await getData("username");
+        console.log("👤 Usuario obtenido:", username);
+        const url = `https://spongefy-back-end.onrender.com/queue/show?nombre_usuario=${username}&posicion=0`;
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log("Respuesta de la API:", data);
+        if (response.ok) {
+          setQueue(data.cola);
+          console.log("Cola obtenida:", queue); // Puedes hacer algo con las playlists si es necesario
+        }
+      } catch (error) {
+        console.error("⚠️ Error en la solicitud:", error);
+      }
+    };
+    fetchQueue();
+    setQueueModalVisible(true);
+  }
+  const toggleBorrarQueue = async (borrar: boolean) => {
+    const clearQueue = async () => {
+      try {
+        const username = await getData("username");
+        const url = `https://spongefy-back-end.onrender.com/queue/clear`;
+        const bodyData = {
+          "nombre_usuario": username // Cambia esto por el nombre de usuario real
+        }
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bodyData),
+        });
+        const data = await response.json();
+        console.log("Respuesta de la API:", data);
+      } catch (error) {
+        console.error("❌ Error al borrar cola:", error);
+      }
+
     }
-    const toggleBorrarQueue = async (borrar: boolean) => {
-      const clearQueue = async () => {
-        try {
-          const username = await getData("username");
-          const url = `https://spongefy-back-end.onrender.com/queue/clear`;
-          const bodyData = {
-            "nombre_usuario": username // Cambia esto por el nombre de usuario real
-          }
-          const response = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(bodyData),
-          });
-          const data = await response.json();
-          console.log("Respuesta de la API:", data);
-        } catch (error) {
-          console.error("❌ Error al borrar cola:", error);
+    clearQueue();
+    setQueue([]);
+  };
+  const toggleRandomQueue = async (aleatorio: boolean) => {
+    const randomQueue = async () => {
+      try {
+        const username = await getData("username");
+        const url = `https://spongefy-back-end.onrender.com/queue/shuffle`;
+        const bodyData = {
+          "nombre_usuario": username, // Cambia esto por el nombre de usuario real
+          "posicion": 0
         }
-
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bodyData),
+        });
+        const data = await response.json();
+        console.log("Respuesta de la API:", data);
+      } catch (error) {
+        console.error("❌ Error al aleatorizar cola:", error);
       }
-      clearQueue();
-      setQueue([]);
-    };
-    const toggleRandomQueue = async (aleatorio: boolean) => {
-      const randomQueue = async () => {
-        try {
-          const username = await getData("username");
-          const url = `https://spongefy-back-end.onrender.com/queue/shuffle`;
-          const bodyData = {
-            "nombre_usuario": username, // Cambia esto por el nombre de usuario real
-            "posicion": 0
-          }
-          const response = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(bodyData),
-          });
-          const data = await response.json();
-          console.log("Respuesta de la API:", data);
-        } catch (error) {
-          console.error("❌ Error al aleatorizar cola:", error);
-        }
 
+    }
+    randomQueue();
+    const fetchQueue = async () => {
+      try {
+        const username = await getData("username");
+        console.log("👤 Usuario obtenido:", username);
+        const url = `https://spongefy-back-end.onrender.com/queue/show?nombre_usuario=${username}&posicion=0`;
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log("Respuesta de la API:", data);
+        if (response.ok) {
+          setQueue(data.cola);
+          console.log("Cola obtenida:", queue); // Puedes hacer algo con las playlists si es necesario
+        }
+      } catch (error) {
+        console.error("⚠️ Error en la solicitud:", error);
       }
-      randomQueue();
-      const fetchQueue = async () => {
-        try {
-          const username = await getData("username");
-          console.log("👤 Usuario obtenido:", username);
-          const url = `https://spongefy-back-end.onrender.com/queue/show?nombre_usuario=${username}&posicion=0`;
-          const response = await fetch(url);
-          const data = await response.json();
-          console.log("Respuesta de la API:", data);
-          if (response.ok) {
-            setQueue(data.cola);
-            console.log("Cola obtenida:", queue); // Puedes hacer algo con las playlists si es necesario
-          }
-        } catch (error) {
-          console.error("⚠️ Error en la solicitud:", error);
-        }
-      };
-      fetchQueue();
     };
+    fetchQueue();
+  };
 
-    const rotateInterpolate = rotation.interpolate({
-      inputRange: [0, 1],
-      outputRange: ["0deg", "45deg"],
-    });
+  const rotateInterpolate = rotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "45deg"],
+  });
 
   if (isLoading) {
     return (
-      <View style={styles.container}>
+      <Pressable
+        style={styles.container}
+        onPress={() => router.push("/baseLayoutPages/PlaySong")}    >
         <View style={styles.controlsContainer}>
           <View style={styles.songInfo}>
           </View>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
             <Pressable style={styles.controls}>
               <Image
-                  source={require("../../assets/queue.png")}
-                  style={styles.icon}
-                />
-            </Pressable>      
+                source={require("../../assets/queue.png")}
+                style={styles.icon}
+              />
+            </Pressable>
             <Pressable style={styles.controls}>
               <Image
                 source={require("../../assets/anyadirplaylist.png")}
@@ -335,39 +339,41 @@ const PlayerComponent = () => {
               />
             </Pressable>
             <Image
-                source={require("../../assets/heart.png")}
-                style={styles.icon}
-              />
+              source={require("../../assets/heart.png")}
+              style={styles.icon}
+            />
             <Pressable style={styles.controls}>
-              
+
               <Animated.Image
                 source={isPlaying ? require("../../assets/pause.png") : require("../../assets/play.png")}
                 style={[styles.icon, { transform: [{ rotate: rotateInterpolate }] }]}
                 fadeDuration={2}
-                />
+              />
             </Pressable>
           </View>
         </View>
         <View style={styles.progressBarContainer}>
           <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
         </View>
-      </View>
+      </Pressable>
     );
   }
 
   if (!currentSong) {
     return (
-      <View style={styles.container}>
+      <Pressable
+        style={styles.container}
+        onPress={() => router.push("/baseLayoutPages/PlaySong")}    >
         <View style={styles.controlsContainer}>
           <View style={styles.songInfo}>
           </View>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
             <Pressable style={styles.controls}>
               <Image
-                  source={require("../../assets/queue.png")}
-                  style={styles.icon}
-                />
-            </Pressable>      
+                source={require("../../assets/queue.png")}
+                style={styles.icon}
+              />
+            </Pressable>
             <Pressable style={styles.controls}>
               <Image
                 source={require("../../assets/anyadirplaylist.png")}
@@ -375,23 +381,23 @@ const PlayerComponent = () => {
               />
             </Pressable>
             <Image
-                source={require("../../assets/heart.png")}
-                style={styles.icon}
-              />
+              source={require("../../assets/heart.png")}
+              style={styles.icon}
+            />
             <Pressable style={styles.controls}>
-              
+
               <Animated.Image
                 source={isPlaying ? require("../../assets/pause.png") : require("../../assets/play.png")}
                 style={[styles.icon, { transform: [{ rotate: rotateInterpolate }] }]}
                 fadeDuration={2}
-                />
+              />
             </Pressable>
           </View>
         </View>
         <View style={styles.progressBarContainer}>
           <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
         </View>
-      </View>
+      </Pressable>
     );
   }
 
@@ -401,54 +407,56 @@ const PlayerComponent = () => {
 
 
   return (
-      <View style={styles.container}>
-        <View style={styles.controlsContainer}>
-          <View style={styles.songInfo}>
-            {currentSong.link_imagen && (
-              <Image source={{ uri: currentSong.link_imagen }} style={styles.songImage} />
-            )}
-            <View>
-              <Text style={styles.songTitle}>{currentSong.titulo}</Text>
-              <Text style={styles.songArtists}>
-                {currentSong.autor}{featuringArtists && `, ${featuringArtists}`}
-              </Text>
-            </View>
+    <Pressable
+      style={styles.container}
+      onPress={() => router.push("/baseLayoutPages/PlaySong")}
+    >      <View style={styles.controlsContainer}>
+        <View style={styles.songInfo}>
+          {currentSong.link_imagen && (
+            <Image source={{ uri: currentSong.link_imagen }} style={styles.songImage} />
+          )}
+          <View>
+            <Text style={styles.songTitle}>{currentSong.titulo}</Text>
+            <Text style={styles.songArtists}>
+              {currentSong.autor}{featuringArtists && `, ${featuringArtists}`}
+            </Text>
           </View>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+        </View>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
           <Pressable onPress={() => toggleQueue()} style={styles.controls}>
             <Image
-                source={require("../../assets/queue.png")}
-                style={styles.icon}
-              />
-            </Pressable>
+              source={require("../../assets/queue.png")}
+              style={styles.icon}
+            />
+          </Pressable>
           {/* Modal de Queue */}
           <Modal visible={queueModalVisible} transparent animationType="slide">
             <View style={styles.modalContainerQueue}>
               <View style={styles.modalContentQueue}>
-              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                <Text style={styles.modalTitleQueue}>Cola de Reproducción</Text>
-                {/*Botón para aleatorizar la cola*/}
-                <Pressable onPress={() => toggleRandomQueue(true)} style={styles.controls}>
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                  <Text style={styles.modalTitleQueue}>Cola de Reproducción</Text>
+                  {/*Botón para aleatorizar la cola*/}
+                  <Pressable onPress={() => toggleRandomQueue(true)} style={styles.controls}>
                     <Image
                       source={require("../../assets/aleatorio.png")}
                       style={styles.icon}
                     />
                   </Pressable>
-                {/* Botón para borrar la cola */}
-                <Pressable onPress={() => toggleBorrarQueue(false)} style={styles.controls}>
-                  <Image
-                    source={require("../../assets/trash.png")}
-                    style={styles.icon}
-                  />
-                </Pressable>
-              </View>
-                
+                  {/* Botón para borrar la cola */}
+                  <Pressable onPress={() => toggleBorrarQueue(false)} style={styles.controls}>
+                    <Image
+                      source={require("../../assets/trash.png")}
+                      style={styles.icon}
+                    />
+                  </Pressable>
+                </View>
+
                 <FlatList
                   data={queue} // Excluye la canción actual
                   //keyExtractor={(index) => index.toString()} // Usamos el índice como clave
-                  renderItem={({ item, index}) => {
+                  renderItem={({ item, index }) => {
                     const isCurrentSong = index === queueIndex; // Verifica si es la canción actual usando el índice
-                    return(
+                    return (
                       <View style={[styles.queueItem, isCurrentSong && styles.currentSong]}>
                         <Text style={[styles.songTitle]}>
                           {item.titulo}
@@ -475,7 +483,7 @@ const PlayerComponent = () => {
               style={styles.icon}
             />
           </Pressable>
-          
+
           {/* Modal con las playlists */}
           <Modal visible={modalVisible} transparent animationType="slide">
             <View style={styles.modalContainer}>
@@ -514,23 +522,23 @@ const PlayerComponent = () => {
             </View>
           </Modal>
           <Image
-              source={require("../../assets/heart.png")}
-              style={styles.icon}
-            />
+            source={require("../../assets/heart.png")}
+            style={styles.icon}
+          />
           <Pressable onPress={togglePlayPause} style={styles.controls}>
-            
+
             <Animated.Image
               source={isPlaying ? require("../../assets/pause.png") : require("../../assets/play.png")}
               style={[styles.icon, { transform: [{ rotate: rotateInterpolate }] }]}
               fadeDuration={2}
-              />
+            />
           </Pressable>
         </View>
-        </View>
-        <View style={styles.progressBarContainer}>
-          <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
-        </View>
       </View>
+      <View style={styles.progressBarContainer}>
+        <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
+      </View>
+    </Pressable>
   );
 };
 

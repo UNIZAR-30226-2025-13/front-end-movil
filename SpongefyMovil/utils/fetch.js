@@ -256,7 +256,7 @@ export const fetchAndSaveFriendsList = async (nombre_usuario) => {
     }
 };
 
-export const fetchAndSaveLyrics = async (id_cancion: string) => {
+export const fetchAndSaveLyrics = async (id_cancion) => {
     try {
         const response = await fetch(
             `https://spongefy-back-end.onrender.com/song/show-lyrics?id_cancion=${id_cancion}`
