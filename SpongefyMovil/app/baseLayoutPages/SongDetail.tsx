@@ -1,9 +1,14 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { usePlayer } from './PlayerContext';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
 
 export default function SongDetail() {
+    const { currentSong, isPlaying, setIsPlaying } = usePlayer();
     const router = useRouter();
 
     const song = {
@@ -16,7 +21,18 @@ export default function SongDetail() {
         releaseDate: '21 de marzo de 2025',
     };
 
-    return (
+    type Content = {
+        titulo: string;
+        duracion: string;
+        link_imagen: string;
+        fecha_pub: string;
+        posicion: number;
+        artista: string;
+        featurings: string[];
+        podcast: string;
+    };
+
+    return currentSong ? (
         <View style={styles.container}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                 <Ionicons name="arrow-back" size={28} color="#fff" />
@@ -24,10 +40,17 @@ export default function SongDetail() {
 
             <View style={styles.coverContainer}>
                 <View style={styles.bigCover}>
-                    <Text style={styles.coverText}>{song.coverTitle}</Text>
+                    {currentSong.link_imagen ? (
+                        <Image
+                            source={{ uri: currentSong.link_imagen }}
+                            style={styles.coverImage}
+                        />
+                    ) : (
+                        <View style={styles.coverFallback} />
+                    )}
                 </View>
-                <Text style={styles.songTitle}>{song.title}</Text>
-                <Text style={styles.songArtist}>{song.artists}</Text>
+                <Text style={styles.songTitle}>{currentSong.titulo}</Text>
+                <Text style={styles.songArtist}>{currentSong.autor}</Text>
                 <TouchableOpacity style={styles.moreOptions}>
                     <Ionicons name="ellipsis-horizontal" size={24} color="#fff" />
                 </TouchableOpacity>
@@ -45,27 +68,10 @@ export default function SongDetail() {
                 <Text style={styles.infoText}>Duración: {song.duration}</Text>
                 <Text style={styles.infoText}>fecha de publicación: {song.releaseDate}</Text>
             </View>
-
-            <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('./home')}>
-                    <Ionicons name="home" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Home</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('./Biblioteca')}>
-                    <Ionicons name="library" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Tu biblioteca</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('./perfil')}>
-                    <Ionicons name="person" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Perfil</Text>
-                </TouchableOpacity>
-            </View>
         </View>
-    );
-}
+    ) : null;
 
+}
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -122,6 +128,18 @@ const styles = StyleSheet.create({
         color: '#bbb',
         fontSize: 14,
         marginBottom: 5,
+    },
+    coverImage: {
+        width: SCREEN_WIDTH * 0.7,
+        height: SCREEN_HEIGHT * 0.7,
+        borderRadius: 12,
+        backgroundColor: '#222',
+    },
+    coverFallback: {
+        width: SCREEN_WIDTH * 0.9,
+        height: SCREEN_HEIGHT * 0.7,
+        borderRadius: 12,
+        backgroundColor: '#333',
     },
     bottomBar: {
         flexDirection: 'row',

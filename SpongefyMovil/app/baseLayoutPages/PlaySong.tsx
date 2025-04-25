@@ -1,4 +1,4 @@
-// app/baseLayoutPages/SongDetail.tsx
+// app/baseLayoutPages/Playsong.tsx
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, Image, StyleSheet, Animated, Pressable, Modal, FlatList, TouchableOpacity, Alert, Dimensions, ScrollView } from "react-native";
 import { Audio } from "expo-av";
@@ -16,6 +16,7 @@ export default function SongDetail() {
     const [progress, setProgress] = useState(0); // Estado para la barra de progreso
     const audioPlayer = useRef<Audio.Sound | null>(null);
     const rotation = useRef(new Animated.Value(0)).current;
+    const [showOptions, setShowOptions] = useState(false);
     const { fetchAndPlaySong } = usePlayer();
     //indice de la cola
     const [queueIndex, setQueueIndex] = useState(0);
@@ -335,7 +336,6 @@ export default function SongDetail() {
                 <Ionicons name="arrow-back" size={28} color="#fff" />
             </TouchableOpacity>
 
-            {/* Cover réduite à 70% de la hauteur */}
             <View style={styles.coverContainer}>
                 {currentSong.link_imagen ? (
                     <Image
@@ -350,7 +350,12 @@ export default function SongDetail() {
             {/* Titre & artiste */}
             <View style={styles.infoContainer}>
                 <Text style={styles.songTitle}>{currentSong.titulo}</Text>
-                <Text style={styles.songArtists}>{currentSong.autor}</Text>
+                <View style={styles.artistRow}>
+                    <Text style={styles.songArtists}>{currentSong.autor}</Text>
+                    <Pressable onPress={() => setShowOptions(true)} style={styles.ellipsisBtn}>
+                        <Ionicons name="ellipsis-horizontal" size={24} color="#fff" />
+                    </Pressable>
+                </View>
             </View>
 
             <View style={styles.progressBar}>
@@ -436,7 +441,26 @@ export default function SongDetail() {
                     </View>
                 </View>
             </Modal>
+            {showOptions && (
+                <View style={styles.optionsOverlay}>
+                    <View style={styles.optionsMenu}>
+                        <TouchableOpacity onPress={() => { /* Ver Artista */ }} style={styles.optionItem}>
+                            <Text style={styles.optionText}>Ver Artista</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => { /* Ver Álbum */ }} style={styles.optionItem}>
+                            <Text style={styles.optionText}>Ver Álbum</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => router.push('/baseLayoutPages/SongDetail')} style={styles.optionItem}>
+                            <Text style={styles.optionText}>Ver información</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setShowOptions(false)} style={styles.optionItem}>
+                            <Text style={styles.optionText}>Cancelar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            )}
         </ScrollView>
+
     );
 }
 
@@ -457,6 +481,15 @@ const styles = StyleSheet.create({
 
     backButton: {
         margin: 16,
+    },
+    artistRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 4,
+    },
+    ellipsisBtn: {
+        marginLeft: 12,
+        padding: 4,
     },
     playlistItem: {
         padding: 10,
@@ -574,5 +607,26 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    optionsOverlay: {
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    optionsMenu: {
+        width: 200,
+        backgroundColor: '#6A0DAD',  // violet
+        borderRadius: 12,
+        paddingVertical: 8,
+    },
+    optionItem: {
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+    },
+    optionText: {
+        color: '#fff',
+        fontSize: 16,
     },
 });
