@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "react-native-wheel-color-picker": "^1.3.1"
+  }
+}
