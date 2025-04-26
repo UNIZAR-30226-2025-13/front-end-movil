@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Alert, Text, TextInput, TouchableOpacity, ImageBackground, View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { saveData, getData, removeData } from "../utils/storage";
+import { socketService } from "./socketService";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function LoginScreen() {
      await saveData("username", username);
 
       // Redirigir a la pantalla principal
+      socketService.login(username);
       router.push("/baseLayoutPages/home");
 
     } catch (error) {
