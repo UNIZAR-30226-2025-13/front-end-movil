@@ -391,10 +391,21 @@ export default function HomeScreen() {
                 return (
                     <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                         <Text style={styles.subtitle}>Lo mejor de cada artista</Text>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            style={styles.scrollView}
+                        >
                             {listasArtistas.map(a => (
-                                <TouchableOpacity key={a.id_lista} style={styles.itemContainer}>
-                                    <Image source={{ uri: a.link_imagen }} style={styles.itemImage} />
+                                <TouchableOpacity
+                                    key={a.id_lista}
+                                    style={styles.itemContainer}
+                                    onPress={() => router.push(`/baseLayoutPages/playlist/${a.id_lista}`)}
+                                >
+                                    <Image
+                                        source={{ uri: a.link_imagen }}
+                                        style={styles.itemImage}
+                                    />
                                     <Text style={styles.itemText}>{a.nombre}</Text>
                                 </TouchableOpacity>
                             ))}
@@ -403,7 +414,7 @@ export default function HomeScreen() {
                         <Text style={styles.subtitle}>Descubre música nueva</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                             {listasGeneros.map(g => (
-                                <TouchableOpacity key={g.id_lista} style={[styles.genreItem, { backgroundColor: g.color }]}>
+                                <TouchableOpacity key={g.id_lista} style={[styles.genreItem, { backgroundColor: g.color }]} onPress={() => router.push(`/baseLayoutPages/playlist/${g.id_lista}`)}>
                                     <Text style={styles.genreText}>{g.nombre}</Text>
                                 </TouchableOpacity>
                             ))}
@@ -412,7 +423,7 @@ export default function HomeScreen() {
                         <Text style={styles.subtitle}>Conoce la mejor música de cada idioma</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                             {listasIdiomas.map(i => (
-                                <TouchableOpacity key={i.id_lista} style={[styles.genreItem, { backgroundColor: i.color }]}>
+                                <TouchableOpacity key={i.id_lista} style={[styles.genreItem, { backgroundColor: i.color }]} onPress={() => router.push(`/baseLayoutPages/playlist/${i.id_lista}`)}>
                                     <Text style={styles.genreText}>{i.nombre}</Text>
                                 </TouchableOpacity>
                             ))}
