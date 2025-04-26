@@ -444,10 +444,10 @@ export default function SongDetail() {
             {showOptions && (
                 <View style={styles.optionsOverlay}>
                     <View style={styles.optionsMenu}>
-                        <TouchableOpacity onPress={() => { /* Ver Artista */ }} style={styles.optionItem}>
+                        <TouchableOpacity onPress={() => router.push(`/baseLayoutPages/artista/${currentSong.autor}`)} style={styles.optionItem}>
                             <Text style={styles.optionText}>Ver Artista</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => { /* Ver Álbum */ }} style={styles.optionItem}>
+                        <TouchableOpacity onPress={() => router.push(`/baseLayoutPages/playlist/${currentSong.autor}`)} style={styles.optionItem}>
                             <Text style={styles.optionText}>Ver Álbum</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => router.push('/baseLayoutPages/SongDetail')} style={styles.optionItem}>
