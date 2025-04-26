@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, TextInput
 } from 'react-native';
@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { saveData, getData, removeData } from "../../utils/storage";
 import { fetchAndSaveLibrary, fetchAndSaveSearchLista } from "../../utils/fetch";
 import { goToPerfil, goToPodcasterPerfil } from '../../utils/navigation';
+import SearchBar from "./SearchBar";
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -92,6 +93,12 @@ interface SearchResults {
     podcasts: Podcast[];
 }
 
+interface Props {
+    searchQuery: string;
+    setSearchQuery: (q: string) => void;
+    onSearch: () => void;
+}
+
 export default function BibliotecaScreen() {
     const router = useRouter();
     const [selectedTab, setSelectedTab] = useState('Listas');
@@ -153,7 +160,7 @@ export default function BibliotecaScreen() {
         router.push('/baseLayoutPages/CarpetaScreen');
     };
 
-    const handleSearch = async () => {
+    const handleSearch = useCallback(async () => {
 
 
         if (searchQuery.trim() === '') {
@@ -180,35 +187,85 @@ export default function BibliotecaScreen() {
                 return;
         }
 
-    };
+    }, [searchQuery, selectedTab]);
 
-    const SearchBar = () => {
-        return (
-            <View style={styles.searchContainer}>
-                {/* Icono de búsqueda a la izquierda */}
-                <Ionicons name="search" size={20} color="#fff" style={styles.iconLeft} />
+    // const SearchBar = () => {
+    //     return (
+    //         <View style={styles.searchContainer}>
+    //             {/* Icono de búsqueda a la izquierda */}
+    //             <Ionicons name="search" size={20} color="#fff" style={styles.iconLeft} />
 
-                {/* Input de búsqueda */}
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Buscar"
-                    placeholderTextColor="#888"
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    onSubmitEditing={handleSearch} // Ejecuta al presionar Enter
-                    returnKeyType="search" // Hace que el botón de teclado muestre "Buscar"
-                />
+    //             {/* Input de búsqueda */}
+    //             <TextInput
+    //                 style={styles.searchInput}
+    //                 placeholder="Buscar"
+    //                 placeholderTextColor="#888"
+    //                 value={searchQuery}
+    //                 onChangeText={setSearchQuery}
+    //                 onSubmitEditing={handleSearch} // Ejecuta al presionar Enter
+    //                 returnKeyType="search" // Hace que el botón de teclado muestre "Buscar"
+    //             />
 
-                {/*    
-                    <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-                        <Ionicons name="arrow-forward-circle" size={24} color="#fff" />
-                    </TouchableOpacity> */}
+    //             {/*    
+    //                 <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+    //                     <Ionicons name="arrow-forward-circle" size={24} color="#fff" />
+    //                 </TouchableOpacity> */}
 
-            </View>
-        );
-    };
+    //         </View>
+    //     );
+    // };
 
     const renderSectionContent = () => {
+        if (searchResults) {
+            return (
+                <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+                    {!!searchResults.listas.length && (
+                        <>
+                            {searchResults.listas.map(l => (
+                                <TouchableOpacity
+                                    key={l.id_lista}
+                                    style={styles.folderItem}
+                                    onPress={() => router.push(`./playlist/${l.id_lista}`)}
+                                >
+                                    <Text style={styles.playlistText}>{l.nombre}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </>
+                    )}
+                    {!!searchResults.podcasts.length && (
+                        <>
+                            <Text style={styles.sectionText}>Podcasts trouvés</Text>
+                            {searchResults.podcasts.map(p => (
+                                <TouchableOpacity
+                                    key={p.id_podcast}
+                                    style={styles.podcastItem}
+                                    onPress={() => handlePerfilPodcaster(p.nombre)}
+                                >
+                                    <Image source={{ uri: p.link_imagen }} style={styles.podcastImage} />
+                                    <Text style={styles.podcastText}>{p.nombre}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </>
+                    )}
+
+                    {!!searchResults.creadores.length && (
+                        <>
+                            <Text style={styles.sectionText}>Artistes trouvés</Text>
+                            {searchResults.creadores.map(c => (
+                                <TouchableOpacity
+                                    key={c.nombre_creador}
+                                    style={styles.podcastItem}
+                                    onPress={() => handleGoToArtista(c.nombre_creador)}
+                                >
+                                    <Image source={{ uri: c.link_imagen }} style={styles.podcastImage} />
+                                    <Text style={styles.podcastText}>{c.nombre_creador}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </>
+                    )}
+                </ScrollView>
+            );
+        }
         switch (selectedTab) {
             case 'Listas':
                 return (
@@ -350,15 +407,11 @@ export default function BibliotecaScreen() {
                 <Text style={styles.title}>Tu biblioteca</Text>
             </View>
 
-            {/* Barra de búsqueda */}
-            <View style={styles.searchContainer}>
-                <Ionicons name="search" size={20} color="#888" style={styles.iconLeft} />
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Buscar"
-                    placeholderTextColor="#888"
-                />
-            </View>
+            <SearchBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                onSearch={handleSearch}
+            />
 
             {/* Tabs de navegación */}
             <View style={styles.tabsContainer}>

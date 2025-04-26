@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, TextInput
 } from 'react-native';
@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { saveData, getData, removeData } from "../../utils/storage";
 import { fetchAndSaveHomeData, fetchAndSaveHomeMusicData, fetchAndSaveHomePodcastData, fetchAndSaveSearchHomeAll } from "../../utils/fetch";
 import { goToPerfil, goToPodcasterPerfil } from '../../utils/navigation';
+import SearchBar from './SearchBar';
 
 const SIMILARITY_THRESHOLD = 1;
 
@@ -161,6 +162,13 @@ interface PodcastListaAleatorioInfo {
     color: string;
 }
 
+interface Props {
+    searchQuery: string;
+    setSearchQuery: (q: string) => void;
+    onSearch: () => void;
+}
+
+
 
 export default function HomeScreen() {
     const router = useRouter();
@@ -229,7 +237,7 @@ export default function HomeScreen() {
         fetchAll();
     }, []);
 
-    const handleSearch = async () => {
+    const handleSearch = useCallback(async () => {
         if (!searchQuery.trim()) {
             setSearchResults(null);
             return;
@@ -248,7 +256,7 @@ export default function HomeScreen() {
                 });
             }
         }
-    };
+    }, [searchQuery, selectedTab]);
 
     const handlePerfilPodcaster = (name: string) => {
         goToPodcasterPerfil(name);
@@ -262,20 +270,20 @@ export default function HomeScreen() {
         goToPerfil(name);
     };
 
-    const SearchBar = () => (
-        <View style={styles.searchContainer}>
-            <Ionicons name="search" size={20} color="#fff" style={styles.iconLeft} />
-            <TextInput
-                style={styles.searchInput}
-                placeholder="Buscar"
-                placeholderTextColor="#888"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                onSubmitEditing={handleSearch}
-                returnKeyType="search"
-            />
-        </View>
-    );
+    // const SearchBar = () => (
+    //     <View style={styles.searchContainer}>
+    //         <Ionicons name="search" size={20} color="#fff" style={styles.iconLeft} />
+    //         <TextInput
+    //             style={styles.searchInput}
+    //             placeholder="Buscar"
+    //             placeholderTextColor="#888"
+    //             value={searchQuery}
+    //             onChangeText={setSearchQuery}
+    //             onSubmitEditing={handleSearch}
+    //             returnKeyType="search"
+    //         />
+    //     </View>
+    // );
 
     const renderSectionContent = () => {
         if (searchResults) {
@@ -529,7 +537,11 @@ export default function HomeScreen() {
             </View>
 
             {/* — SearchBar — */}
-            <SearchBar />
+            <SearchBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                onSearch={handleSearch}
+            />
 
             <View style={styles.tabsContainer}>
                 {tabs.map(tab => (
