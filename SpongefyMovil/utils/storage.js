@@ -28,7 +28,7 @@ podcaster             nombre del ultimo podcaster seleccionado
 podcaster_profile     guarda los datos del perfil del podcaster
 friendlist            guarda la lista de amigos del usuario
 user_chat             guarda el nombre del ultimo usuario con el que se ha chateado
-
+messages              guarda los mensajes entre el usuario y el ultimo usuario con el que se ha chateado
 
 */
 

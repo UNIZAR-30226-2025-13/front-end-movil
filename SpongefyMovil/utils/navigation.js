@@ -14,5 +14,5 @@ export const goToPodcasterPerfil = async (nombre_podcaster) => {
 
 export const goToChat = async (nombre_usuario) =>  {
     await saveData("user_chat", nombre_usuario);
-    router.push('/baseLayoutPages/Chat')
+    router.push('/Chat')
 }
