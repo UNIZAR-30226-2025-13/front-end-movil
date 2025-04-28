@@ -6,6 +6,7 @@ import {
     TextInput,
     TouchableOpacity,
     FlatList,
+    Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -25,18 +26,19 @@ export default function ChatScreen() {
         const loadData = async () => {
             const nombre = await getData("username");
             setUsername(nombre);
-
+    
             const nombre_amigo = await getData("user_chat");
             setFriendName(nombre_amigo);
-
+    
             await fetchAndSaveMessages(nombre, nombre_amigo);
             const datosMensajes = await getData("messages");
-
+    
             if (datosMensajes) {
                 setMessages(datosMensajes || []);
             }
         };
-
+    
+        // Recibir nuevos mensajes
         chatService.onNewMessage((message) => {
             setMessages(prev => [...prev, {
                 id_mensaje: Date.now(),
@@ -46,8 +48,18 @@ export default function ChatScreen() {
                 fecha: new Date().toISOString()
             }]);
         });
-
+    
+        // Escuchar cuando un mensaje sea eliminado
+        chatService.onMessageDeleted((data) => {
+            setMessages(prev => prev.filter(msg => msg.id_mensaje !== data.id_mensaje));
+        });
+    
         loadData();
+    
+        // Limpiar eventos al desmontar
+        return () => {
+            chatService.offEvents();
+        };
     }, []);
 
     const handleSend = async () => {
@@ -95,24 +107,77 @@ export default function ChatScreen() {
         }
     };
 
+    const handleDeleteMessage = (id_mensaje: number) => {
+       
+        setMessages(prev => prev.filter(msg => msg.id_mensaje !== id_mensaje));
+        chatService.deleteMessage(id_mensaje);
+    };
+
+    // const renderItem = ({ item }: { item: any }) => {
+    //     const isMyMessage = item.nombre_usuario_envia === username;
+    //     const hora = new Date(item.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    //     return (
+    //         <View style={[styles.bubble, isMyMessage ? styles.bubbleRight : styles.bubbleLeft]}>
+    //             <Text style={styles.messageText}>{item.contenido}</Text>
+    //             {/* por si queremos mostrar la hora de envio */}
+    //             {/* <Text style={styles.timeText}>{hora}</Text> */}
+    //         </View>
+    //     );
+    // };
+
+    const alertConfirmDelete = (id_mensaje: number) => {
+        Alert.alert(
+            "Eliminar mensaje",
+            "¿Quieres eliminar este mensaje?",
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel"
+                },
+                {
+                    text: "Eliminar",
+                    onPress: () => handleDeleteMessage(id_mensaje),
+                    style: "destructive"
+                }
+            ]
+        );
+    };
+
     const renderItem = ({ item }: { item: any }) => {
         const isMyMessage = item.nombre_usuario_envia === username;
         const hora = new Date(item.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
+    
+        const onPressMessage = () => {
+            if (isMyMessage) {
+                // Solo puedes borrar tus propios mensajes
+                // Confirmación rápida con alert
+                alertConfirmDelete(item.id_mensaje);
+            }
+        };
+    
         return (
-            <View style={[styles.bubble, isMyMessage ? styles.bubbleRight : styles.bubbleLeft]}>
-                <Text style={styles.messageText}>{item.contenido}</Text>
-                {/* por si queremos mostrar la hora de envio */}
-                {/* <Text style={styles.timeText}>{hora}</Text> */}
-            </View>
+            <TouchableOpacity
+                onPress={onPressMessage}
+                activeOpacity={isMyMessage ? 0.7 : 1}
+            >
+                <View style={[styles.bubble, isMyMessage ? styles.bubbleRight : styles.bubbleLeft]}>
+                    <Text style={styles.messageText}>{item.contenido}</Text>
+                    {/* <Text style={styles.timeText}>{hora}</Text> */}
+                </View>
+            </TouchableOpacity>
         );
     };
+
+    const goToFriends = () => {
+        router.push('/baseLayoutPages/Friends');
+      };
 
     return (
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <TouchableOpacity onPress={goToFriends} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={24} color="#fff" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>{friendName || 'Amigo'}</Text>
