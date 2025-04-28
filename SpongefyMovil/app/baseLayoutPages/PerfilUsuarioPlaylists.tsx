@@ -94,9 +94,9 @@ export default function PerfilUsuarioPlaylists() {
           {Array.isArray(playlists) ? playlists.map((playlist, index) => (
             <View key={index} style={styles.playlistWrapper}>
               <TouchableOpacity onPress={() => handleGoToPlaylist(playlist.id_lista)} style={[styles.genreItem, { backgroundColor: playlist.color || '#ccc' }]}>
-                <Text style={styles.playlistCardText}>{playlist.nombre}</Text> {/* Texto negro encima */}
+                <Text style={styles.playlistCardText}>{String(playlist.nombre)}</Text> {/* Texto negro encima */}
               </TouchableOpacity>
-              <Text style={styles.playlistText}>{playlist.nombre}</Text> {/* Texto blanco debajo */}
+              <Text style={styles.playlistText}>{String(playlist.nombre)}</Text> {/* Texto blanco debajo */}
             </View>
           )) : (
             <Text style={styles.playlistTitle}>Este usuario no tiene listas</Text>
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#4B2E83',
+    backgroundColor: '#9400D3',
   },
   scrollContent: {
     paddingBottom: 40,

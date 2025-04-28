@@ -282,3 +282,23 @@ export const fetchAndSaveLyrics = async (id_cancion) => {
         console.error("Error en fetchAndSaveLyrics:", error);
     }
 };
+
+export const fetchAndSaveMessages = async (nombre_usuario_envia, nombre_usuario_recibe) => {
+    try {
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/get-messages?nombre_usuario_envia=${nombre_usuario_envia}&nombre_usuario_recibe=${nombre_usuario_recibe}`
+        );
+
+        if (!response.ok) {
+            const errorResponse = await response.text();
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al obtener los mensajes: ${response.status} - ${response.statusText}`);
+        }
+
+        const messages = await response.json();
+        await saveData("messages", messages);
+        console.log("Mensajes guardados correctamente:", messages);
+    } catch (error) {
+        console.error("Error en fetchAndSaveMessages:", error);
+    }
+};
