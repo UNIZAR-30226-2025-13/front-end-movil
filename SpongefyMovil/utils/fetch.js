@@ -282,3 +282,32 @@ export const fetchAndSaveLyrics = async (id_cancion) => {
         console.error("Error en fetchAndSaveLyrics:", error);
     }
 };
+
+export const fetchAndSaveRating = async (
+    id_cm,
+    nombreUsuario
+) => {
+    try {
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/get-rate?id_cm=${id_cm}&nombre_usuario=${nombreUsuario}`
+        );
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Error en la respuesta de get-rate:", errorText);
+            throw new Error(
+                `Error al obtener la nota: ${response.status} - ${response.statusText}`
+            );
+        }
+
+        const json = await response.json();
+        const valoracion = json.valoracion;
+
+        await saveData("rating", valoracion);
+
+        console.log("Nota guardada correctamente:", valoracion);
+    } catch (error) {
+        console.error("Error en fetchAndSaveRating:", error);
+    }
+};
+
