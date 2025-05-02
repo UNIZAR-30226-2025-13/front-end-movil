@@ -47,8 +47,11 @@ export default function PerfilUsuarioPlaylists() {
     };
 
     loadProfile();
-  }, []);
 
+  }, []);
+  const handleEditProfile = () => {
+    router.push('/baseLayoutPages/EditPerfil');
+  };
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -80,7 +83,7 @@ export default function PerfilUsuarioPlaylists() {
           </View>
 
           {userName === profileUsername ? (
-            <TouchableOpacity style={styles.friendButton}>
+            <TouchableOpacity style={styles.friendButton} onPress={handleEditProfile}>
               <Text style={styles.friendButtonText}>Editar perfil</Text>
             </TouchableOpacity>
           ) : (

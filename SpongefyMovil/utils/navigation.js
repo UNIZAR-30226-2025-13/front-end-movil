@@ -7,9 +7,22 @@ export const goToPerfil = async (nombre) => {
     router.push('/baseLayoutPages/PerfilUsuarioPlaylists');
 };
 
-export const goToPodcasterPerfil = async (nombre_podcaster) => {
-    await saveData("podcaster", nombre_podcaster);
-    router.push('/baseLayoutPages/PerfilPodcaster');
+export const goToPodcasterPerfil =(name) => {
+    saveData("podcaster", name);
+    console.log(name);
+    router.push(`/baseLayoutPages/podcaster/${name}`);
+}
+
+export const goToPodcast =(name) => {
+    saveData("podcaster", name);
+    console.log(name);
+    router.push(`/baseLayoutPages/podcast/${name}`);
+}
+
+export const goToEpisode =(id) => {
+    saveData("podcaster", id);
+    console.log(id);
+    router.push(`/baseLayoutPages/episode/${id}`);
 }
 
 export const goToChat = async (nombre_usuario) =>  {
