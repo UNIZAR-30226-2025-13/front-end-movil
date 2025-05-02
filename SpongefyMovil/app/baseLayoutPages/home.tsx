@@ -541,7 +541,7 @@ export default function HomeScreen() {
             {/* — Header — */}
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
-                    <Ionicons name="library-outline" size={28} color="#fff" />
+                    <Ionicons name="home-outline" size={28} color="#fff" />
                     <Text style={styles.title}>Home</Text>
                 </View>
             </View>

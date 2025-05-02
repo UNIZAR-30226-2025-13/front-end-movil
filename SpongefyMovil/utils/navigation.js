@@ -27,5 +27,5 @@ export const goToEpisode =(id) => {
 
 export const goToChat = async (nombre_usuario) =>  {
     await saveData("user_chat", nombre_usuario);
-    router.push('/baseLayoutPages/Chat')
+    router.push('/Chat')
 }

@@ -46,7 +46,7 @@ export default function LoginScreen() {
   };
 
   const handleDebug = async () => {
-    const usernamedebug = "maka";
+    const usernamedebug = "jorge";
     console.log("debug desde login con", usernamedebug);
     await saveData("username", usernamedebug);
     router.push("/baseLayoutPages/home");
