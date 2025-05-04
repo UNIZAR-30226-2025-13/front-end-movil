@@ -36,8 +36,9 @@ useEffect(() => {
 export default function CreatePlaylistScreen() {
 
     const router = useRouter();
-    const [selectedTab, setSelectedTab] = useState('Canciones');
+    
     const [playlistName, setplaylistName] = useState<string>("");
+    const [playlistDescription, setplaylistDescription] = useState<string>("");
     const tabs = ['Canciones', 'Episodios'];
 
     const [listas, setListas] = useState<CreatePlaylistLista[]>([]);
@@ -49,13 +50,13 @@ export default function CreatePlaylistScreen() {
     ) => {
 
         try {
-            const url = `https://spongefy-back-end.onrender.com/create-list`;
+            const url = `https://spongefy-back-end.onrender.com/generar-playlist`;
 
             const bodyData = {
                 nombre_usuario: nombreUsuario,
-                nombre_lista: playlistName,
+                nombre_playlist: playlistName,
                 color: selectedColor,
-                tipo: tipo,
+                contexto: playlistDescription
             };
 
             const response = await fetch(url, {
@@ -117,44 +118,28 @@ export default function CreatePlaylistScreen() {
         );
     };
     const renderSectionContent = () => {
-        switch (selectedTab) {
-            case 'Canciones':
-                return (
-                    <View style={{ flex: 1 }}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Nombre de la Playlist"
-                            placeholderTextColor="#888"
-                            onChangeText={setplaylistName}
-                        />
-                        <ColorDropdown selectedColor={selectedColor} setSelectedColor={setSelectedColor} />
+        
+        return (
+            <View style={{ flex: 1 }}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Nombre de la Playlist"
+                    placeholderTextColor="#888"
+                    onChangeText={setplaylistName}
+                />
+                <TextInput
+                        style={styles.input}
+                        placeholder="Descripción de la Playlist"
+                        placeholderTextColor="#888"
+                        onChangeText={setplaylistDescription}
+                    />
+                <ColorDropdown selectedColor={selectedColor} setSelectedColor={setSelectedColor} />
 
-                        <TouchableOpacity style={styles.addButton} onPress={async () => { const username = await getData("username"); handleGuardar(username, "canciones") }}>
-                            <Ionicons name="add" size={24} color="white" />
-                        </TouchableOpacity>
-                    </View>
-                );
-            case 'Episodios':
-                return (
-                    <View style={{ flex: 1 }}>
-                        <ScrollView style={styles.scrollView}>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Nombre de la Playlist"
-                                placeholderTextColor="#888"
-                                onChangeText={setplaylistName}
-                            />
-                            <ColorDropdown selectedColor={selectedColor} setSelectedColor={setSelectedColor} />
-
-                        </ScrollView>
-                        <TouchableOpacity style={styles.addButton} onPress={async () => { const username = await getData("username"); handleGuardar(username, "episodios") }}>
-                            <Ionicons name="add" size={24} color="white" />
-                        </TouchableOpacity>
-                    </View>
-                );
-            default:
-                return <Text style={styles.sectionText}>Selecciona una sección</Text>;
-        }
+                <TouchableOpacity style={styles.addButton} onPress={async () => { const username = await getData("username"); handleGuardar(username, "canciones") }}>
+                    <Ionicons name="add" size={24} color="white" />
+                </TouchableOpacity>
+            </View>
+        );
     };
 
     const handleBiblioteca = () => {
@@ -169,23 +154,11 @@ export default function CreatePlaylistScreen() {
             {/* Encabezado */}
             <View style={styles.header}>
                 <Ionicons name="library-outline" size={28} color="white" />
-                <Text style={styles.title}>Crea una Playlist</Text>
+                <Text style={styles.title}>Crea una Playlist con IA</Text>
             </View>
 
             {/* Tabs de navegación */}
-            <View style={styles.tabsContainer}>
-                {tabs.map((tab) => (
-                    <TouchableOpacity
-                        key={tab}
-                        style={[styles.tab, selectedTab === tab && styles.tabSelected]}
-                        onPress={() => setSelectedTab(tab)}
-                    >
-                        <Text style={[styles.tabText, selectedTab === tab && styles.tabTextSelected]}>
-                            {tab}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
+            
             <View style={styles.content}>
                 {renderSectionContent()}
             </View>

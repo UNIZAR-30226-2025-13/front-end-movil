@@ -139,6 +139,10 @@ export default function BibliotecaScreen() {
         console.log("Boton añadir carpeta pulsado");
         router.push('/baseLayoutPages/CrearCarpeta');
     };
+    const handleAddPlaylistIA = async () => {
+        console.log("Boton añadir playlist pulsado");
+        router.push('/baseLayoutPages/CrearPlaylistIA');
+    };
     const handleGoToArtista = async (nombre_artista: string) => {
         console.log("Boton Artista pulsado para:", nombre_artista);
         await saveData("artist", nombre_artista);
@@ -355,6 +359,9 @@ export default function BibliotecaScreen() {
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.optionButton} onPress={handleAddFolder}>
                                     <Text style={styles.optionText}>Nueva Carpeta</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.optionButton} onPress={handleAddPlaylistIA}>
+                                    <Text style={styles.optionText}>Nueva Playlist con IA</Text>
                                 </TouchableOpacity>
                             </View>
                         )}
