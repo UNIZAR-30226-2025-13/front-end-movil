@@ -40,13 +40,13 @@ export default function ChatScreen() {
     
         // Recibir nuevos mensajes
         chatService.onNewMessage((message) => {
-            setMessages(prev => [...prev, {
+            setMessages(prev => [{
                 id_mensaje: Date.now(),
                 nombre_usuario_envia: message.from,
                 nombre_usuario_recibe: message.to,
                 contenido: message.content,
                 fecha: new Date().toISOString()
-            }]);
+            }, ...prev]);
         });
     
         // Escuchar cuando un mensaje sea eliminado
