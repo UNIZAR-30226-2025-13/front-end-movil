@@ -23,7 +23,7 @@ export default function GestionPerfilesScreen() {
   }, []);
 
   const handlePressArtistas = () => {
-    // router.push("/gestionar-artistas");
+    router.push("/AdminArtistas");
   };
 
   const handlePressAutores = () => {
@@ -111,6 +111,6 @@ const styles = StyleSheet.create({
   },
   usernameText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 30,
   },
 });
