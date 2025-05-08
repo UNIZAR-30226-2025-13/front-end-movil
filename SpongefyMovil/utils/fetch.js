@@ -302,3 +302,28 @@ export const fetchAndSaveMessages = async (nombre_usuario_envia, nombre_usuario_
         console.error("Error en fetchAndSaveMessages:", error);
     }
 };
+
+export const fetchAndSaveAllCreators = async () => {
+
+    const cadena = "a";
+
+    try {
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/search-creator?cadena=${cadena}`
+        );
+
+        if (!response.ok) {
+            const errorResponse = await response.text();
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al obtener los creadores: ${response.status} - ${response.statusText}`);
+        }
+
+        const busqueda_creadores = await response.json();
+        await saveData("allCreators", busqueda_creadores);
+
+        console.log("Resultados de búsqueda guardados correctamente:", busqueda_creadores);
+    } catch (error) {
+        console.error("Error en fetchAndSaveAllCreators:", error);
+    }
+};
+
