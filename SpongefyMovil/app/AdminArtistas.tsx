@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { getData, saveData } from "../utils/storage";
@@ -49,9 +50,55 @@ export default function GestionArtistasScreen() {
     router.push('/AdminEditarCreador');
   };
 
-  const handleEliminar = () => {
-    
+  const handleEliminar = async () => {
+    if (!artistaSeleccionado) return;
+  
+    Alert.alert(
+      "Confirmar eliminación",
+      `¿Estás seguro de que quieres eliminar a "${artistaSeleccionado}"?`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const response = await fetch("https://spongefy-back-end.onrender.com/admin/delete-creator", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ nombre_creador: artistaSeleccionado }),
+              });
+  
+              let data;
+              try {
+                data = await response.json();
+              } catch (jsonError) {
+                console.warn("No se pudo parsear JSON:", jsonError);
+                console.log("Status:", response.status);
+                console.log("Texto plano:", await response.text());
+              }
+  
+              if (response.ok) {
+                Alert.alert("Éxito", "Creador eliminado con éxito.");
+                setArtistaSeleccionado(null);
+                setArtistaTipo(null);
+                await fetchAndSaveAllCreators();
+                const updatedData = await getData("allCreators");
+                setArtistas(updatedData.creadores || []);
+              } else {
+              }
+            } catch (error) {
+              console.error("Error en eliminación:", error);
+              Alert.alert("Error", "Ocurrió un error inesperado.");
+            }
+          },
+        },
+      ]
+    );
   };
+  
 
   const handleAlbum = () => {
     // setArtistaSeleccionado(nombre);
