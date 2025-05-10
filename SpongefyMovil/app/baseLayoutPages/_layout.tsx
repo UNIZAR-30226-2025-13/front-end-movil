@@ -1,7 +1,7 @@
 // baseLayoutPages/_layout.tsx
 import React from "react";
 import { View, StyleSheet, Text, ScrollView, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { Slot, router, useSegments } from "expo-router";
 import PlayerComponent from "./PlayerComponent";
 import { getData } from "@/utils/storage";
@@ -19,6 +19,10 @@ const Layout = () => {
     const username = await getData("username");
     //llama a goToPerfil con su propio nombre, para acceder a su perfil
     goToPerfil(username);
+  };
+
+    const goToFriends = () => {
+    router.push('/baseLayoutPages/Friends');
   };
 
 
@@ -51,6 +55,14 @@ const Layout = () => {
           >
             <Ionicons name="library" size={24} color="#fff" />
             <Text style={styles.bottomBarText}>Tu biblioteca</Text>
+          </TouchableOpacity>
+
+        <TouchableOpacity
+            style={styles.bottomBarItem}
+            onPress={goToFriends}
+          >
+            <FontAwesome name="users" size={24} color="#fff" />
+            <Text style={styles.bottomBarText}>Amigos</Text>
           </TouchableOpacity>
 
           <TouchableOpacity

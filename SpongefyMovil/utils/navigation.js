@@ -13,10 +13,10 @@ export const goToPodcasterPerfil =(name) => {
     router.push(`/baseLayoutPages/podcaster/${name}`);
 }
 
-export const goToPodcast =(name) => {
-    saveData("podcaster", name);
-    console.log(name);
-    router.push(`/baseLayoutPages/podcast/${name}`);
+export const goToPodcast =(id) => {
+    // saveData("podcaster", name);
+    console.log(id);
+    router.push(`/baseLayoutPages/podcast/${id}`);
 }
 
 export const goToEpisode =(id) => {

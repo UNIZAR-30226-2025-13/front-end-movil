@@ -144,6 +144,7 @@ interface PodcastEpisodio {
 }
 
 interface PodcastCompleto {
+    id_podcast: number;
     nombre_podcast: string;
     foto_podcast: string;
     episodios_recientes: PodcastEpisodio[];
@@ -450,7 +451,7 @@ export default function HomeScreen() {
                         <Text style={styles.subtitle}>Lo mejor en podcasts</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                             {listasPodcast.map(p => (
-                                <TouchableOpacity key={p.id_podcast} style={styles.itemContainer} onPress={() => handlePerfilPodcaster(p.nombre)}>
+                                <TouchableOpacity key={p.id_podcast} style={styles.itemContainer} onPress={() => handlePodcast(p.id_podcast)}>
                                     <Image source={{ uri: p.link_imagen }} style={styles.itemImage} />
                                     <Text style={styles.itemText}>{p.nombre}</Text>
                                 </TouchableOpacity>
@@ -499,7 +500,11 @@ export default function HomeScreen() {
                             <>
                                 <Text style={styles.subtitle}>Lo mejor de {podcastCompleto.nombre_podcast}</Text>
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+                                    <TouchableOpacity onPress={() => handlePodcast(podcastCompleto.id_podcast)}>
                                     <Image source={{ uri: podcastCompleto.foto_podcast }} style={styles.artistaImage} />
+                                    <Text style={styles.itemText}>{podcastCompleto.nombre_podcast}</Text>
+                                    </TouchableOpacity>
+                                    
                                     {podcastCompleto.episodios_recientes.map((e, i) => (
                                         <TouchableOpacity key={i} style={styles.itemContainer} onPress={() => handleEpisodio(e.id_ep)}>
                                             <Image source={{ uri: e.link_imagen }} style={styles.itemImage} />

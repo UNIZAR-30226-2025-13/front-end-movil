@@ -229,6 +229,11 @@ export default function PodcasterScreen() {
       }
     };
 
+    const handleGoToPlaylist = (id_playlist: number) => {
+        console.log("Boton Playlist pulsado para:", id_playlist);
+        router.push(`../playlist/${id_playlist}`);
+    };
+
   return (
     <View style={styles.container}>
       {!podcasterData ? (
@@ -258,26 +263,14 @@ export default function PodcasterScreen() {
 
 
           <View style={styles.favoriteSection}>
+            <TouchableOpacity style={styles.favoriteSection} onPress={() => handleGoToPlaylist(podcasterData.lista_this_is.id_lista)}>
             <Text style={styles.sectionTitle}>Todos los episodios</Text>
             <View style={styles.favoriteImageContainer}>
               <Image source={{ uri: podcasterData.link_imagen }} style={styles.favoriteArtistImage} />
               <Image source={require("../../../assets/heart.png")} style={styles.heartIcon} />
             </View>
+            </TouchableOpacity>
           </View>
-
-          {/* Más reciente */}
-          {/* <View style={styles.songsWrapper}>
-            <Text style={styles.section2Title}>Más reciente</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.songsContainer}>
-              {podcasterData.ep_mas_reciente?.map((ep) => (
-                <View key={ep.id_episodio} style={styles.songCard}>
-                  <Image source={{ uri: ep.link_imagen }} style={styles.songImage} />
-                  <Text style={styles.songTitle}>{ep.titulo_episodio}</Text>
-                  <Text style={styles.artistTitle}>{ep.nombre}</Text>
-                </View>
-              ))}
-            </ScrollView>
-          </View> */}
 
           {/* Más reciente */}
           <View style={styles.songsWrapper}>

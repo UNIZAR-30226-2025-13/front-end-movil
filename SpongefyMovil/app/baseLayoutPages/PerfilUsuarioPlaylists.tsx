@@ -21,10 +21,6 @@ export default function PerfilUsuarioPlaylists() {
     console.log("Boton Playlist pulsado para:", id_playlist);
     router.push(`./playlist/${id_playlist}`);
   };
-  const goToFriends = () => {
-    router.push('/baseLayoutPages/Friends');
-  };
-
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -63,15 +59,6 @@ export default function PerfilUsuarioPlaylists() {
 
         {/* Cabecera */}
         <View style={styles.header}>
-
-        {userName === profileUsername && (
-          <TouchableOpacity onPress={goToFriends}>
-            <Image
-              source={require('../../assets/friends.png')}
-              style={styles.friendsIcon}
-            />
-          </TouchableOpacity>
-        )}
 
           <Text style={styles.label}>Usuario</Text>
           <Text style={styles.username}>{profileUsername}</Text>
