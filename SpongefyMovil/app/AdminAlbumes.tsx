@@ -8,54 +8,84 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { getData, saveData } from "../utils/storage";
 import { fetchAndSaveAllCreators } from "../utils/fetch";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { fetchArtistByName } from "./baseLayoutPages/songService";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
-interface Artista {
-  nombre_creador: string;
+interface Album {
+  id_album: string;
   link_imagen: string;
-  similitud: number;
-  tipo: string;
+  nombre_album: string;
 }
 
-export default function GestionArtistasScreen() {
+export default function GestionarAlbumesScreen() {
   const router = useRouter();
-  const [artistaSeleccionado, setArtistaSeleccionado] = useState<string | null>(null);
-  const [artistaTipo, setArtistaTipo] = useState<string | null>(null);
-  const [Artistas, setArtistas] = useState<Artista[]>([]);
+  const { artista } = useLocalSearchParams();
+  const nombreArtista = artista as string;
+  console.log("Nombre del artista:", nombreArtista);
+  const [isLoading, setIsLoading] = useState(false);
 
+  const [albumSeleccionado, setAlbumSeleccionado] = useState<string | null>(null);
+  const [Albumes, setAlbumes] = useState<Album[]>([]);
+  const [artistData, setArtistData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    const loadData = async () => {
-      await fetchAndSaveAllCreators();
-      const data = await getData("allCreators");
-      setArtistas(data.creadores || []);
-    };
-    loadData();
-  }, []);
-
-  const handleSelect = (nombre: string, tipo: string) => {
-    setArtistaSeleccionado(nombre);
-    setArtistaTipo(tipo);
+    const fetchArtistInfo = async () => {
+          if (nombreArtista) {
+            const artistName = Array.isArray(nombreArtista) ? nombreArtista[0] : nombreArtista;
+            console.log("Nombre del artista:", artistName);
+            setIsLoading(true);
+            try {
+              const artist = await fetchArtistByName(artistName);
+              console.log("Datos del artista obtenidos:", artist);
+              if (artist) {
+                setArtistData(artist);
+                
+                setError(null);
+              } else {
+                setError("No se encontraron datos del artista.");
+              }
+            } catch (err) {
+              setError("Hubo un error al obtener la información del artista.");
+              console.error(err);
+            } finally {
+              setIsLoading(false);
+            }
+          }
+        };
+    fetchArtistInfo();
+  }, [nombreArtista]);
+  useEffect(() => {
+    if (artistData) {
+      setAlbumes(artistData.albumes || []);
+    }
+  }, [artistData]);  // Esto se ejecuta solo cuando `artistData` cambia
+  
+  const handleSelect = (nombre: string) => {
+    setAlbumSeleccionado(nombre);
   };
 
   const handleNuevo = () => {
-    router.push('/AdminNuevoCreador');
+    router.push(`/AdminNuevoAlbum?artista=${encodeURIComponent(nombreArtista)}`);
   };
 
   const handleEditar = async ()  => {
-    const nombre = artistaSeleccionado;
-    await saveData("creatorEdit", artistaSeleccionado);
-    router.push('/AdminEditarCreador');
+    const nombre = albumSeleccionado;
+    if(!nombre) return;
+    console.log("Nombre del album:", nombre);
+    await saveData("albumEdit", albumSeleccionado);
+    router.push(`/AdminEditarAlbum?artista=${encodeURIComponent(nombreArtista)}&album=${encodeURIComponent(albumSeleccionado)}`);
   };
 
   const handleEliminar = async () => {
-    if (!artistaSeleccionado) return;
+    if (!albumSeleccionado) return;
   
     Alert.alert(
       "Confirmar eliminación",
-      `¿Estás seguro de que quieres eliminar a "${artistaSeleccionado}"?`,
+      `¿Estás seguro de que quieres eliminar el Album "${albumSeleccionado}"?`,
       [
         { text: "Cancelar", style: "cancel" },
         {
@@ -63,12 +93,13 @@ export default function GestionArtistasScreen() {
           style: "destructive",
           onPress: async () => {
             try {
-              const response = await fetch("https://spongefy-back-end.onrender.com/admin/delete-creator", {
+              // Aquí puedes realizar la lógica para eliminar el álbum
+              const response = await fetch("https://spongefy-back-end.onrender.com/admin/delete-album", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ nombre_creador: artistaSeleccionado }),
+                body: JSON.stringify({ albumSeleccionado: albumSeleccionado }),
               });
   
               let data;
@@ -81,12 +112,11 @@ export default function GestionArtistasScreen() {
               }
   
               if (response.ok) {
-                Alert.alert("Éxito", "Creador eliminado con éxito.");
-                setArtistaSeleccionado(null);
-                setArtistaTipo(null);
+                Alert.alert("Éxito", "Album eliminado con éxito.");
+                setAlbumSeleccionado(null);
                 await fetchAndSaveAllCreators();
                 const updatedData = await getData("allCreators");
-                setArtistas(updatedData.creadores || []);
+                setAlbumes(updatedData.creadores || []);
               } else {
               }
             } catch (error) {
@@ -100,9 +130,8 @@ export default function GestionArtistasScreen() {
   };
   
 
-  const handleAlbum = (artista: string) => {
+  const handleAlbum = () => {
     // setArtistaSeleccionado(nombre);
-    router.push(`/AdminAlbumes?artista=${encodeURIComponent(artista)}`);
   };
 
 
@@ -116,7 +145,7 @@ export default function GestionArtistasScreen() {
       </View>
 
       {/* Título */}
-      <Text style={styles.title}>GESTIONAR{"\n"}CREADORES</Text>
+      <Text style={styles.title}>GESTIONAR{"\n"}ÁLBUMES DE {nombreArtista.toUpperCase()}</Text>
 
       {/* Lista de artistas */}
       <ScrollView style={styles.listContainer}>
@@ -126,19 +155,19 @@ export default function GestionArtistasScreen() {
     <Text style={styles.artistName}>Nuevo</Text>
   </TouchableOpacity>
 
-  {Artistas.map((artista) => {
-    const isSelected = artista.nombre_creador === artistaSeleccionado;
+  {Albumes.map((id_album) => {
+    const isSelected = id_album.id_album === albumSeleccionado;
 
     return (
-      <View key={artista.nombre_creador}>
+      <View key={id_album.nombre_album}>
         <TouchableOpacity
           style={styles.artistItem}
           onPress={() =>
-            handleSelect(artista.nombre_creador, artista.tipo)
+            handleSelect(id_album.id_album)
           }
         >
-          <Image source={{ uri: artista.link_imagen }} style={styles.artistImage} />
-          <Text style={styles.artistName}>{artista.nombre_creador}</Text>
+          <Image source={{ uri: id_album.link_imagen }} style={styles.artistImage} />
+          <Text style={styles.artistName}>{id_album.nombre_album}</Text>
         </TouchableOpacity>
 
         {isSelected && (
@@ -147,9 +176,9 @@ export default function GestionArtistasScreen() {
               <Ionicons name="pencil" size={20} color="#fff" />
               <Text style={styles.dropdownText}>Editar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.dropdownItem} onPress={ () => handleAlbum(artista.nombre_creador) }>
+            <TouchableOpacity style={styles.dropdownItem} onPress={handleAlbum}>
               <Ionicons name="albums" size={20} color="#fff" />
-              <Text style={styles.dropdownText}>Gestionar Álbumes</Text>
+              <Text style={styles.dropdownText}>Gestionar Canciones</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.dropdownItem} onPress={handleEliminar}>
               <Ionicons name="trash" size={20} color="#fff" />
