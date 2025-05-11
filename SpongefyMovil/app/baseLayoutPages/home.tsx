@@ -484,7 +484,7 @@ export default function HomeScreen() {
                         <Text style={styles.subtitle}>Spongefy recomienda</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                             {listasMusicaAleatorio.map(i => (
-                                <TouchableOpacity key={i.id_lista} style={[styles.genreItem, { backgroundColor: i.color }]}>
+                                <TouchableOpacity key={i.id_lista} style={[styles.genreItem, { backgroundColor: i.color }]} onPress={() => router.push(`/baseLayoutPages/playlist/${i.id_lista}`)}>
                                     <Text style={styles.genreText}>{i.nombre}</Text>
                                 </TouchableOpacity>
                             ))}
@@ -518,7 +518,7 @@ export default function HomeScreen() {
                         <Text style={styles.subtitle}>Spongefy recomienda</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                             {listasPodcastAleatorioInfo.map(a => (
-                                <TouchableOpacity key={a.id_lista} onPress={() => handlePodcast(a.id_lista)} style={[styles.genreItem, { backgroundColor: a.color }]}> 
+                                <TouchableOpacity key={a.id_lista} onPress={() => router.push(`/baseLayoutPages/playlist/${a.id_lista}`)} style={[styles.genreItem, { backgroundColor: a.color }]}> 
                                     <Text style={styles.genreText}>{a.nombre}</Text>
                                 </TouchableOpacity>
                             ))}

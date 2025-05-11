@@ -17,6 +17,8 @@ export default function PerfilUsuarioPlaylists() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [userName, setUser] = useState<any>(null);
   const [profileUsername, setProfileUsername] = useState<any>(null);
+  const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
+
   const handleGoToPlaylist = (id_playlist: number) => {
     console.log("Boton Playlist pulsado para:", id_playlist);
     router.push(`./playlist/${id_playlist}`);
@@ -31,8 +33,6 @@ export default function PerfilUsuarioPlaylists() {
       const nombre_usuario = await getData("username");
       setUser(nombre_usuario);
       
-
-
       await fetchAndSavePublicPlaylists(nombre_perfil);
       const datosPlaylistsPublicas = await getData("public_playlists");
 
@@ -40,14 +40,106 @@ export default function PerfilUsuarioPlaylists() {
         setPlaylists(datosPlaylistsPublicas || []);
       }
 
+
+      if (nombre_usuario != nombre_perfil) {
+          console.log("Llamada a checkIfFollowing");
+          checkIfFollowing();
+      }
+    };
+
+
+    const checkIfFollowing = async () => {
+          
+          try {
+            const nombre_usuario = await getData("username");
+            const nombre_usuario_a_seguir = await getData("user");
+    
+            const response = await fetch(
+              `https://spongefy-back-end.onrender.com/is-a-follower-of-user?nombre_usuario=${nombre_usuario}&nombre_usuario_a_seguir=${nombre_usuario_a_seguir}`
+            );
+    
+            if (!response.ok) {
+              const errorResponse = await response.text();
+              console.error("Error al comprobar si sigue:", errorResponse);
+              return;
+            }
+    
+            const result = await response.json();
+    
+            console.log("¿Sigue al usuario?:", result.es_seguidor);
+    
+            setIsFollowing(result.es_seguidor);
+    
+          } catch (error) {
+            console.error("Error en checkIfFollowing:", error);
+          }
     };
 
     loadProfile();
+    
+    // if (userName != profileUsername) {
+    //       console.log("Llamada a checkIfFollowing");
+    //       checkIfFollowing();
+    // }
 
   }, []);
+
   const handleEditProfile = () => {
     router.push('/baseLayoutPages/EditPerfil');
   };
+
+  const handleFollowUser = async () => {
+    const nombre_usuario = await getData("username"); 
+    const nombre_usuario_a_seguir = await getData("user");
+
+    if (isFollowing) {
+      try {
+        const response = await fetch("https://spongefy-back-end.onrender.com/unfollow-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nombre_usuario,
+            nombre_usuario_a_dejar_seguir: nombre_usuario_a_seguir,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log("Dejaste de seguir al usuario:", data);
+          setIsFollowing(false);
+        } else {
+          console.error("Error al dejar de seguir al usuario:", data);
+        }
+      } catch (error) {
+        console.error("Error en handleFollowUser (unfollow):", error);
+      }
+    } else {
+      try {
+        const response = await fetch("https://spongefy-back-end.onrender.com/follow-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nombre_usuario,
+            nombre_usuario_a_seguir,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log("Ahora sigues al usuario:", data);
+          setIsFollowing(true);
+        } else {
+          console.error("Error al seguir al usuario:", data);
+        }
+      } catch (error) {
+        console.error("Error en handleFollowUser (follow):", error);
+      }
+    }
+};
+
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -74,8 +166,8 @@ export default function PerfilUsuarioPlaylists() {
               <Text style={styles.friendButtonText}>Editar perfil</Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.friendButton}>
-              <Text style={styles.friendButtonText}>+ Solicitud de amistad</Text>
+            <TouchableOpacity style={styles.friendButton} onPress={handleFollowUser}>
+              <Text style={styles.friendButtonText}> {isFollowing === true ? "Siguiendo" : "+ Seguir"} </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -112,7 +204,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#9400D3',
+    backgroundColor: '#A020F0',
   },
   scrollContent: {
     paddingBottom: 40,
@@ -124,6 +216,10 @@ const styles = StyleSheet.create({
     top: 40,
     left: 20,
     zIndex: 10,
+  },
+  followContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   label: {
     color: '#ccc',
@@ -151,11 +247,11 @@ const styles = StyleSheet.create({
   },
   friendsIcon: { width: 24, height: 24 },
   friendButton: {
-    borderColor: '#fff',
-    borderWidth: 1,
-    borderRadius: 20,
+    backgroundColor: '#A020F0',
     paddingVertical: 6,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    marginRight: 10,
   },
   friendButtonText: {
     color: '#fff',
@@ -208,6 +304,19 @@ const styles = StyleSheet.create({
     width: '48%',
     marginBottom: 15,
     alignItems: 'center',
+  },
+  artistInfo: {
+    alignItems: 'flex-start',
+  },
+  artistLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  artistLabelText: {
+    fontSize: 16,
+    color: '#fff',
+    marginRight: 5,
   },
 
 });
