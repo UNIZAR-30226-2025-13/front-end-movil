@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { saveData, getData, removeData } from "../../utils/storage";
 import { fetchAndSaveHomeData, fetchAndSaveHomeMusicData, fetchAndSaveHomePodcastData, fetchAndSaveSearchHomeAll } from "../../utils/fetch";
-import { goToPerfil, goToPodcasterPerfil } from '../../utils/navigation';
+import { goToEpisode, goToPerfil, goToPodcast, goToPodcasterPerfil } from '../../utils/navigation';
 import SearchBar from './SearchBar';
 
 const SIMILARITY_THRESHOLD = 1;
@@ -144,6 +144,7 @@ interface PodcastEpisodio {
 }
 
 interface PodcastCompleto {
+    id_podcast: number;
     nombre_podcast: string;
     foto_podcast: string;
     episodios_recientes: PodcastEpisodio[];
@@ -258,8 +259,18 @@ export default function HomeScreen() {
         }
     }, [searchQuery, selectedTab]);
 
-    const handlePerfilPodcaster = (name: string) => {
+    const handlePerfilPodcaster = async (name: string) => {
+        await saveData('podcaster', name);
+        console.log('Podcaster name:', name);
         goToPodcasterPerfil(name);
+    };
+    const handlePodcast = async (id: number) => {
+        await saveData('podcast', id);
+        goToPodcast(id);
+    };
+    const handleEpisodio = async (id: number) => {
+        await saveData('episode', id);
+        goToEpisode(id);
     };
     const handleGoToArtista = async (name: string) => {
         await saveData('artist', name);
@@ -440,7 +451,7 @@ export default function HomeScreen() {
                         <Text style={styles.subtitle}>Lo mejor en podcasts</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                             {listasPodcast.map(p => (
-                                <TouchableOpacity key={p.id_podcast} style={styles.itemContainer} onPress={() => handlePerfilPodcaster(p.nombre)}>
+                                <TouchableOpacity key={p.id_podcast} style={styles.itemContainer} onPress={() => handlePodcast(p.id_podcast)}>
                                     <Image source={{ uri: p.link_imagen }} style={styles.itemImage} />
                                     <Text style={styles.itemText}>{p.nombre}</Text>
                                 </TouchableOpacity>
@@ -473,7 +484,7 @@ export default function HomeScreen() {
                         <Text style={styles.subtitle}>Spongefy recomienda</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                             {listasMusicaAleatorio.map(i => (
-                                <TouchableOpacity key={i.id_lista} style={[styles.genreItem, { backgroundColor: i.color }]}>
+                                <TouchableOpacity key={i.id_lista} style={[styles.genreItem, { backgroundColor: i.color }]} onPress={() => router.push(`/baseLayoutPages/playlist/${i.id_lista}`)}>
                                     <Text style={styles.genreText}>{i.nombre}</Text>
                                 </TouchableOpacity>
                             ))}
@@ -489,9 +500,13 @@ export default function HomeScreen() {
                             <>
                                 <Text style={styles.subtitle}>Lo mejor de {podcastCompleto.nombre_podcast}</Text>
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+                                    <TouchableOpacity onPress={() => handlePodcast(podcastCompleto.id_podcast)}>
                                     <Image source={{ uri: podcastCompleto.foto_podcast }} style={styles.artistaImage} />
+                                    <Text style={styles.itemText}>{podcastCompleto.nombre_podcast}</Text>
+                                    </TouchableOpacity>
+                                    
                                     {podcastCompleto.episodios_recientes.map((e, i) => (
-                                        <TouchableOpacity key={i} style={styles.itemContainer}>
+                                        <TouchableOpacity key={i} style={styles.itemContainer} onPress={() => handleEpisodio(e.id_ep)}>
                                             <Image source={{ uri: e.link_imagen }} style={styles.itemImage} />
                                             <Text style={styles.itemText}>{e.titulo}</Text>
                                         </TouchableOpacity>
@@ -503,7 +518,7 @@ export default function HomeScreen() {
                         <Text style={styles.subtitle}>Spongefy recomienda</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
                             {listasPodcastAleatorioInfo.map(a => (
-                                <TouchableOpacity key={a.id_lista} style={[styles.genreItem, { backgroundColor: a.color }]}>
+                                <TouchableOpacity key={a.id_lista} onPress={() => router.push(`/baseLayoutPages/playlist/${a.id_lista}`)} style={[styles.genreItem, { backgroundColor: a.color }]}> 
                                     <Text style={styles.genreText}>{a.nombre}</Text>
                                 </TouchableOpacity>
                             ))}

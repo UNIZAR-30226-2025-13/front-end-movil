@@ -35,7 +35,7 @@ export default function CarpetaScreen() {
     }, []);
 
     const handleAddPlaylist = () => {
-        router.push('/AddPlaylistToFolder');
+        router.push('/baseLayoutPages/AddPlaylistToFolder');
     };
 
     const handleDeleteFolder = async () => {
@@ -58,7 +58,7 @@ export default function CarpetaScreen() {
 
             if (response.ok) {
                 console.log("Carpeta eliminada con éxito:", data);
-                router.push("/Biblioteca");
+                router.push("/baseLayoutPages/Biblioteca");
             } else {
                 console.error("Error al eliminar la carpeta:", data.message);
                 alert(`Error: ${data.message}`);
@@ -100,6 +100,11 @@ export default function CarpetaScreen() {
         }
     };
 
+    const handleGoToPlaylist = (id_playlist: number) => {
+        console.log("Boton Playlist pulsado para:", id_playlist);
+        router.push(`./playlist/${id_playlist}`);
+    };
+
     return (
         <View style={styles.container}>
             {/* Encabezado */}
@@ -131,7 +136,7 @@ export default function CarpetaScreen() {
                         <View key={index} style={styles.playlistContainer}>
                             <TouchableOpacity
                                 style={styles.playlistItem}
-                                onPress={() => router.push('./PlaylistDetail')}
+                                onPress={() => handleGoToPlaylist(lista.id_lista)}
                             >
                                 <Text style={styles.playlistText}>{lista.nombre}</Text>
                             </TouchableOpacity>
@@ -155,24 +160,7 @@ export default function CarpetaScreen() {
                     <Ionicons name="add" size={24} color="white" />
                 </TouchableOpacity>
             </View>
-
-            {/* Barra de navegación inferior */}
-            <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/home')}>
-                    <Ionicons name="home" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Home</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/Biblioteca')}>
-                    <Ionicons name="library" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Tu biblioteca</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/perfil')}>
-                    <Ionicons name="person" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Perfil</Text>
-                </TouchableOpacity>
-            </View>
+            
         </View>
     );
 }

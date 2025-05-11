@@ -52,6 +52,13 @@ export default function LoginScreen() {
     router.push("/baseLayoutPages/home");
   };
 
+  const handleDebugAdmin = async () => {
+    const usernamedebug = "admin";
+    console.log("debug desde login con", usernamedebug);
+    await saveData("username", usernamedebug);
+    router.push("/HomeAdmin");
+  };
+
   const handlePressRegister = () => {
     console.log("Register Pressed");
     router.push("/register");
@@ -92,6 +99,10 @@ export default function LoginScreen() {
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleDebug}>
           <Text style={styles.buttonText}>DEBUG</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={handleDebugAdmin}>
+          <Text style={styles.buttonText}>DEBUG ADMIN</Text>
         </TouchableOpacity>
         
       </View>

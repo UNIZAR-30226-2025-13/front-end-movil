@@ -48,7 +48,7 @@ export default function CreateCarpetaScreen() {
 
             if (response.ok) {
                 console.log("Carpeta creada exitosamente:", data);
-                router.push("/Biblioteca");
+                router.push("./Biblioteca");
             } else {
                 console.error("Error al crear la carpeta:", data);
             }
@@ -62,7 +62,7 @@ export default function CreateCarpetaScreen() {
         <View style={styles.container}>
             {/* Contenedor del título y la flecha */}
             <View style={styles.header}>
-                <TouchableOpacity style={styles.backButton} onPress={() => router.push('/Biblioteca')}>
+                <TouchableOpacity style={styles.backButton} onPress={() => router.push('./Biblioteca')}>
                     <Ionicons name="arrow-back" size={28} color="#fff" />
                 </TouchableOpacity>
                 <Text style={styles.title}>Nueva Carpeta</Text>
@@ -83,23 +83,7 @@ export default function CreateCarpetaScreen() {
                 </TouchableOpacity>
             </View>
 
-            {/* Barra de navegación inferior */}
-            <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/home')}>
-                    <Ionicons name="home" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Home</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/Biblioteca')}>
-                    <Ionicons name="library" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Tu biblioteca</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.bottomBarItem} onPress={() => router.push('/perfil')}>
-                    <Ionicons name="person" size={24} color="#fff" />
-                    <Text style={styles.bottomBarText}>Perfil</Text>
-                </TouchableOpacity>
-            </View>
+            
         </View>
     );
 }

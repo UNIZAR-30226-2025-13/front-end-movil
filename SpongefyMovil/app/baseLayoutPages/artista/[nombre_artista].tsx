@@ -209,6 +209,11 @@ const ArtistScreen = () => {
     }
   };
 
+      const handleGoToPlaylist = (id_playlist: number) => {
+          console.log("Boton Playlist pulsado para:", id_playlist);
+          router.push(`../playlist/${id_playlist}`);
+      };
+
   return (
     <View style={styles.container}>
       {isLoading ? (
@@ -237,11 +242,13 @@ const ArtistScreen = () => {
 
           {/* Sección de favoritas */}
           <View style={styles.favoriteSection}>
+            <TouchableOpacity style={styles.favoriteSection} onPress={() => handleGoToPlaylist(artistData.lista_this_is.id_lista)}>
             <Text style={styles.sectionTitle}>Todas las canciones</Text>
             <View style={styles.favoriteImageContainer}>
               <Image source={{ uri: artistData.link_imagen }} style={styles.favoriteArtistImage} />
               <Image source={require("../../../assets/heart.png")} style={styles.heartIcon} />
             </View>
+            </TouchableOpacity>
           </View>
 
           {/* Álbumes */}

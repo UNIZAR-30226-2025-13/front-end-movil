@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Pressable, Modal } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 // import { fetchArtistByName } from 'songService';
 // import { usePlayer } from 'PlayerContext';
-import { getData } from '../../utils/storage';
-import { fetchAndSavePodcaster } from '../../utils/fetch'
+import { getData } from '../../../utils/storage';
+import { fetchAndSavePodcaster } from '../../../utils/fetch'
+import { goToEpisode, goToPodcast } from '@/utils/navigation';
 
 
 
@@ -47,8 +48,9 @@ interface ThisIsList {
 
 
 export default function PodcasterScreen() {
-
-    const [nombre_podcaster, setNombrePodcaster] = useState<string | null>(null);
+    const { nombre_podcaster } = useLocalSearchParams<{ nombre_podcaster: string | string[] }>();
+    console.log("Pantalla Artista para:", nombre_podcaster);
+    
     const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
     const [podcasterData, setPodcasterData] = useState<PodcasterData | null>(null);
 
@@ -99,109 +101,137 @@ export default function PodcasterScreen() {
         }
       ]
     };
-
+    const fetchPodcasterByName = async (nombre_podcaster: string): Promise<PodcasterData | null> => {  
+      try {
+        const nombre_podcaster_encoded = encodeURIComponent(nombre_podcaster);
+        const response = await fetch(`https://spongefy-back-end.onrender.com/podcaster?nombre_podcaster=${nombre_podcaster_encoded}`);
+        const data = await response.json();
+    
+        console.log("📥 Respuesta de la API:", data);
+    
+    
+        return data;
+      } catch (error) {
+        console.error("❌ Error en fetchPodcasterByName:", error);
+        return null;
+      }
+    };
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     useEffect(() => {
-
-      const fetchPodcasterInfo = async () => {
-
-        // const nombre_podcaster = await getData("podcaster");
-        // setNombrePodcaster(nombre_podcaster);
-        // console.log("Nombre del podcaster:", nombre_podcaster);
-        // await fetchAndSavePodcaster(nombre_podcaster);
-        // const podcasterProfileData = await getData("podcaster_profile");
-        // if (podcasterProfileData) {
-        //     const parsedPodcasterData: PodcasterData = JSON.parse(podcasterProfileData);
-        //     setPodcasterData(parsedPodcasterData);
-        // }
-
-          // DEBUG
-          setPodcasterData(mockPodcasterData);
-        }
-
-
-
-        //   const checkIfFollowing = async () => {
-    //     try {
-    //       const nombre_usuario = await getData("username");
-    //       const nombre_creador = await getData("artist");
-      
-    //       if (!nombre_usuario || !nombre_creador) return;
-      
-    //       const response = await fetch(
-    //         `https://spongefy-back-end.onrender.com/is-a-follower-of-creator?nombre_usuario=${nombre_usuario}&nombre_creador=${nombre_creador}`
-    //       );
-      
-    //       if (!response.ok) {
-    //         const errorResponse = await response.text();
-    //         console.error("Error al comprobar si sigue:", errorResponse);
-    //         return;
-    //       }
-      
-    //       const result = await response.json();
-
-    //       console.log("¿Sigue al artista?:", result.es_seguidor);
-
-    //       setIsFollowing(result.es_seguidor);
-      
-    //     } catch (error) {
-    //       console.error("Error en checkIfFollowing:", error);
-    //     }
-    //   };
-
-        fetchPodcasterInfo();
-    //  checkIfFollowing();
-
-      }, []);
+        const fetchArtistInfo = async () => {
+          if (nombre_podcaster) {
+            const podcastername = Array.isArray(nombre_podcaster) ? nombre_podcaster[0] : nombre_podcaster;
+            console.log("Nombre del artista:", podcastername);
+            setIsLoading(true);
+            try {
+              const podcaster = await fetchPodcasterByName(podcastername);
+              console.log("Datos del artista obtenidos:", podcaster);
+              if (podcaster) {
+                setPodcasterData(podcaster);
+                setError(null);
+              } else {
+                setError("No se encontraron datos del artista.");
+              }
+            } catch (err) {
+              setError("Hubo un error al obtener la información del artista.");
+              console.error(err);
+            } finally {
+              setIsLoading(false);
+            }
+          }
+        };
+    
+        const checkIfFollowing = async () => {
+          try {
+            const nombre_usuario = await getData("username");
+    
+            if (!nombre_usuario || !nombre_podcaster) return;
+    
+            const response = await fetch(
+              `https://spongefy-back-end.onrender.com/is-a-follower-of-creator?nombre_usuario=${nombre_usuario}&nombre_creador=${nombre_podcaster}`
+            );
+    
+            if (!response.ok) {
+              const errorResponse = await response.text();
+              console.error("Error al comprobar si sigue:", errorResponse);
+              return;
+            }
+    
+            const result = await response.json();
+    
+            console.log("¿Sigue al artista?:", result.es_seguidor);
+            if (result.es_seguidor === true) {
+              setIsFollowing(true);
+              console.log("Ya sigues al creador:", nombre_podcaster);
+            }
+            else if (result.es_seguidor === false) {
+              setIsFollowing(false);
+            }
+    
+          } catch (error) {
+            console.error("Error en checkIfFollowing:", error);
+          }
+        };
+    
+        fetchArtistInfo();
+        checkIfFollowing();
+      }, [nombre_podcaster]);
 
     const handleFollow = async () => {
-      // const nombre_usuario = await getData("username");
-      // const nombre_creador = await getData("artist");
-    
-      // if (isFollowing) {
-      //   try {
-      //     const response = await fetch("https://spongefy-back-end.onrender.com/unfollow-creator", {
-      //       method: "POST",
-      //       headers: { "Content-Type": "application/json" },
-      //       body: JSON.stringify({
-      //         nombre_usuario,
-      //         nombre_creador,
-      //       }),
-      //     });
-    
-      //     const data = await response.json();
-    
-      //     if (response.ok) {
-      //       console.log("Ya no sigues al creador:", data);
-      //       setIsFollowing(false);
-      //     } else {
-      //       console.error("Error al dejar de seguir al creador:", data);
-      //     }
-      //   } catch (error) {
-      //     console.error("Error en handleFollow:", error);
-      //   }
-      // } else {
-      //   try {
-      //     const response = await fetch("https://spongefy-back-end.onrender.com/follow-creator", {
-      //       method: "POST",
-      //       headers: { "Content-Type": "application/json" },
-      //       body: JSON.stringify({
-      //         nombre_usuario,
-      //         nombre_creador,
-      //       }),
-      //     });
-    
-      //     const data = await response.json();
-    
-      //     if (response.ok) {
-      //       console.log("Ahora sigues al creador:", data);
-      //       setIsFollowing(true);
-      //     } else {
-      //       console.error("Error al seguir al creador:", data);
-      //     }
-      //   } catch (error) {
-      //     console.error("Error en handleFollow:", error);
-      //   }
-      // }
+      const nombre_usuario = await getData("username");
+      const nombre_creador = nombre_podcaster;
+  
+      if (isFollowing) {
+        try {
+          const response = await fetch("https://spongefy-back-end.onrender.com/unfollow-creator", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              nombre_usuario,
+              nombre_creador,
+            }),
+          });
+  
+          const data = await response.json();
+  
+          if (response.ok) {
+            console.log("Ya no sigues al creador:", data);
+            setIsFollowing(false);
+          } else {
+            console.error("Error al dejar de seguir al creador:", data);
+          }
+        } catch (error) {
+          console.error("Error en handleFollow:", error);
+        }
+      } else {
+        try {
+          const response = await fetch("https://spongefy-back-end.onrender.com/follow-creator", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              nombre_usuario,
+              nombre_creador,
+            }),
+          });
+  
+          const data = await response.json();
+  
+          if (response.ok) {
+            console.log("Ahora sigues al creador:", data);
+            setIsFollowing(true);
+          } else {
+            console.error("Error al seguir al creador:", data);
+          }
+        } catch (error) {
+          console.error("Error en handleFollow:", error);
+        }
+      }
+    };
+
+    const handleGoToPlaylist = (id_playlist: number) => {
+        console.log("Boton Playlist pulsado para:", id_playlist);
+        router.push(`../playlist/${id_playlist}`);
     };
 
   return (
@@ -217,7 +247,7 @@ export default function PodcasterScreen() {
             <View style={styles.artistInfo}>
               <View style={styles.artistLabel}>
                 <Text style={styles.artistLabelText}>Podcaster</Text>
-                <Image source={require("../../assets/certification.png")} style={styles.icon} />
+                <Image source={require("../../../assets/certification.png")} style={styles.icon} />
               </View>
               <Text style={styles.artistName}>{podcasterData.nombre_podcaster}</Text>
               <View style={styles.followContainer}>
@@ -233,26 +263,14 @@ export default function PodcasterScreen() {
 
 
           <View style={styles.favoriteSection}>
+            <TouchableOpacity style={styles.favoriteSection} onPress={() => handleGoToPlaylist(podcasterData.lista_this_is.id_lista)}>
             <Text style={styles.sectionTitle}>Todos los episodios</Text>
             <View style={styles.favoriteImageContainer}>
               <Image source={{ uri: podcasterData.link_imagen }} style={styles.favoriteArtistImage} />
-              <Image source={require("../../assets/heart.png")} style={styles.heartIcon} />
+              <Image source={require("../../../assets/heart.png")} style={styles.heartIcon} />
             </View>
+            </TouchableOpacity>
           </View>
-
-          {/* Más reciente */}
-          {/* <View style={styles.songsWrapper}>
-            <Text style={styles.section2Title}>Más reciente</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.songsContainer}>
-              {podcasterData.ep_mas_reciente?.map((ep) => (
-                <View key={ep.id_episodio} style={styles.songCard}>
-                  <Image source={{ uri: ep.link_imagen }} style={styles.songImage} />
-                  <Text style={styles.songTitle}>{ep.titulo_episodio}</Text>
-                  <Text style={styles.artistTitle}>{ep.nombre}</Text>
-                </View>
-              ))}
-            </ScrollView>
-          </View> */}
 
           {/* Más reciente */}
           <View style={styles.songsWrapper}>
@@ -262,7 +280,7 @@ export default function PodcasterScreen() {
                 <Pressable
                   key={ep.id_episodio}
                   style={({ pressed }) => [ styles.recentEpisodeCard, pressed && { opacity: 0.7 }
-                  ]} >
+                  ]} onPress={() => { console.log("Episodio ID:", ep.id_episodio) }}>
                   <Image source={{ uri: ep.link_imagen }} style={styles.songImage} />
                   <View style={styles.recentEpisodeTextContainer}>
                     <Text style={styles.songTitle}>{ep.titulo_episodio}</Text>
@@ -281,10 +299,10 @@ export default function PodcasterScreen() {
             <Text style={styles.section2Title}>Podcasts</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.albumsContainer}>
               {podcasterData.podcasts_info?.map((podcast) => (
-                <View key={podcast.id_podcast} style={styles.albumCard}>
+                <Pressable key={podcast.id_podcast} style={styles.albumCard} onPress={() => { console.log("Podcast ID:", podcast.id_podcast); goToPodcast(podcast.id_podcast) }}>
                   <Image source={{ uri: podcast.link_imagen }} style={styles.albumImage} />
                   <Text style={styles.albumTitle}>{podcast.nombre}</Text>
-                </View>
+                </Pressable>
               ))}
             </ScrollView>
           </View>
@@ -300,7 +318,7 @@ export default function PodcasterScreen() {
                     styles.songCard,
                     pressed && { opacity: 0.7 }
                   ]}
-                  onPress={() => { }}
+                  onPress={() => { console.log("Episodio ID:", ep.id_episodio); goToEpisode(ep.id_episodio) } }
                 >
                   <Image source={{ uri: ep.link_imagen }} style={styles.songImage} />
                   <Text style={styles.songTitle}>{ep.titulo_episodio}</Text>

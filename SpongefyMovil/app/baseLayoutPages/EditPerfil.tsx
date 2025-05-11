@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -6,42 +6,112 @@ import {
     StyleSheet,
     TouchableOpacity
 } from 'react-native';
+import { getData } from '../../utils/storage';
 import { useRouter } from 'expo-router';
 
 export default function EditProfile() {
+    
     const router = useRouter();
 
-    const [email, setEmail] = useState('paulablasco@gmail.com');
-    const [password, setPassword] = useState('********');
+    const [email, setEmail] = useState('Si no quieres cambiarlo, escribe el mismo');
+    const [password, setPassword] = useState('Nueva o actual contraseña');
+    const [isLoading, setIsLoading] = useState(false);
+    
+    
+    useEffect(() => {
+        const loadUser = async () => {
+            setIsLoading(true);
+            try{
+                const nombre_usuario = await getData("username");
+                const url = `https://spongefy-back-end.onrender.com/perfil?nombre_usuario=${nombre_usuario}`;
+                console.log("URL de la API:", url);
+                const response = await fetch(url);
+                const data = await response.json();
+                if (response.ok) {
+                    console.log("Respuesta de la API:", data);
+                    setEmail(data[0].email);
+                    setPassword(data[0].password);
+                }
+            } catch (error) {
+                console.log("⚠️ Error en la solicitud:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        loadUser();   
 
-    const handleSave = () => {
-        console.log('Nouvelles valeurs:', email, password);
-        router.push('./perfil');
-    };
+    }, []);
+    
+    
+    const handleSave = async () => {
+        console.log('Guardar con Valores:', email, password);
+        try {
+            const nombre_usuario = await getData("username");
+        
+            // Construir la URL con parámetros por separado
+            const baseUrl = "https://spongefy-back-end.onrender.com/update-profile";
+            const params = new URLSearchParams({
+                nombre_usuario: nombre_usuario,
+                nuevo_email: email,
+                nueva_contrasena: password
+            });
+        
+            const url = `${baseUrl}?${params.toString()}`;
+            console.log("URL de la API:", url);
+        
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log('Respuesta de la API:', data);
+                    if (data.success) {
+                        alert('Perfil actualizado con éxito');
+                    } else {
+                        alert('Error al actualizar el perfil');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        
+        } catch (error) {
+            console.log("⚠️ Error en la solicitud:", error);
+        }
+        router.push('./PerfilUsuarioPlaylists');
+        };
 
     const handleCancel = () => {
-        router.push('./perfil');
+        router.push('./PerfilUsuarioPlaylists');
     };
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Editar Perfil</Text>
 
-            <Text style={styles.label}>Correo electrónico</Text>
+            <Text style={styles.label}>Correo electrónico:</Text>
             <TextInput
                 style={styles.input}
                 value={email}
                 onChangeText={setEmail}
+                onFocus={() => setEmail('')}
                 keyboardType="email-address"
                 autoCapitalize="none"
             />
 
-            <Text style={styles.label}>Contraseña</Text>
+            <Text style={styles.label}>Contraseña:</Text>
             <TextInput
                 style={styles.input}
                 value={password}
                 onChangeText={setPassword}
-                secureTextEntry
+                onFocus={() => setPassword('')}
             />
 
             <View style={styles.buttonsRow}>
@@ -65,7 +135,7 @@ export default function EditProfile() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#9400D3',
+        backgroundColor: '#4B2E83',
         justifyContent: 'center',
         padding: 20,
     },
