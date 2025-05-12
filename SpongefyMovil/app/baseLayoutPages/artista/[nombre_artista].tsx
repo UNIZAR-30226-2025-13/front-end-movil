@@ -213,6 +213,10 @@ const ArtistScreen = () => {
           console.log("Boton Playlist pulsado para:", id_playlist);
           router.push(`../playlist/${id_playlist}`);
       };
+      const handleGoToAlbum = (id_album: number) => {
+          console.log("Boton Album pulsado para:", id_album);
+          router.push(`../album/${id_album}`);
+      };
 
   return (
     <View style={styles.container}>
@@ -256,7 +260,7 @@ const ArtistScreen = () => {
             <Text style={styles.section2Title}>Álbumes</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.albumsContainer} >
               {artistData.albumes?.map((album: any) => (
-                <TouchableOpacity key={album.id} style={styles.albumCard} onPress={() => router.push(`/baseLayoutPages/playlist/${album.id_album}`)}>
+                <TouchableOpacity key={album.id_album} style={styles.albumCard} onPress={() => handleGoToAlbum(album.id_album)}>
                   <Image source={{ uri: album.link_imagen }} style={styles.albumImage} />
                   <Text style={styles.albumTitle}>{album.nombre_album}</Text>
                 </TouchableOpacity>

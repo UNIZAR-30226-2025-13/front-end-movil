@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { Song } from "./songService";
-import { fetchSongById } from "./songService";
+import { fetchSongById, fetchEpById} from "./songService";
 import { getData } from "../../utils/storage";
 interface PlayerContextType {
   currentSong: Song | null;
   isPlaying: boolean;
   fetchAndPlaySong: (id: string) => Promise<void>;
+  fetchAndPlayEp: (id: string) => Promise<void>;
   setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -82,13 +83,29 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
       console.error("❌ No se pudo cargar la canción. El link_cm es inválido.");
     }
   };
+  const fetchAndPlayEp = async (id: string) => {
+    console.log("📢 fetchAndPlayEp se está ejecutando con ID:", id);
   
+    setCurrentSong(null); // 🔥 Forzar una actualización antes de asignar la nueva canción
+  
+    const song = await fetchEpById(id);
+    console.log("🎵 Episodio obtenido de fetchSongById:", song);
+  
+    if (song && song.link_cm) {
+      setTimeout(() => {
+        console.log("✅ Asignando currentSong en el estado:", song);
+        setCurrentSong({ ...song }); // Clonamos el objeto para forzar cambio de estado
+      }, 100);
+    } else {
+      console.error("❌ No se pudo cargar el episodio. El link_cm es inválido.");
+    }
+  };
   
   
   
 
   return (
-    <PlayerContext.Provider value={{ currentSong, isPlaying, fetchAndPlaySong, setIsPlaying }}>
+    <PlayerContext.Provider value={{ currentSong, isPlaying, fetchAndPlaySong, setIsPlaying, fetchAndPlayEp }}>
       {children}
     </PlayerContext.Provider>
   );
