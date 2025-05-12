@@ -131,6 +131,36 @@ const PlayerComponent = () => {
       }).start();
     }
   };
+  const [isFav, setIsFav] = useState(false);
+  const toggleFavs = async () => {
+    if (audioPlayer.current) {
+      console.log("Canción actual:", currentSong);
+      const username = await getData("username");
+      console.log("👤 Usuario obtenido:", username);
+      if (isFav) {
+        console.log("Cancion ya es favorita")
+      } else {
+        //logica de añadir a favoritos
+        const url = `https://spongefy-back-end.onrender.com/add-to-favourites`;
+        console.log("URL de la API:", url);
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id_cm: currentSong.id,
+            nombre_usuario: username,
+          }),
+        });
+        const data = await response.json();
+        console.log("Respuesta de la API:", data);
+        //await audioPlayer.current.playAsync();
+      }
+      setIsFav(!isFav);
+      
+    }
+  };
 
 
 
@@ -521,10 +551,12 @@ const PlayerComponent = () => {
               </View>
             </View>
           </Modal>
-          <Image
-            source={require("../../assets/heart.png")}
-            style={styles.icon}
-          />
+          <Pressable onPress={toggleFavs} style={styles.controls}>
+            <Animated.Image
+              source={isFav ? require("../../assets/heart.png") : require("../../assets/fav.png")}
+              style={styles.icon}
+            />
+          </Pressable>
           <Pressable onPress={togglePlayPause} style={styles.controls}>
 
             <Animated.Image
@@ -598,8 +630,8 @@ const styles = StyleSheet.create({
     gap: 0,
   },
   icon: {
-    width: 15,
-    height: 15,
+    width: 30,
+    height: 30,
     tintColor: "white",
   },
   container2: {
