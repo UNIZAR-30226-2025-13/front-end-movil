@@ -375,7 +375,7 @@ export default function SongDetail() {
                 </View>
             </View>
 
-            <View style={styles.progressBar}>
+            <View style={styles.progressBarContainer}>
                 <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
             </View>
 
@@ -522,8 +522,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     coverImage: {
-        width: SCREEN_WIDTH * 0.9,
-        height: SCREEN_WIDTH * 0.9,
+        width: SCREEN_WIDTH * 0.8,
+        height: SCREEN_HEIGHT * 0.6,
         borderRadius: 12,
         backgroundColor: '#222',
     },
@@ -582,13 +582,17 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         marginBottom: 10,
     },
-    progressBar: {
+    progressBarContainer: {
         height: 4,
-        backgroundColor: '#333',
+        backgroundColor: 'transparent',
         borderRadius: 2,
         marginVertical: 20,
         marginHorizontal: 16,
         overflow: 'hidden',
+    },
+    progressBar: {
+        height: '100%',
+        backgroundColor: "white",
     },
     progressFill: {
         height: '100%',
@@ -598,6 +602,7 @@ const styles = StyleSheet.create({
     controlsRow: {
         flexDirection: 'row',
         justifyContent: 'space-around',
+        
         alignItems: 'center',
         marginBottom: 20,
     },

@@ -28,6 +28,23 @@ export const fetchSongById = async (id: string): Promise<Song | null> => {
     return null;
   }
 };
+export const fetchEpById = async (id: string): Promise<Song | null> => {  
+  try {
+    const response = await fetch(`https://spongefy-back-end.onrender.com/play-cm?id_cm=${id}`);
+    const data = await response.json();
+    
+    console.log("📥 Respuesta de la API:", data);
+    
+    if (!data || !data.link_cm) {
+      return null;
+    }
+    data.id = id;
+    return data;
+  } catch (error) {
+    console.error("❌ Error en fetchSongById:", error);
+    return null;
+  }
+};
 
 export const fetchArtistByName = async (nombre_artista: string): Promise<Song | null> => {  
   try {
