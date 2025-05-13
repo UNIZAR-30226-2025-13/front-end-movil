@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Pressable, Modal } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Pressable, Modal, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { getData } from '../../utils/storage';
@@ -18,7 +18,8 @@ export default function PerfilUsuarioPlaylists() {
   const [userName, setUser] = useState<any>(null);
   const [profileUsername, setProfileUsername] = useState<any>(null);
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
-
+  const [password, setPassword] = useState<string>('');
+  const[showOptions, setShowOptions] = useState(false);
   const handleGoToPlaylist = (id_playlist: number) => {
     console.log("Boton Playlist pulsado para:", id_playlist);
     router.push(`./playlist/${id_playlist}`);
@@ -86,6 +87,30 @@ export default function PerfilUsuarioPlaylists() {
 
   const handleEditProfile = () => {
     router.push('/baseLayoutPages/EditPerfil');
+  };
+  const handleElimProfile = async () => {
+    const nombre_usuario = await getData("username");
+    const bodyData = {
+      "nombre_usuario": nombre_usuario,
+      "contrasena": password,
+    };
+
+    try {
+      const response = await fetch("https://spongefy-back-end.onrender.com/delete-account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bodyData),
+      });
+
+      if (response.ok) {
+        console.log("Usuario eliminado correctamente");
+        router.push('../LoginScreen');
+      } else {
+        console.error("Error al eliminar el usuario");
+      }
+    } catch (error) {
+      console.error("Error en handleElimProfile:", error);
+    }
   };
 
   const handleFollowUser = async () => {
@@ -162,9 +187,36 @@ export default function PerfilUsuarioPlaylists() {
           </View>
 
           {userName === profileUsername ? (
-            <TouchableOpacity style={styles.friendButton} onPress={handleEditProfile}>
-              <Text style={styles.friendButtonText}>Editar perfil</Text>
-            </TouchableOpacity>
+            <View style={styles.optionsContainer}>
+              <TouchableOpacity style={styles.friendButton} onPress={handleEditProfile}>
+                <Text style={styles.friendButtonText}>Editar perfil</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.eliminarButton} onPress={() => setShowOptions(true)}>
+                <Text style={styles.eliminarButtonText}>Eliminar perfil</Text>
+              </TouchableOpacity>
+              {showOptions && (
+                <View style={styles.optionsOverlay}>
+                    <View style={styles.optionsMenu}>
+                      <Text style={styles.infoText}>¿Estás seguro de que quieres eliminar tu perfil?</Text>
+                      <Text style={styles.infoText}>Introduce tu contraseña para confirmar:</Text>
+                      <TextInput
+                          placeholder="Contraseña"
+                          secureTextEntry
+                          onChange={(e) => setPassword(e.nativeEvent.text)}
+                          value={password}
+                          style={{ width: "90%", alignSelf:'center', backgroundColor: "#777", borderWidth: 1, borderColor: '#ccc', padding: 10, borderRadius: 5, marginVertical: 10 }}
+                      />
+                      <TouchableOpacity onPress={() => handleElimProfile()} style={styles.optionItem}>
+                          <Text style={styles.optionText}>Eliminar</Text>
+                      </TouchableOpacity>
+                      
+                      <TouchableOpacity onPress={() => setShowOptions(false)} style={styles.optionItem}>
+                          <Text style={styles.optionText}>Cancelar</Text>
+                      </TouchableOpacity>
+                    </View>
+                </View>
+              )}
+            </View>
           ) : (
             <TouchableOpacity style={styles.friendButton} onPress={handleFollowUser}>
               <Text style={styles.friendButtonText}> {isFollowing === true ? "Siguiendo" : "+ Seguir"} </Text>
@@ -246,6 +298,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   friendsIcon: { width: 24, height: 24 },
+  optionsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
   friendButton: {
     backgroundColor: '#A020F0',
     paddingVertical: 6,
@@ -258,11 +316,58 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
+  eliminarButton: {
+    backgroundColor: '#FF0000',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+  },
+  eliminarButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  
   playlistGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 11,
     paddingVertical: 20,
+  },
+  optionsOverlay: {
+      position: 'absolute',
+      top: 0, left: 0, right: 0, bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+  },
+  optionsMenu: {
+      width: 400,
+      backgroundColor: '#6A0DAD',  // violet
+      borderRadius: 12,
+      paddingVertical: 8,
+  },
+  optionItem: {
+    justifyContent: 'center',
+    alignSelf: 'center',
+    borderColor: '#ccc',
+    width: '90%',
+    borderWidth: 1,
+    marginVertical: 5,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  infoText: {
+    alignItems: 'center',
+    alignSelf: 'center',
+    color: '#fff',
+    fontSize: 16,
+  },
+  optionText: {
+    fontWeight: 'bold',
+    alignItems: 'center',
+    color: '#fff',
+    fontSize: 16,
   },
 
   playlistCard: {

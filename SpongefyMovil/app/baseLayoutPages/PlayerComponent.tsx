@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Image, StyleSheet, Animated, Pressable, Modal, FlatList, TouchableOpacity, Alert } from "react-native";
+import { View, Text, Image, StyleSheet, Animated, Pressable, Modal, FlatList, TouchableOpacity, Alert, AppState } from "react-native";
 import { Audio } from "expo-av";
 import { useRouter } from 'expo-router';
 import { usePlayer } from "./PlayerContext";
@@ -23,6 +23,48 @@ const PlayerComponent = () => {
     { id: 2, nombre: "Playlist 2" },
     { id: 3, nombre: "Playlist 3" },
   ];*/
+  const appState = useRef(AppState.currentState);
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (
+        appState.current.match(/active/) &&
+        (nextAppState === 'background' || nextAppState === 'inactive')
+      ) {
+        // Aquí puedes guardar el estado antes de que se cierre o pase a segundo plano
+        saveCurrentSongState();
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+  const saveCurrentSongState = async () => {
+    // Llamada a la API para guardar el estado de la canción actual
+    const username = await getData("username");
+    console.log("👤 Usuario obtenido:", username);
+    const url = `https://spongefy-back-end.onrender.com/save-last-playing`;
+    const bodyData = {
+      "nombre_usuario": username,
+      "id_cm": currentSong?.id,
+      "tiempo": progress
+    }
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bodyData),
+    });
+    const data = await response.json();
+    console.log("Respuesta de la API:", data);
+    if (response.ok) {
+      console.log("Estado de la canción guardado correctamente");
+    } else {
+      console.error("❌ Error al guardar el estado de la canción:", data);
+    }
+  };
   useEffect(() => {
     if (!currentSong || !currentSong.link_cm) {
       console.error("❌ No se encontró el link_cm en la canción.");
