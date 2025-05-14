@@ -372,3 +372,154 @@ export const fetchAndSaveAllAlbums = async (artista) => {
     }
 };
 
+//Funciones para la cola de canciones
+export const initializeQueue = async (nombre_usuario) => {
+    try {
+        const queue = await getData("queue");
+        if (!queue) {
+            console.log("Cola inicializada como vacía.");
+        } else {
+            //vaciar cola
+            clearQueue(nombre_usuario);
+        }
+        await saveData("queue", []);
+        await saveData("queuePosition", 0);
+        console.log("Cola inicializada correctamente.");
+    } catch (error) {
+        console.error("Error al inicializar la cola:", error);
+    }
+};
+export const addToQueue = async (nombre_usuario, id_cancion) => {
+    try {
+        const queue = await getData("queue");
+        if (!queue) {
+            console.log("Cola no encontrada, inicializando cola vacía.");
+            await initializeQueue(nombre_usuario);
+        }
+
+        const bodyData = {
+            "id_cm": id_cancion,
+            "nombre_usuario": nombre_usuario, // Cambia esto por el nombre de usuario real
+        }
+        const url = `https://spongefy-back-end.onrender.com/queue/add`;
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify(bodyData),
+        });
+
+        if (!response.ok) {
+            const errorResponse = await response.text();
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al añadir a la cola: ${response.status} - ${response.statusText}`);
+        }
+
+        const updatedQueue = await response.json();
+        await saveData("queue", updatedQueue);
+
+        console.log("Cola actualizada correctamente:", updatedQueue);
+    } catch (error) {
+        console.error("Error en addToQueue:", error);
+    }
+};
+export const fetchAndSaveQueue = async (nombre_usuario, posicion) => {
+    try {
+        console.log("fetchAndSaveQueue se ejecuta con nombre_usuario:", nombre_usuario, "y posicion:", posicion);
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/queue/show?nombre_usuario=${nombre_usuario}&posicion=${posicion}`
+        );
+
+        if (!response.ok) {
+            const errorResponse = await response.text();
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al obtener la cola: ${response.status} - ${response.statusText}`);
+        }
+
+        const queue = await response.json();
+
+        await saveData("queue", queue);
+
+        console.log("Cola guardada correctamente:", queue);
+    } catch (error) {
+        console.error("Error en fetchAndSaveQueue:", error);
+    }
+};
+
+export const  clearQueue = async (nombre_usuario) => {
+    try {
+        const response = await fetch(`https://spongefy-back-end.onrender.com/queue/clear`, {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ nombre_usuario }) // 👈 enviar el usuario en el body
+        });
+
+        if (!response.ok) {
+            const errorResponse = await response.text();
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al limpiar la cola: ${response.status} - ${response.statusText}`);
+        }
+        // Si la respuesta es exitosa, puedes limpiar la cola en el almacenamiento local
+        await saveData("queue", []);
+        await saveData("queuePosition", 0);
+        console.log("Respuesta de la API:", await response.json());
+    } catch (error) {
+        console.error("Error en clearQueue:", error);
+    }
+};
+
+export const shuffleQueue = async (nombre_usuario, posicion) => {
+    try {
+        const bodyData = {
+            "nombre_usuario": nombre_usuario,
+            "posicion": posicion
+        };
+        console.log("shuffleQueue se ejecuta con nombre_usuario:", nombre_usuario, "y posicion:", posicion);
+        const response = await fetch("https://spongefy-back-end.onrender.com/queue/shuffle", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ bodyData }) // 👈 enviar el usuario en el body
+        });
+
+        if (!response.ok) {
+            const errorResponse = await response.text();
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al randomizar la cola: ${response.status} - ${response.statusText}`);
+        }
+        // Si la respuesta es exitosa, guardar nuevos datos en el almacenamiento local
+        const queue = await response.json();
+        await saveData("queue", queue);
+        console.log("Cola randomizada correctamente:", queue);
+        console.log("Respuesta de la API:", await response.json());
+    } catch (error) {
+        console.error("Error en randomizeQueue:", error);
+    }
+}
+export const fetchAndSaveQueuePosition = async (nombre_usuario, posicion) => {
+    try {
+
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/queue/get-cm?nombre_usuario=${nombre_usuario}&posicion=${posicion + 1}`
+        );
+
+        if (!response.ok) {
+            const errorResponse = await response.text();
+            console.error("Error en la respuesta del servidor:", errorResponse);
+            throw new Error(`Error al obtener la posición de la cola: ${response.status} - ${response.statusText}`);
+        }
+
+        const queuePosition = await response.json();
+
+        await saveData("queuePosition", posicion + 1);
+        console.log("Posición actualizada correctamente:", posicion + 1);
+        await saveData("queueSong", queuePosition);
+        console.log("Canción de la cola obtenida correctamente:", queuePosition);
+    } catch (error) {
+        console.error("Error en fetchAndSaveQueuePosition:", error);
+    }
+};

@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { fetchArtistByName } from '../songService';
 import { usePlayer } from '../PlayerContext';
 import { getData } from '../../../utils/storage';
+import { addToQueue, clearQueue, initializeQueue } from '@/utils/fetch';
 
 const ArtistScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -91,43 +92,18 @@ const ArtistScreen = () => {
     try {
       const username = await getData("username");
       console.log("👤 Usuario obtenido:", username);
-      const bodyData = {
-        "id_cm": cancion,
-        "nombre_usuario": username, // Cambia esto por el nombre de usuario real
-      }
-      const url = `https://spongefy-back-end.onrender.com/queue/add`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(bodyData),
-      });
-      const data = await response.json();
-      console.log("Respuesta de la API:", data);
-      if (response.ok) {
-        console.log("Cancion añadida:", cancion); // Puedes hacer algo con las playlists si es necesario
-      }
+      addToQueue(username, cancion);
+      console.log("Canción añadida a la cola:", cancion);
     } catch (error) {
       console.error("⚠️ Error en la solicitud:", error);
     }
   };
-  const clearQueue = async () => {
+  const elimQueue = async () => {
     try {
       const username = await getData("username");
-      const url = `https://spongefy-back-end.onrender.com/queue/clear`;
-      const bodyData = {
-        "nombre_usuario": username // Cambia esto por el nombre de usuario real
-      }
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(bodyData),
-      });
-      const data = await response.json();
-      console.log("Respuesta de la API:", data);
+      console.log("👤 Usuario obtenido:", username);
+      clearQueue(username);
+      console.log("Cola eliminada para el usuario:", username);
     } catch (error) {
       console.error("❌ Error al borrar cola:", error);
     }
@@ -136,23 +112,9 @@ const ArtistScreen = () => {
     try {
       const username = await getData("username");
       console.log("👤 Usuario obtenido:", username);
-      const bodyData = {
-        "id_cm": id,
-        "nombre_usuario": username, // Cambia esto por el nombre de usuario real
-      }
-      const url = `https://spongefy-back-end.onrender.com/queue/add`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(bodyData),
-      });
-      const data = await response.json();
-      console.log("Respuesta de la API:", data);
-      if (response.ok) {
-        console.log("Cancion añadida:", id); // Puedes hacer algo con las playlists si es necesario
-      }
+      initializeQueue(username);
+      addToQueue(username, id);
+      console.log("Cancion añadida a la cola:", id);
     } catch (error) {
       console.error("⚠️ Error en la solicitud:", error);
     }
@@ -281,7 +243,7 @@ const ArtistScreen = () => {
                   ]}
                   onPress={() => {
                     fetchAndPlaySong(cancion.id_cancion);
-                    clearQueue();
+                    elimQueue();
                     iniQueue(cancion.id_cancion);
                   }}
                   onLongPress={() => handleLongPress(cancion.id_cancion)}
