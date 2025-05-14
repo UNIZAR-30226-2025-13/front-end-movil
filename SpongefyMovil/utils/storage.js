@@ -31,6 +31,8 @@ user_chat             guarda el nombre del ultimo usuario con el que se ha chate
 messages              guarda los mensajes entre el usuario y el ultimo usuario con el que se ha chateado
 allCreators           guarda todos los creadores obtenidos al buscar con la cadena vacia
 creatorEdit           guarda el nombre del ultimo creador que se ha querido editar
+albumAdmin            guarda el nombre del album cuyas canciones se quieren gestionar ocmo admin
+idCancionEdit         id de la ultima cancion que se ha querido editar
 
 */
 
