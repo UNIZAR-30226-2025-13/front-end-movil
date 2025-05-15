@@ -53,7 +53,9 @@ export default function LoginScreen() {
         throw new Error();
       }
 
-     await saveData("username", username);
+    await saveData("username", username);
+    await saveData("token", data.token);
+    console.log("Token guardado:", data);
 
       // Redirigir a la pantalla principal
       socketService.login(username);

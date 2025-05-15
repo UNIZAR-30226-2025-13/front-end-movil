@@ -20,17 +20,23 @@ export default function EditProfile() {
     
     useEffect(() => {
         const loadUser = async () => {
+            const token = await getData("token");
+            console.log("Token:", token);
             setIsLoading(true);
             try{
                 const nombre_usuario = await getData("username");
                 const url = `https://spongefy-back-end.onrender.com/perfil?nombre_usuario=${nombre_usuario}`;
                 console.log("URL de la API:", url);
-                const response = await fetch(url);
+                const response = await fetch(url,{
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
                 const data = await response.json();
                 if (response.ok) {
                     console.log("Respuesta de la API:", data);
-                    setEmail(data[0].email);
-                    setPassword(data[0].password);
+                    setEmail(data.correo);
+                    setPassword(data.password);
                 }
             } catch (error) {
                 console.log("⚠️ Error en la solicitud:", error);
@@ -47,36 +53,32 @@ export default function EditProfile() {
         console.log('Guardar con Valores:', email, password);
         try {
             const nombre_usuario = await getData("username");
-        
+            const token = await getData("token");
+            console.log("Token:", token);
             // Construir la URL con parámetros por separado
             const baseUrl = "https://spongefy-back-end.onrender.com/update-profile";
-            const params = new URLSearchParams({
-                nombre_usuario: nombre_usuario,
-                nuevo_email: email,
-                nueva_contrasena: password
-            });
+            const bodyData = {
+                "nombre_usuario": nombre_usuario,
+                "nuevo_email": email,
+                "nueva_contrasena": password
+            };
         
-            const url = `${baseUrl}?${params.toString()}`;
+            const url = `https://spongefy-back-end.onrender.com/update-profile`;
             console.log("URL de la API:", url);
         
             fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({
-                    email: email,
-                    password: password,
-                }),
+                body: JSON.stringify(bodyData),
+                
             })
                 .then((response) => response.json())
                 .then((data) => {
                     console.log('Respuesta de la API:', data);
-                    if (data.success) {
-                        alert('Perfil actualizado con éxito');
-                    } else {
-                        alert('Error al actualizar el perfil');
-                    }
+                    
                 })
                 .catch((error) => {
                     console.error('Error:', error);
