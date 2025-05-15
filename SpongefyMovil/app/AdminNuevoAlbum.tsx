@@ -65,10 +65,10 @@ export default function AdminNuevoAlbum() {
         Alert.alert("Éxito", data.message || "Album creado con éxito");
         router.back(); // O redirige a otra pantalla
       } else {
-        Alert.alert("Error", data.message || "No se pudo crear el creador");
+        Alert.alert("Error", data.message || "No se pudo crear el álbum");
       }
     } catch (error) {
-      console.error("Error al crear creador:", error);
+      console.error("Error al crear álbum:", error);
       Alert.alert("Error", "Algo salió mal");
     }
   };

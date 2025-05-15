@@ -1,4 +1,4 @@
-import React, { useState, useEffect, } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,52 +10,107 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { getData, saveData } from "../utils/storage";
-import { fetchAndSaveAllCreators } from "../utils/fetch";
+import { fetchAndSaveSearchHomeAll } from "../utils/fetch";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
-interface Artista {
-  nombre_creador: string;
-  link_imagen: string;
-  similitud: number;
-  tipo: string;
+interface Episodio {
+    id_ep: number;
+    nombre_ep: string;
+    valoracion_del_usuario: number;
+    valoracion_media: number;
+    duracion: string;
+    descripcion: string;
 }
 
-export default function GestionArtistasScreen() {
+
+
+export default function AdminCanciones() {
   const router = useRouter();
-  const [artistaSeleccionado, setArtistaSeleccionado] = useState<string | null>(null);
+  const [cancionSeleccionada, setCancionSeleccionada] = useState<number | null>(null);
   const [artistaTipo, setArtistaTipo] = useState<string | null>(null);
-  const [Artistas, setArtistas] = useState<Artista[]>([]);
+  const [nombreAlbum, setNombreAlbum] = useState<string | null>(null);
+  const [Imagen, setImagen] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadData = async () => {
-      await fetchAndSaveAllCreators();
-      const data = await getData("allCreators");
-      setArtistas(data.creadores || []);
-    };
-    loadData();
-  }, []);
+  const [Episodios, setEpisodios] = useState<Episodio[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [podcastData, setPodcastData] = useState<{
+          nombre: string;
+          imagen: string;
+          tematicas: string;
+          creadores: string;
+          episodios: Array<{
+              id_ep: number;
+              nombre: string;
+              valoracion_del_usuario: number;
+              valoracion_media: number;
+              duracion: string;
+              descripcion: string;
+          }>;
+      }>({
+          nombre: '',
+          imagen: '#2F4F4F',
+          tematicas: '',
+          creadores: '',
+          episodios: []
+      });
 
-  const handleSelect = (nombre: string, tipo: string) => {
-    setArtistaSeleccionado(nombre);
-    setArtistaTipo(tipo);
+
+
+useEffect(() => {
+  const loadPlaylist = async () => {
+    const id_podcast = await getData("podcastAdmin");
+    if (!id_podcast) return;
+    try {
+      const username = await getData("username");
+      const albumId = Array.isArray(id_podcast) ? id_podcast[0] : id_podcast;
+      const url = `https://spongefy-back-end.onrender.com/get-podcast?id_podcast=${albumId}&nombre_usuario=${username}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (response.ok) {
+        // console.log("Album data:", data);
+        setPodcastData({
+          nombre: data.podcast.nombre_podcast,
+          imagen: data.podcast.link_imagen,
+          tematicas: data.podcast.tematicas,
+          creadores: data.creadores,
+          episodios: data.episodios,
+        });
+        setImagen(data.podcast.link_imagen);
+        setEpisodios(data.episodios);
+        setNombreAlbum(data.podcast.nombre);
+        console.log("Episodios:", data.episodios);
+      } else {
+        console.error("API error", data);
+      }
+    } catch (err) {
+      console.error("Failed to load playlist:", err);
+    }
+  };
+
+  loadPlaylist();
+}, []);
+
+  const handleSelect = (nombre: number) => {
+    setCancionSeleccionada(nombre);
   };
 
   const handleNuevo = () => {
-    router.push('/AdminNuevoCreador');
+    router.push('/AdminNuevoEpisodio');
   };
 
   const handleEditar = async ()  => {
-    const nombre = artistaSeleccionado;
-    await saveData("creatorEdit", artistaSeleccionado);
-    router.push('/AdminEditarCreador');
+    const nombre = cancionSeleccionada;
+    await saveData("idCancionEdit", cancionSeleccionada);
+    router.push('./AdminEditarEpisodio');
   };
 
   const handleEliminar = async () => {
-    if (!artistaSeleccionado) return;
+    if (!cancionSeleccionada) return;
   
     Alert.alert(
       "Confirmar eliminación",
-      `¿Estás seguro de que quieres eliminar a "${artistaSeleccionado}"?`,
+      `¿Estás seguro de que quieres eliminar a "${cancionSeleccionada}"?`,
       [
         { text: "Cancelar", style: "cancel" },
         {
@@ -63,12 +118,12 @@ export default function GestionArtistasScreen() {
           style: "destructive",
           onPress: async () => {
             try {
-              const response = await fetch("https://spongefy-back-end.onrender.com/admin/delete-creator", {
+              const response = await fetch("https://spongefy-back-end.onrender.com/admin/delete-multimedia", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ nombre_creador: artistaSeleccionado }),
+                body: JSON.stringify({ id_cm: cancionSeleccionada }),
               });
   
               let data;
@@ -81,12 +136,12 @@ export default function GestionArtistasScreen() {
               }
   
               if (response.ok) {
-                Alert.alert("Éxito", "Creador eliminado con éxito.");
-                setArtistaSeleccionado(null);
+                Alert.alert("Éxito", "Cancion eliminada con éxito.");
+                setEpisodios((prev) =>
+                prev.filter((c) => c.id_ep !== cancionSeleccionada));
+                setCancionSeleccionada(null);
                 setArtistaTipo(null);
-                await fetchAndSaveAllCreators();
-                const updatedData = await getData("allCreators");
-                setArtistas(updatedData.creadores || []);
+
               } else {
               }
             } catch (error) {
@@ -97,21 +152,8 @@ export default function GestionArtistasScreen() {
         },
       ]
     );
-  };
+  };  
   
-
-  const handleAlbum = async (artista: string) => {
-    // setArtistaSeleccionado(nombre);
-    await saveData("creatorEdit", artista);
-    router.push(`/AdminAlbumes?artista=${encodeURIComponent(artista)}`);
-  };
-  const handlePodcasts = async (artista: string) => {
-    // setArtistaSeleccionado(nombre);
-    await saveData("creatorEdit", artista);
-    router.push(`/AdminPodcasts?artista=${encodeURIComponent(artista)}`);
-  };
-
-
 
   return (
     <View style={styles.container}>
@@ -122,7 +164,7 @@ export default function GestionArtistasScreen() {
       </View>
 
       {/* Título */}
-      <Text style={styles.title}>GESTIONAR{"\n"}CREADORES</Text>
+      <Text style={styles.title}>GESTIONAR{"\n"}EPISODIOS </Text>
 
       {/* Lista de artistas */}
       <ScrollView style={styles.listContainer}>
@@ -132,19 +174,19 @@ export default function GestionArtistasScreen() {
     <Text style={styles.artistName}>Nuevo</Text>
   </TouchableOpacity>
 
-  {Artistas.map((artista) => {
-    const isSelected = artista.nombre_creador === artistaSeleccionado;
+  {Episodios.map((episodio) => {
+    const isSelected = episodio.id_ep === cancionSeleccionada;
 
     return (
-      <View key={artista.nombre_creador}>
+      <View key={episodio.id_ep}>
         <TouchableOpacity
           style={styles.artistItem}
           onPress={() =>
-            handleSelect(artista.nombre_creador, artista.tipo)
+            handleSelect(episodio.id_ep)
           }
         >
-          <Image source={{ uri: artista.link_imagen }} style={styles.artistImage} />
-          <Text style={styles.artistName}>{artista.nombre_creador}</Text>
+          <Image source={{ uri: Imagen }} style={styles.artistImage} />
+          <Text style={styles.artistName}>{episodio.nombre_ep}</Text>
         </TouchableOpacity>
 
         {isSelected && (
@@ -152,19 +194,6 @@ export default function GestionArtistasScreen() {
             <TouchableOpacity style={styles.dropdownItem} onPress={handleEditar}>
               <Ionicons name="pencil" size={20} color="#fff" />
               <Text style={styles.dropdownText}>Editar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.dropdownItem}
-              onPress={() =>
-                artista.tipo === "Podcaster"
-                  ? handlePodcasts(artista.nombre_creador)
-                  : handleAlbum(artista.nombre_creador)
-              }
-            >
-              <Ionicons name="albums" size={20} color="#fff" />
-              <Text style={styles.dropdownText}>
-                {artista.tipo === "Podcaster" ? "Gestionar Podcasts" : "Gestionar Álbumes"}
-              </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.dropdownItem} onPress={handleEliminar}>
               <Ionicons name="trash" size={20} color="#fff" />

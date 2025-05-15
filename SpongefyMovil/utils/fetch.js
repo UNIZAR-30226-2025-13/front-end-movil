@@ -305,7 +305,7 @@ export const fetchAndSaveMessages = async (nombre_usuario_envia, nombre_usuario_
 
 export const fetchAndSaveAllCreators = async () => {
 
-    const cadena = "a";
+    const cadena = "b";
 
     try {
         const response = await fetch(

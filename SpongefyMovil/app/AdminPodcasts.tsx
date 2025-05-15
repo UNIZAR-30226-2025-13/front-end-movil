@@ -8,54 +8,98 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { getData, saveData } from "../utils/storage";
 import { fetchAndSaveAllCreators } from "../utils/fetch";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { fetchArtistByName } from "./baseLayoutPages/songService";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { fetchAndSavePodcaster } from "../utils/fetch";
 
-interface Artista {
-  nombre_creador: string;
+interface Podcast {
+  id_podcast: string;
   link_imagen: string;
-  similitud: number;
-  tipo: string;
+  nombre: string;
 }
 
-export default function GestionArtistasScreen() {
+export default function GestionarAlbumesScreen() {
   const router = useRouter();
-  const [artistaSeleccionado, setArtistaSeleccionado] = useState<string | null>(null);
-  const [artistaTipo, setArtistaTipo] = useState<string | null>(null);
-  const [Artistas, setArtistas] = useState<Artista[]>([]);
+  const { artista } = useLocalSearchParams();
+  const nombreArtista = artista as string;
+  console.log("Nombre del podcaster:", nombreArtista);
+  const [isLoading, setIsLoading] = useState(false);
 
+  const [albumSeleccionado, setAlbumSeleccionado] = useState<string | null>(null);
+  const [Podcasts, setPodcasts] = useState<Podcast[]>([]);
+  const [artistData, setArtistData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    const loadData = async () => {
-      await fetchAndSaveAllCreators();
-      const data = await getData("allCreators");
-      setArtistas(data.creadores || []);
-    };
-    loadData();
-  }, []);
+    const fetchArtistInfo = async () => {
+          if (nombreArtista) {
+            const artistName = Array.isArray(nombreArtista) ? nombreArtista[0] : nombreArtista;
+            console.log("Nombre del artista:", artistName);
+            setIsLoading(true);
+            try {
+              const response = await fetch(
+                  `https://spongefy-back-end.onrender.com/podcaster?nombre_podcaster=${artistName}`
+              );
 
-  const handleSelect = (nombre: string, tipo: string) => {
-    setArtistaSeleccionado(nombre);
-    setArtistaTipo(tipo);
+              if (!response.ok) {
+                  const errorResponse = await response.text();
+                  console.error("Error en la respuesta del servidor:", errorResponse);
+                  throw new Error(`Error al obtener el perfil de podcaster: ${response.status} - ${response.statusText}`);
+              }
+
+              const podcasterProfile = await response.json();
+
+              await saveData("podcaster_profile", podcasterProfile);
+              const artist = podcasterProfile;
+              console.log("Datos del artista obtenidos:", artist);
+              if (artist) {
+                setArtistData(artist);
+                
+                setError(null);
+              } else {
+                setError("No se encontraron datos del artista.");
+              }
+            } catch (err) {
+              setError("Hubo un error al obtener la información del artista.");
+              console.error(err);
+            } finally {
+              setIsLoading(false);
+            }
+          }
+        };
+    fetchArtistInfo();
+  }, [nombreArtista]);
+  useEffect(() => {
+    if (artistData) {
+      setPodcasts(artistData.podcasts_info || []);
+    }
+  }, [artistData]);  // Esto se ejecuta solo cuando `artistData` cambia
+  
+  const handleSelect = (nombre: string) => {
+    setAlbumSeleccionado(nombre);
   };
 
   const handleNuevo = () => {
-    router.push('/AdminNuevoCreador');
+    router.push(`/AdminNuevoPodcast?artista=${encodeURIComponent(nombreArtista)}`);
   };
 
   const handleEditar = async ()  => {
-    const nombre = artistaSeleccionado;
-    await saveData("creatorEdit", artistaSeleccionado);
-    router.push('/AdminEditarCreador');
+    const nombre = albumSeleccionado;
+    if(!nombre) return;
+    console.log("Nombre del album:", nombre);
+    await saveData("albumEdit", albumSeleccionado);
+    router.push(`/AdminCanciones?artista=${encodeURIComponent(nombreArtista)}&album=${encodeURIComponent(albumSeleccionado)}`);
   };
 
   const handleEliminar = async () => {
-    if (!artistaSeleccionado) return;
+    if (!albumSeleccionado) return;
   
     Alert.alert(
       "Confirmar eliminación",
-      `¿Estás seguro de que quieres eliminar a "${artistaSeleccionado}"?`,
+      `¿Estás seguro de que quieres eliminar el Podcast "${albumSeleccionado}"?`,
       [
         { text: "Cancelar", style: "cancel" },
         {
@@ -63,12 +107,13 @@ export default function GestionArtistasScreen() {
           style: "destructive",
           onPress: async () => {
             try {
-              const response = await fetch("https://spongefy-back-end.onrender.com/admin/delete-creator", {
+              // Aquí puedes realizar la lógica para eliminar el álbum
+              const response = await fetch("https://spongefy-back-end.onrender.com/admin/delete-podcast", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ nombre_creador: artistaSeleccionado }),
+                body: JSON.stringify({ albumSeleccionado: albumSeleccionado }),
               });
   
               let data;
@@ -81,12 +126,11 @@ export default function GestionArtistasScreen() {
               }
   
               if (response.ok) {
-                Alert.alert("Éxito", "Creador eliminado con éxito.");
-                setArtistaSeleccionado(null);
-                setArtistaTipo(null);
+                Alert.alert("Éxito", "Album eliminado con éxito.");
+                setAlbumSeleccionado(null);
                 await fetchAndSaveAllCreators();
                 const updatedData = await getData("allCreators");
-                setArtistas(updatedData.creadores || []);
+                setPodcasts(updatedData.creadores || []);
               } else {
               }
             } catch (error) {
@@ -100,15 +144,13 @@ export default function GestionArtistasScreen() {
   };
   
 
-  const handleAlbum = async (artista: string) => {
+  const handleAlbum = async () => {
     // setArtistaSeleccionado(nombre);
-    await saveData("creatorEdit", artista);
-    router.push(`/AdminAlbumes?artista=${encodeURIComponent(artista)}`);
-  };
-  const handlePodcasts = async (artista: string) => {
-    // setArtistaSeleccionado(nombre);
-    await saveData("creatorEdit", artista);
-    router.push(`/AdminPodcasts?artista=${encodeURIComponent(artista)}`);
+
+    await saveData("podcastAdmin", albumSeleccionado);
+    console.log(albumSeleccionado);
+    router.push("/AdminEpisodios");
+
   };
 
 
@@ -122,7 +164,7 @@ export default function GestionArtistasScreen() {
       </View>
 
       {/* Título */}
-      <Text style={styles.title}>GESTIONAR{"\n"}CREADORES</Text>
+      <Text style={styles.title}>GESTIONAR{"\n"}PODCASTS DE {nombreArtista.toUpperCase()}</Text>
 
       {/* Lista de artistas */}
       <ScrollView style={styles.listContainer}>
@@ -132,19 +174,19 @@ export default function GestionArtistasScreen() {
     <Text style={styles.artistName}>Nuevo</Text>
   </TouchableOpacity>
 
-  {Artistas.map((artista) => {
-    const isSelected = artista.nombre_creador === artistaSeleccionado;
+  {Podcasts.map((id_podcast) => {
+    const isSelected = id_podcast.id_podcast === albumSeleccionado;
 
     return (
-      <View key={artista.nombre_creador}>
+      <View key={id_podcast.nombre}>
         <TouchableOpacity
           style={styles.artistItem}
           onPress={() =>
-            handleSelect(artista.nombre_creador, artista.tipo)
+            handleSelect(id_podcast.id_podcast)
           }
         >
-          <Image source={{ uri: artista.link_imagen }} style={styles.artistImage} />
-          <Text style={styles.artistName}>{artista.nombre_creador}</Text>
+          <Image source={{ uri: id_podcast.link_imagen }} style={styles.artistImage} />
+          <Text style={styles.artistName}>{id_podcast.nombre}</Text>
         </TouchableOpacity>
 
         {isSelected && (
@@ -153,18 +195,9 @@ export default function GestionArtistasScreen() {
               <Ionicons name="pencil" size={20} color="#fff" />
               <Text style={styles.dropdownText}>Editar</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.dropdownItem}
-              onPress={() =>
-                artista.tipo === "Podcaster"
-                  ? handlePodcasts(artista.nombre_creador)
-                  : handleAlbum(artista.nombre_creador)
-              }
-            >
+            <TouchableOpacity style={styles.dropdownItem} onPress={handleAlbum}>
               <Ionicons name="albums" size={20} color="#fff" />
-              <Text style={styles.dropdownText}>
-                {artista.tipo === "Podcaster" ? "Gestionar Podcasts" : "Gestionar Álbumes"}
-              </Text>
+              <Text style={styles.dropdownText}>Gestionar Episodios</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.dropdownItem} onPress={handleEliminar}>
               <Ionicons name="trash" size={20} color="#fff" />

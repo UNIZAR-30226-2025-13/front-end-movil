@@ -77,7 +77,7 @@ export default function LoginScreen() {
     const usernamedebug = "admin";
     console.log("debug desde login con", usernamedebug);
     await saveData("username", usernamedebug);
-    router.push("/HomeAdmin");
+    router.push("/AdminArtistas");
   };
 
   const handlePressRegister = () => {
