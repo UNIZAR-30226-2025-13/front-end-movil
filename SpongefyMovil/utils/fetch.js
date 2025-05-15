@@ -553,3 +553,30 @@ export const fetchAndSaveQueuePosition = async (nombre_usuario, posicion) => {
         console.error("Error en fetchAndSaveQueuePosition:", error);
     }
 };
+
+export const changeListPrivacy = async (id_lista, nombre_usuario) => {
+  try {
+    const bodyData = { id_lista, nombre_usuario };
+    const response = await fetch(
+      `https://spongefy-back-end.onrender.com/change-list-privacy`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bodyData),
+      }
+    );
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Erreur serveur change-list-privacy:", errorText);
+      throw new Error(
+        `Erreur au changement de confidentialité: ${response.status} ${response.statusText}`
+      );
+    }
+    const json = await response.json();
+    console.log("changeListPrivacy:", json.message);
+    return json;
+  } catch (error) {
+    console.error("Error in changeListPrivacy:", error);
+    throw error;
+  }
+};

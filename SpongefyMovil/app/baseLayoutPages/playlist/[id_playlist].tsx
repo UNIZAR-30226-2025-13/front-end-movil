@@ -13,11 +13,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { getData } from '../../../utils/storage';
 import { usePlayer } from '../PlayerContext';
+import { changeListPrivacy } from '../../../utils/fetch';
+
 
 export default function PlaylistDetailScreen() {
     const router = useRouter();
     const { id_playlist } = useLocalSearchParams<{ id_playlist: string | string[] }>();
     const { fetchAndPlaySong } = usePlayer();
+    const [showOptions, setShowOptions] = useState(false);
 
     const [playlistData, setPlaylistData] = useState<{
         nombre: string;
@@ -45,6 +48,23 @@ export default function PlaylistDetailScreen() {
 
     const [loading, setLoading] = useState(true);
     const [isPlaying, setIsPlaying] = useState(false);
+
+    const handleTogglePrivacy = async () => {
+        try {
+            const playlistId = Array.isArray(id_playlist) ? +id_playlist[0] : +id_playlist!;
+            const username = playlistData.nombre_usuario;
+            const result = await changeListPrivacy(playlistId, username);
+            console.log('Privacy changé:', result.message);
+            // setPlaylistData(prev => ({
+            //     ...prev,
+            //     es_publica: !prev.es_publica
+            // }));
+        } catch (err) {
+            console.error('Impossible de changer la confidentialité', err);
+        } finally {
+            setShowOptions(false);
+        }
+    };
 
     useEffect(() => {
         const loadPlaylist = async () => {
@@ -140,7 +160,7 @@ export default function PlaylistDetailScreen() {
                 <TouchableOpacity onPress={() => console.log('Shuffle')} style={styles.controlButton}>
                     <Ionicons name="shuffle" size={24} color="#fff" />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => console.log('Options')} style={styles.controlButton}>
+                <TouchableOpacity onPress={() => setShowOptions(true)} style={styles.controlButton}>
                     <Ionicons name="ellipsis-horizontal" size={24} color="#fff" />
                 </TouchableOpacity>
             </View>
@@ -163,8 +183,23 @@ export default function PlaylistDetailScreen() {
                     </TouchableOpacity>
                 ))}
             </ScrollView>
+            {showOptions && (
+                <View style={styles.optionsOverlay}>
+                    <View style={styles.optionsMenu}>
+                        <TouchableOpacity onPress={handleTogglePrivacy}>
+                            <Text style={styles.optionText}>
+                                {playlistData.es_publica ? 'Hacer privada' : 'Hacer pública'}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setShowOptions(false)}>
+                            <Text style={styles.optionText}>Cancelar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            )}
         </View>
     );
+
 }
 
 const styles = StyleSheet.create({
@@ -188,5 +223,27 @@ const styles = StyleSheet.create({
     songImage: { width: 50, height: 50, borderRadius: 5, marginRight: 12 },
     songText: { flex: 1 },
     songTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-    songArtist: { color: '#bbb', fontSize: 14 }
+    songArtist: { color: '#bbb', fontSize: 14 },
+    optionsOverlay: {
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    optionsMenu: {
+        width: 200,
+        backgroundColor: '#6A0DAD',  // violet
+        borderRadius: 12,
+        paddingVertical: 8,
+    },
+    optionItem: {
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+    },
+    optionText: {
+        color: '#fff',
+        fontSize: 16,
+    },
+
 });
