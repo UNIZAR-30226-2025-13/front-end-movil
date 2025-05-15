@@ -2,6 +2,7 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "jsx": "react-native",
     "paths": {
       "@/*": [
         "./*"
@@ -9,9 +10,11 @@
     }
   },
   "include": [
+    "declarations/**/*.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-, "app/songService.js"  ]
+    "expo-env.d.ts",
+    "app/songService.js"
+  ]
 }

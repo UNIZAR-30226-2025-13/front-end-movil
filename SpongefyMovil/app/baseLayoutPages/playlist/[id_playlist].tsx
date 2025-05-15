@@ -15,6 +15,10 @@ import { getData } from '../../../utils/storage';
 import { usePlayer } from '../PlayerContext';
 import { changeListPrivacy } from '../../../utils/fetch';
 
+import { Component } from 'react';
+import type { ViewProps } from 'react-native';
+
+import { Picker } from '@react-native-picker/picker';
 
 export default function PlaylistDetailScreen() {
     const router = useRouter();
@@ -22,21 +26,27 @@ export default function PlaylistDetailScreen() {
     const { fetchAndPlaySong } = usePlayer();
     const [showOptions, setShowOptions] = useState(false);
 
+    const [sortKey, setSortKey] = useState<'fecha_pub' | 'titulo' | 'nombre_creador' | 'duracion' | 'valoracion_media'>('fecha_pub');
+    const [ascending, setAscending] = useState(true);
+    const [sortedSongs, setSortedSongs] = useState<typeof playlistData.contenido>([]);
+
+    interface Song {
+        id_cm: number;
+        titulo: string;
+        link_imagen: string;
+        duracion: string;
+        fecha_pub: string;
+        nombre_creador: string;
+        artistas_feat: string;
+        valoracion_media: number;
+    }
     const [playlistData, setPlaylistData] = useState<{
         nombre: string;
         color: string;
         es_playlist: boolean;
         es_publica: boolean;
         nombre_usuario: string;
-        contenido: Array<{
-            id_cm: number;
-            titulo: string;
-            link_imagen: string;
-            duracion: string;
-            fecha_pub: string;
-            nombre_creador: string;
-            artistas_feat: string;
-        }>;
+        contenido: Song[];
     }>({
         nombre: '',
         color: '#2F4F4F',
@@ -48,6 +58,23 @@ export default function PlaylistDetailScreen() {
 
     const [loading, setLoading] = useState(true);
     const [isPlaying, setIsPlaying] = useState(false);
+
+    const getMyRating = async (id_cm: number) => {
+        try {
+            const username = await getData("username");
+            const response = await fetch(`https://spongefy-back-end.onrender.com/get-rate?id_cm=${id_cm}&nombre_usuario=${username}`);
+            const data = await response.json();
+
+            console.log("📥 Respuesta de la API:", data);
+
+            console.log("⭐️ Valoración mia:", data.valoracion);
+            return data;
+        }
+        catch (error) {
+            console.error("❌ Error en fetchSongById:", error);
+            return null;
+        }
+    }
 
     const handleTogglePrivacy = async () => {
         try {
@@ -77,13 +104,37 @@ export default function PlaylistDetailScreen() {
                 const response = await fetch(url);
                 const data = await response.json();
                 if (response.ok) {
+                    const baseSongs = data.contenido as Omit<Song, 'valoracion_media'>[];
+
+                    const cancionesConValoraciones: Song[] = await Promise.all(
+                        baseSongs.map(async song => {
+                            try {
+                                // const rateRes = await fetch(
+                                //     `https://spongefy-back-end.onrender.com/get-rate?id_cm=${song.id_cm}&nombre_usuario=${username}`
+                                // );
+                                // const rateJson = await rateRes.json();
+                                // return {
+                                //     ...song,
+                                //     valoracion_media: rateJson.valoracion_media ?? 0
+                                // };
+                                var valoracion = await getMyRating(song.id_cm);
+                                return {
+                                    ...song,
+                                    valoracion_media: valoracion.valoracion
+                                };
+                            } catch {
+                                return { ...song, valoracion_media: 0 };
+                            }
+                        })
+                    );
+
                     setPlaylistData({
                         nombre: data.nombre,
                         color: data.color,
                         es_playlist: data.es_playlist,
                         es_publica: data.es_publica,
                         nombre_usuario: data.nombre_usuario,
-                        contenido: data.contenido
+                        contenido: cancionesConValoraciones
                     });
                 } else {
                     console.error('API error', data);
@@ -96,6 +147,31 @@ export default function PlaylistDetailScreen() {
         };
         loadPlaylist();
     }, [id_playlist]);
+
+    useEffect(() => {
+        const songs = [...playlistData.contenido];
+        switch (sortKey) {
+            case 'fecha_pub':
+                songs.sort((a, b) => {
+                    return new Date(a.fecha_pub).getTime() - new Date(b.fecha_pub).getTime();
+                });
+                break;
+            case 'titulo':
+                songs.sort((a, b) => a.titulo.localeCompare(b.titulo));
+                break;
+            case 'nombre_creador':
+                songs.sort((a, b) => a.nombre_creador.localeCompare(b.nombre_creador));
+                break;
+            case 'duracion':
+                songs.sort((a, b) => convertToSeconds(a.duracion) - convertToSeconds(b.duracion));
+                break;
+            case 'valoracion_media':
+                songs.sort((a, b) => a.valoracion_media - b.valoracion_media);
+                break;
+        }
+        if (!ascending) songs.reverse();
+        setSortedSongs(songs);
+    }, [playlistData.contenido, sortKey, ascending]);
 
     if (loading) {
         return (
@@ -140,6 +216,10 @@ export default function PlaylistDetailScreen() {
                 </Text>
             </View>
 
+
+
+
+
             <View style={styles.searchContainer}>
                 <Ionicons name="search" size={20} color="#888" />
                 <TextInput
@@ -164,9 +244,28 @@ export default function PlaylistDetailScreen() {
                     <Ionicons name="ellipsis-horizontal" size={24} color="#fff" />
                 </TouchableOpacity>
             </View>
-
+            <View style={styles.sortContainer}>
+                <View style={styles.optionsMenu}>
+                    <Picker
+                        selectedValue={sortKey}
+                        onValueChange={(v: any) => {
+                            setSortKey(v as any);
+                            setAscending(true);
+                        }}
+                    >
+                        <Picker.Item label="Fecha de publicacion" value="fecha_pub" style={styles.optionText} />
+                        <Picker.Item label="Titulo" value="titulo" style={styles.optionText} />
+                        <Picker.Item label="Artista" value="nombre_creador" style={styles.optionText} />
+                        <Picker.Item label="Duracion" value="duracion" style={styles.optionText} />
+                        <Picker.Item label="Mi Valoracion" value="valoracion_media" style={styles.optionText} />
+                    </Picker>
+                    <TouchableOpacity onPress={() => setAscending(!ascending)} style={styles.orderButton}>
+                        <Ionicons name={ascending ? 'arrow-down' : 'arrow-up'} size={24} color="#fff" />
+                    </TouchableOpacity>
+                </View>
+            </View>
             <ScrollView style={styles.songList}>
-                {playlistData.contenido.map((song) => (
+                {sortedSongs.map((song) => (
                     <TouchableOpacity
                         key={song.id_cm}
                         style={styles.songItem}
@@ -183,12 +282,31 @@ export default function PlaylistDetailScreen() {
                     </TouchableOpacity>
                 ))}
             </ScrollView>
+
+            {/* <ScrollView style={styles.songList}>
+                {playlistData.contenido.map((song) => (
+                    <TouchableOpacity
+                        key={song.id_cm}
+                        style={styles.songItem}
+                        onPress={() => fetchAndPlaySong(song.id_cm.toString())}
+                    >
+                        <Image
+                            source={{ uri: song.link_imagen }}
+                            style={styles.songImage}
+                        />
+                        <View style={styles.songText}>
+                            <Text style={styles.songTitle}>{song.titulo}</Text>
+                            <Text style={styles.songArtist}>{song.nombre_creador}</Text>
+                        </View>
+                    </TouchableOpacity>
+                ))}
+            </ScrollView> */}
             {showOptions && (
                 <View style={styles.optionsOverlay}>
                     <View style={styles.optionsMenu}>
                         <TouchableOpacity onPress={handleTogglePrivacy}>
                             <Text style={styles.optionText}>
-                                {playlistData.es_publica ? 'Hacer privada' : 'Hacer pública'}
+                                {playlistData.es_publica ? 'Cambiar a privada' : 'Cambiar a pública'}
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setShowOptions(false)}>
@@ -245,5 +363,20 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
     },
+    sortContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    Picker: {
+        flex: 1,
+        color: '#fff',
+        backgroundColor: '#111',
+    },
+    orderButton: {
+        padding: 8,
+        marginLeft: 8,
+    },
+
 
 });
