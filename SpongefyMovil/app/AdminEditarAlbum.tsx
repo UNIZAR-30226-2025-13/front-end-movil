@@ -74,7 +74,7 @@ export default function AdminNuevoAlbum() {
     } as any);
 
     try {
-      const response = await fetch("https://spongefy-back-end.onrender.com/admin/upload-album", {
+      const response = await fetch("https://spongefy-back-end.onrender.com/admin/update-album", {
         method: "POST",
         body: formData,
         headers: {

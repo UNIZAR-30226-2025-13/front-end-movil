@@ -77,7 +77,7 @@ export default function GestionarAlbumesScreen() {
     if(!nombre) return;
     console.log("Nombre del album:", nombre);
     await saveData("albumEdit", albumSeleccionado);
-    router.push(`/AdminCanciones?artista=${encodeURIComponent(nombreArtista)}&album=${encodeURIComponent(albumSeleccionado)}`);
+    router.push(`/AdminEditarAlbum?artista=${encodeURIComponent(nombreArtista)}&album=${encodeURIComponent(albumSeleccionado)}`);
   };
 
   const handleEliminar = async () => {
