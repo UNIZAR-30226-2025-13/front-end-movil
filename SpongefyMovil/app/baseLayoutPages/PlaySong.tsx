@@ -8,6 +8,7 @@ import { getData } from "../../utils/storage";
 import { usePlayer } from './PlayerContext';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const THUMB_SIZE = 200;
 
 export default function SongDetail() {
     const { currentSong, isPlaying, setIsPlaying } = usePlayer();
@@ -316,6 +317,21 @@ export default function SongDetail() {
         fetchQueue();
     };
 
+    const goToNext = () => {
+        setQueueIndex(i => {
+            const next = i + 1;
+            fetchNextSong(next);
+            return next;
+        });
+    };
+    const goToPrevious = () => {
+        setQueueIndex(i => {
+            const prev = i - 1;
+            fetchNextSong(prev);
+            return prev;
+        });
+    };
+
     const rotateInterpolate = rotation.interpolate({
         inputRange: [0, 1],
         outputRange: ["0deg", "45deg"],
@@ -341,6 +357,7 @@ export default function SongDetail() {
                     <Image
                         source={{ uri: currentSong.link_imagen }}
                         style={styles.coverImage}
+                        resizeMode="cover"
                     />
                 ) : (
                     <View style={styles.coverFallback} />
@@ -368,7 +385,7 @@ export default function SongDetail() {
                     <Image source={require('../../assets/aleatorio.png')} style={styles.controlIcon} />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => console.log('Prev')} style={styles.controlBtn}>
+                <TouchableOpacity onPress={goToPrevious} style={styles.controlBtn}>
                     <Ionicons name="play-skip-back" size={32} color="#fff" />
                 </TouchableOpacity>
 
@@ -383,7 +400,7 @@ export default function SongDetail() {
                     />
                 </Pressable>
 
-                <TouchableOpacity onPress={() => console.log('Next')} style={styles.controlBtn}>
+                <TouchableOpacity onPress={goToNext} style={styles.controlBtn}>
                     <Ionicons name="play-skip-forward" size={32} color="#fff" />
                 </TouchableOpacity>
 
@@ -447,7 +464,7 @@ export default function SongDetail() {
                         <TouchableOpacity onPress={() => router.push(`/baseLayoutPages/artista/${currentSong.autor}`)} style={styles.optionItem}>
                             <Text style={styles.optionText}>Ver Artista</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => router.push(`/baseLayoutPages/playlist/${currentSong.autor}`)} style={styles.optionItem}>
+                        <TouchableOpacity onPress={() => router.push(`/baseLayoutPages/playlist/${currentSong.id}`)} style={styles.optionItem}>
                             <Text style={styles.optionText}>Ver Álbum</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => router.push('/baseLayoutPages/SongDetail')} style={styles.optionItem}>
