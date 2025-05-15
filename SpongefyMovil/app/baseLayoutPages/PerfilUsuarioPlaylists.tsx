@@ -27,7 +27,8 @@ export default function PerfilUsuarioPlaylists() {
 
   useEffect(() => {
     const loadProfile = async () => {
-
+      const token = await getData("token");
+      console.log("Token:", token);
       const nombre_perfil = await getData("user");
       setProfileUsername(nombre_perfil);
 
@@ -84,7 +85,10 @@ export default function PerfilUsuarioPlaylists() {
     // }
 
   }, []);
-
+  const handleLogOut = async () => {
+    
+    router.push('../LoginScreen');
+  };
   const handleEditProfile = () => {
     router.push('/baseLayoutPages/EditPerfil');
   };
@@ -94,6 +98,8 @@ export default function PerfilUsuarioPlaylists() {
       "nombre_usuario": nombre_usuario,
       "contrasena": password,
     };
+    const token = await getData("token");
+    console.log("Token:", token);
 
     try {
       const response = await fetch("https://spongefy-back-end.onrender.com/delete-account", {
@@ -190,6 +196,9 @@ export default function PerfilUsuarioPlaylists() {
             <View style={styles.optionsContainer}>
               <TouchableOpacity style={styles.friendButton} onPress={handleEditProfile}>
                 <Text style={styles.friendButtonText}>Editar perfil</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.friendButton} onPress={handleLogOut}>
+                <Text style={styles.friendButtonText}>Cerrar Sesión</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.eliminarButton} onPress={() => setShowOptions(true)}>
                 <Text style={styles.eliminarButtonText}>Eliminar perfil</Text>
