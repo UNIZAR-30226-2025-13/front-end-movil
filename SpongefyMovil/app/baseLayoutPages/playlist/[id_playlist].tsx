@@ -140,9 +140,6 @@ export default function PlaylistDetailScreen() {
                 <TouchableOpacity onPress={() => console.log('Shuffle')} style={styles.controlButton}>
                     <Ionicons name="shuffle" size={24} color="#fff" />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => router.push('../AddMusicToPlaylist')} style={styles.controlButton}>
-                    <Ionicons name="add-circle" size={28} color="#fff" />
-                </TouchableOpacity>
                 <TouchableOpacity onPress={() => console.log('Options')} style={styles.controlButton}>
                     <Ionicons name="ellipsis-horizontal" size={24} color="#fff" />
                 </TouchableOpacity>
