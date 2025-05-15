@@ -3,12 +3,32 @@ import { Alert, Text, TextInput, TouchableOpacity, ImageBackground, View, StyleS
 import { useRouter } from "expo-router";
 import { saveData, getData, removeData } from "../utils/storage";
 import { socketService } from "./socketService";
+import { usePlayer } from "./baseLayoutPages/PlayerContext"; // Asegúrate de que esta función esté definida en tu servicio de canciones
 
 export default function LoginScreen() {
   const router = useRouter();
   const [username, setUsername] = useState(""); // Estado para el nombre de usuario
   const [password, setPassword] = useState(""); // Estado para la contraseña
-
+  const { fetchAndPlaySong } = usePlayer(); // Asegúrate de que esta función esté definida en tu servicio de canciones
+  const recoverLastSong = async () => {
+    // Llamada a la API para restaurar el estado de la canción
+    const username = await getData("username");
+    console.log("👤 Usuario obtenido:", username);
+    const url = `https://spongefy-back-end.onrender.com/recover-last-playing?nombre_usuario=${username}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    console.log("Respuesta de la API:", data);
+    if (response.ok) {
+      console.log("Estado de la canción restaurado correctamente");
+      // Aquí puedes usar el estado restaurado para reproducir la canción
+      const restoredSong = data;
+      if (restoredSong) {
+        fetchAndPlaySong(restoredSong.id_cm);
+      }
+    } else {
+      console.error("❌ Error al restaurar el estado de la canción:", data);
+    }
+  }
   const handlePressLogin = async () => {
     if (!username || !password) {
       Alert.alert("Error", "Todos los campos son obligatorios.");
@@ -38,7 +58,7 @@ export default function LoginScreen() {
       // Redirigir a la pantalla principal
       socketService.login(username);
       router.push("/baseLayoutPages/home");
-
+      recoverLastSong();
     } catch (error) {
       console.log("Error en el inicio de sesion");
       Alert.alert("Error", "Error en el inicio de sesión");
@@ -50,13 +70,14 @@ export default function LoginScreen() {
     console.log("debug desde login con", usernamedebug);
     await saveData("username", usernamedebug);
     router.push("/baseLayoutPages/home");
+    recoverLastSong();
   };
 
   const handleDebugAdmin = async () => {
     const usernamedebug = "admin";
     console.log("debug desde login con", usernamedebug);
     await saveData("username", usernamedebug);
-    router.push("/HomeAdmin");
+    router.push("/AdminArtistas");
   };
 
   const handlePressRegister = () => {

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Image, StyleSheet, Animated, Pressable, Modal, FlatList, TouchableOpacity, Alert } from "react-native";
+import { View, Text, Image, StyleSheet, Animated, Pressable, Modal, FlatList, TouchableOpacity, Alert, AppState } from "react-native";
 import { Audio } from "expo-av";
 import { useRouter } from 'expo-router';
 import { usePlayer } from "./PlayerContext";
 import { Ionicons } from "@expo/vector-icons";
 import { getData } from "../../utils/storage";
-
+import { fetchAndSaveQueue, clearQueue, shuffleQueue, fetchAndSaveQueuePosition } from "@/utils/fetch";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 const PlayerComponent = () => {
   const { currentSong, isPlaying, setIsPlaying } = usePlayer();
   const router = useRouter();
@@ -14,8 +15,7 @@ const PlayerComponent = () => {
   const audioPlayer = useRef<Audio.Sound | null>(null);
   const rotation = useRef(new Animated.Value(0)).current;
   const { fetchAndPlaySong } = usePlayer();
-  //indice de la cola
-  const [queueIndex, setQueueIndex] = useState(0);
+  const [time, setTime] = useState(0);
   // Listado de playlists estáticas (puedes agregar más si lo necesitas)
   /*
   const playlists = [
@@ -23,7 +23,86 @@ const PlayerComponent = () => {
     { id: 2, nombre: "Playlist 2" },
     { id: 3, nombre: "Playlist 3" },
   ];*/
+  // Estado de la app
+  const appState = useRef(AppState.currentState);
   useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      // App se va a segundo plano o se cierra
+      if (
+        appState.current.match(/active/) &&
+        (nextAppState === 'background' || nextAppState === 'inactive')
+      ) {
+        console.log('⏸ App en segundo plano o cerrada');
+        saveCurrentSongState();
+        audioPlayer.current.pauseAsync(); // Aquí haces lo que quieras al cerrar
+      }
+
+      // App vuelve a estar activa
+      if (
+        (appState.current === 'background' || appState.current === 'inactive') &&
+        nextAppState === 'active'
+      ) {
+        console.log('▶️ App reactivada o abierta');
+        restoreSongState(); // Aquí haces lo que quieras al reabrir
+        audioPlayer.current.pauseAsync(); // Aquí haces lo que quieras al reabrir
+      }
+
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+  const saveCurrentSongState = async () => {
+    // Llamada a la API para guardar el estado de la canción actual
+    const username = await getData("username");
+    console.log("👤 Usuario obtenido:", username);
+    
+    const url = `https://spongefy-back-end.onrender.com/save-last-playing`;
+    const bodyData = {
+      "nombre_usuario": username,
+      "id_cm": currentSong?.id,
+      "tiempo": time,
+    }
+    console.log("Body de la API:", bodyData);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bodyData),
+    });
+    const data = await response.json();
+    console.log("Respuesta de la API:", data);
+    if (response.ok) {
+      console.log("Estado de la canción guardado correctamente");
+    } else {
+      console.error("❌ Error al guardar el estado de la canción:", data);
+    }
+  };
+  const restoreSongState = async () => {
+    // Llamada a la API para restaurar el estado de la canción
+    const username = await getData("username");
+    console.log("👤 Usuario obtenido:", username);
+    const url = `https://spongefy-back-end.onrender.com/recover-last-playing?nombre_usuario=${username}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    console.log("Respuesta de la API:", data);
+    if (response.ok) {
+      console.log("Estado de la canción restaurado correctamente");
+      // Aquí puedes usar el estado restaurado para reproducir la canción
+      const restoredSong = data;
+      if (restoredSong) {
+        fetchAndPlaySong(restoredSong.id_cm);
+      }
+    } else {
+      console.error("❌ Error al restaurar el estado de la canción:", data);
+    }
+  }
+  
+  
+    useEffect(() => {
     if (!currentSong || !currentSong.link_cm) {
       console.error("❌ No se encontró el link_cm en la canción.");
       setIsLoading(false);
@@ -71,41 +150,33 @@ const PlayerComponent = () => {
   }, [currentSong]);
   const handleSongEnd = async () => {
     //aumentar el indice de la cola
-    setQueueIndex(prevIndex => {
-      const newIndex = prevIndex + 1;
-      console.log("Nuevo índice:", newIndex);
-      fetchNextSong(newIndex); // Llamar a la función con el índice actualizado
-      return newIndex;
+    const username = await getData("username");
+    console.log("👤 Usuario obtenido:", username)
+    const position = await getData("queuePosition");
+    console.log("Posición de la cola:", position);
+    await fetchAndSaveQueuePosition(username, position);
+    await getData("queuePosition").then((data) => {
+      console.log("Posición de la cola obtenida:", data);
+      
+    }).catch((error) => { 
+      console.error("⚠️ Error al obtener la cola:", error);
     });
-    //console.log("Índice de cola actualizado:", queueIndex);
-
+    
+    
     //reproducir esa posicion de cola
+    getData("queueSong").then((data) => {
+      console.log("Cancion obtenida:", data);
+      fetchAndPlaySong(data.id_cm);
+      }).catch((error) => {
+        console.error("⚠️ Error al obtener la siguiente canción:", error);
+      });
   }
-  const fetchNextSong = async (index: number) => {
-    try {
-      const username = await getData("username");
-      console.log("👤 Usuario obtenido:", username);
-      const url = `https://spongefy-back-end.onrender.com/queue/get-cm?nombre_usuario=${username}&posicion=${index}`;
-
-      const response = await fetch(url);
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Respuesta de la API:", data);
-        // Aquí puedes reproducir la canción obtenida
-        audioPlayer.current?.unloadAsync(); // Descargar la canción actual
-        audioPlayer.current = null; // Limpiar el audio actual
-        fetchAndPlaySong(data.id_cm); // Llama a la función para reproducir la canción
-      }
-    } catch (error) {
-      console.error("⚠️ Error en la solicitud:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  
   // Función para actualizar la barra de progreso
   const updateProgress = async (status: any) => {
     if (status.isLoaded && status.durationMillis) {
       setProgress(status.positionMillis / status.durationMillis);
+      setTime(status.positionMillis/1000);
     }
     // Verificar si la canción ha terminado
     if (status.positionMillis === status.durationMillis) {
@@ -166,6 +237,7 @@ const PlayerComponent = () => {
 
   const [playlists, setPlaylists] = useState<{ id_lista: number; nombre: string }[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
+  
   const [loading, setLoading] = useState(false);
 
   // Función para abrir el modal y obtener las playlists
@@ -256,90 +328,60 @@ const PlayerComponent = () => {
   const toggleQueue = () => {
 
     const fetchQueue = async () => {
-      try {
-        const username = await getData("username");
-        console.log("👤 Usuario obtenido:", username);
-        const url = `https://spongefy-back-end.onrender.com/queue/show?nombre_usuario=${username}&posicion=0`;
-        const response = await fetch(url);
-        const data = await response.json();
-        console.log("Respuesta de la API:", data);
-        if (response.ok) {
-          setQueue(data.cola);
-          console.log("Cola obtenida:", queue); // Puedes hacer algo con las playlists si es necesario
-        }
-      } catch (error) {
-        console.error("⚠️ Error en la solicitud:", error);
+      const username = await getData("username");
+      const position = await getData("queuePosition");
+
+      console.log("👤 Usuario obtenido:", username);
+      console.log("Posición de la cola:", position);
+      await fetchAndSaveQueue(username, position + 1);
+      await getData("queue").then((data) => {
+        console.log("Cola obtenida:", data);
+        setQueue(data.cola);
       }
+      ).catch((error) => {
+        console.error("⚠️ Error al obtener la cola:", error);
+      });
     };
     fetchQueue();
     setQueueModalVisible(true);
   }
-  const toggleBorrarQueue = async (borrar: boolean) => {
-    const clearQueue = async () => {
-      try {
-        const username = await getData("username");
-        const url = `https://spongefy-back-end.onrender.com/queue/clear`;
-        const bodyData = {
-          "nombre_usuario": username // Cambia esto por el nombre de usuario real
-        }
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(bodyData),
-        });
-        const data = await response.json();
-        console.log("Respuesta de la API:", data);
-      } catch (error) {
-        console.error("❌ Error al borrar cola:", error);
-      }
+  const toggleBorrarQueue = async () => {
+    const elimQueue = async () => {
+      const username = await getData("username");
+      console.log("👤 Usuario obtenido:", username);
+      await clearQueue(username);
+      console.log("Cola eliminada");
 
     }
-    clearQueue();
+    elimQueue();
     setQueue([]);
   };
-  const toggleRandomQueue = async (aleatorio: boolean) => {
+  const toggleRandomQueue = async () => {
     const randomQueue = async () => {
-      try {
-        const username = await getData("username");
-        const url = `https://spongefy-back-end.onrender.com/queue/shuffle`;
-        const bodyData = {
-          "nombre_usuario": username, // Cambia esto por el nombre de usuario real
-          "posicion": 0
-        }
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(bodyData),
-        });
-        const data = await response.json();
-        console.log("Respuesta de la API:", data);
-      } catch (error) {
-        console.error("❌ Error al aleatorizar cola:", error);
-      }
+      const username = await getData("username");
+      const position = await getData("queuePosition");
+      console.log("👤 Usuario obtenido:", username);
+      console.log("Posición de la cola:", position);
+      await shuffleQueue(username, position);
+      console.log("Cola aleatorizada");
 
     }
-    randomQueue();
+    await randomQueue();
     const fetchQueue = async () => {
-      try {
-        const username = await getData("username");
-        console.log("👤 Usuario obtenido:", username);
-        const url = `https://spongefy-back-end.onrender.com/queue/show?nombre_usuario=${username}&posicion=0`;
-        const response = await fetch(url);
-        const data = await response.json();
-        console.log("Respuesta de la API:", data);
-        if (response.ok) {
-          setQueue(data.cola);
-          console.log("Cola obtenida:", queue); // Puedes hacer algo con las playlists si es necesario
-        }
-      } catch (error) {
-        console.error("⚠️ Error en la solicitud:", error);
+      const username = await getData("username");
+      console.log("👤 Usuario obtenido:", username);
+      const position = await getData("queuePosition");
+      console.log("Posición de la cola:", position);
+      await fetchAndSaveQueue(username, position);
+      await getData("queue").then((data) => {
+        console.log("Cola obtenida:", data);
+        setQueue(data.cola);
       }
+      ).catch((error) => {
+        console.error("⚠️ Error al obtener la cola:", error);
+      });
     };
-    fetchQueue();
+    await fetchQueue();
   };
 
   const rotateInterpolate = rotation.interpolate({
@@ -466,14 +508,14 @@ const PlayerComponent = () => {
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                   <Text style={styles.modalTitleQueue}>Cola de Reproducción</Text>
                   {/*Botón para aleatorizar la cola*/}
-                  <Pressable onPress={() => toggleRandomQueue(true)} style={styles.controls}>
+                  <Pressable onPress={() => toggleRandomQueue()} style={styles.controls}>
                     <Image
                       source={require("../../assets/aleatorio.png")}
                       style={styles.icon}
                     />
                   </Pressable>
                   {/* Botón para borrar la cola */}
-                  <Pressable onPress={() => toggleBorrarQueue(false)} style={styles.controls}>
+                  <Pressable onPress={() => toggleBorrarQueue()} style={styles.controls}>
                     <Image
                       source={require("../../assets/trash.png")}
                       style={styles.icon}
@@ -482,12 +524,11 @@ const PlayerComponent = () => {
                 </View>
 
                 <FlatList
-                  data={queue} // Excluye la canción actual
+                  data= {queue} // Excluye la canción actual
                   //keyExtractor={(index) => index.toString()} // Usamos el índice como clave
                   renderItem={({ item, index }) => {
-                    const isCurrentSong = index === queueIndex; // Verifica si es la canción actual usando el índice
                     return (
-                      <View style={[styles.queueItem, isCurrentSong && styles.currentSong]}>
+                      <View style={styles.queueItem}>
                         <Text style={[styles.songTitle]}>
                           {item.titulo}
                         </Text>

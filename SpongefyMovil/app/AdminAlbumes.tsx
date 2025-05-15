@@ -130,8 +130,13 @@ export default function GestionarAlbumesScreen() {
   };
   
 
-  const handleAlbum = () => {
+  const handleAlbum = async () => {
     // setArtistaSeleccionado(nombre);
+
+    await saveData("albumAdmin", albumSeleccionado);
+    console.log(albumSeleccionado);
+    router.push("/AdminCanciones");
+
   };
 
 

@@ -18,8 +18,8 @@ export default function AdminNuevoAlbum() {
   const [nombre, setNombre] = useState("");
   const [creadores, setCreadores] = useState("");
   const [imagen, setImagen] = useState<string | null>(null);
-  const [fecha, setFecha] = useState("");
-
+  const [tematicas, setTematicas] = useState("");
+  const [descripcion, setDescripcion] = useState("");
   const seleccionarImagen = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -40,9 +40,10 @@ export default function AdminNuevoAlbum() {
 
     const formData = new FormData();
 
-    formData.append("nombre_album", nombre);
+    formData.append("nombre_podcast", nombre);
     formData.append("creadores", creadores);
-    formData.append("fecha_pub", fecha);
+    formData.append("tematicas", tematicas);
+    formData.append("descripcion", descripcion);
 
     formData.append("imagen", {
       uri: imagen,
@@ -51,7 +52,7 @@ export default function AdminNuevoAlbum() {
     } as any);
 
     try {
-      const response = await fetch("https://spongefy-back-end.onrender.com/admin/upload-album", {
+      const response = await fetch("https://spongefy-back-end.onrender.com/admin/upload-podcast", {
         method: "POST",
         body: formData,
         headers: {
@@ -62,13 +63,13 @@ export default function AdminNuevoAlbum() {
       const data = await response.json();
 
       if (response.ok) {
-        Alert.alert("Éxito", data.message || "Album creado con éxito");
+        Alert.alert("Éxito", data.message || "Podcast creado con éxito");
         router.back(); // O redirige a otra pantalla
       } else {
-        Alert.alert("Error", data.message || "No se pudo crear el creador");
+        Alert.alert("Error", data.message || "No se pudo crear el podcast");
       }
     } catch (error) {
-      console.error("Error al crear creador:", error);
+      console.error("Error al crear podcast:", error);
       Alert.alert("Error", "Algo salió mal");
     }
   };
@@ -79,7 +80,7 @@ export default function AdminNuevoAlbum() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Nuevo Álbum de {nombreArtista}</Text>
+      <Text style={styles.title}>Nuevo Podcast de {nombreArtista}</Text>
 
       <Text style={styles.label}>Título</Text>
       <TextInput
@@ -89,23 +90,30 @@ export default function AdminNuevoAlbum() {
         placeholder="Introduce un titulo"
         placeholderTextColor="#888"
       />
-
       <Text style={styles.label}>Creadores</Text>
+      <TextInput
+        style={styles.input}
+        value={creadores}
+        onChangeText={setCreadores}
+        placeholder="Introduce los creadores"
+        placeholderTextColor="#888"
+      />
+      <Text style={styles.label}>Descripción</Text>
       <TextInput
         style={[styles.input, { height: 100 }]}
         multiline
-        value={creadores}
-        onChangeText={setCreadores}
-        placeholder="Introduce los colaboradores"
+        value={descripcion}
+        onChangeText={setDescripcion}
+        placeholder="Introduce una descripción"
         placeholderTextColor="#888"
       />
 
-      <Text style={styles.label}>Fecha de Publicación</Text>
+      <Text style={styles.label}>Temáticas</Text>
       <TextInput
         style={styles.input}
-        value={fecha}
-        onChangeText={setFecha}
-        placeholder="Introduce un fecha de publicación (AAAA-MM-DD)"
+        value={tematicas}
+        onChangeText={setTematicas}
+        placeholder="Introduce las temáticas"
         placeholderTextColor="#888"
       />
 
@@ -120,7 +128,7 @@ export default function AdminNuevoAlbum() {
       )}
 
       <TouchableOpacity style={styles.button}  onPress={handleGuardar}>
-        <Text style={styles.buttonText}>Crear Álbum</Text>
+        <Text style={styles.buttonText}>Crear Podcast</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.buttonCancel} onPress={handleCancelar}>
         <Text style={styles.buttonText}>Cancelar</Text>
