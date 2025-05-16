@@ -30,14 +30,13 @@ export default function SongDetail() {
     ];*/
 
     const toggleLoop = () => {
-        setIsLooping(prev => {
-            const next = !prev;
-            if (audioPlayer.current) {
-                audioPlayer.current.setIsLoopingAsync(next);
-            }
-            return next;
-        });
+        const next = !isLooping;
+        setIsLooping(next);
+        if (audioPlayer.current) {
+            audioPlayer.current.setIsLoopingAsync(next);
+        }
     };
+
     useEffect(() => {
         if (!currentSong || !currentSong.link_cm) {
             console.error("❌ No se encontró el link_cm en la canción.");
@@ -56,9 +55,17 @@ export default function SongDetail() {
 
                 const newSound = new Audio.Sound();
                 await newSound.loadAsync({ uri: currentSong.link_cm as string });
+                newSound.setOnPlaybackStatusUpdate(status => {
+                    if (!status.isLoaded || !status.durationMillis) return;
+
+                    setProgress(status.positionMillis / status.durationMillis);
+
+                    if (status.didJustFinish && !status.isLooping) {
+                        handleSongEnd();
+                    }
+                });
                 await newSound.playAsync();
                 await newSound.setIsLoopingAsync(isLooping);
-
                 audioPlayer.current = newSound;
                 setIsPlaying(true);
 
@@ -80,9 +87,7 @@ export default function SongDetail() {
         loadAndPlaySong();
 
         return () => {
-            if (audioPlayer.current) {
-                audioPlayer.current.unloadAsync();
-            }
+            audioPlayer.current?.unloadAsync();
         };
     }, [currentSong, isLooping]);
 
@@ -120,16 +125,11 @@ export default function SongDetail() {
         }
     }
     // Función para actualizar la barra de progreso
-    const updateProgress = async (status: any) => {
-        if (status.isLoaded && status.durationMillis) {
-            setProgress(status.positionMillis / status.durationMillis);
-        }
-        // Verificar si la canción ha terminado
-        if (!isLooping && status.positionMillis === status.durationMillis) {
-            console.log("La canción ha terminado");
-            // Aquí puedes realizar la acción que desees cuando termine la canción
-
-            handleSongEnd(); // Función que manejaría la acción al terminar la canción
+    const updateProgress = (status: any) => {
+        if (!status.isLoaded || !status.durationMillis) return;
+        setProgress(status.positionMillis / status.durationMillis);
+        if (status.didJustFinish && !status.isLooping) {
+            handleSongEnd();// Función que manejaría la acción al terminar la canción
         }
     };
 
@@ -329,16 +329,37 @@ export default function SongDetail() {
         fetchQueue();
     };
 
-    const goToNext = () => {
+    const goToNext = async () => {
+        if (isLooping && audioPlayer.current) {
+            await audioPlayer.current.setPositionAsync(0);
+            await audioPlayer.current.playAsync();
+            return;
+        }
+        if (audioPlayer.current) {
+            await audioPlayer.current.setIsLoopingAsync(false);
+        }
+        setIsLooping(false);
+
         setQueueIndex(i => {
             const next = i + 1;
             fetchNextSong(next);
             return next;
         });
-    };
-    const goToPrevious = () => {
+    }
+
+    const goToPrevious = async () => {
+        if (isLooping && audioPlayer.current) {
+            await audioPlayer.current.setPositionAsync(0);
+            await audioPlayer.current.playAsync();
+            return;
+        }
+        if (audioPlayer.current) {
+            await audioPlayer.current.setIsLoopingAsync(false);
+        }
+        setIsLooping(false);
+
         setQueueIndex(i => {
-            const prev = i - 1;
+            const prev = Math.max(0, i - 1);
             fetchNextSong(prev);
             return prev;
         });
@@ -417,7 +438,13 @@ export default function SongDetail() {
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={toggleLoop} style={styles.controlBtn}>
-                    <Image source={require('../../assets/bucle.png')} style={styles.controlIcon} />
+                    <Image
+                        source={require('../../assets/bucle.png')}
+                        style={[
+                            styles.controlIcon,
+                            isLooping && styles.loopActive   // applique un style en plus si looping
+                        ]}
+                    />
                 </TouchableOpacity>
             </View>
 
@@ -662,5 +689,8 @@ const styles = StyleSheet.create({
     optionText: {
         color: '#fff',
         fontSize: 16,
+    },
+    loopActive: {
+        tintColor: '#9400D3'
     },
 });
