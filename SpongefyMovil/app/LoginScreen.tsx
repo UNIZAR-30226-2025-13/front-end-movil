@@ -59,8 +59,15 @@ export default function LoginScreen() {
 
       // Redirigir a la pantalla principal
       socketService.login(username);
-      router.push("/baseLayoutPages/home");
-      recoverLastSong();
+      //si el usuario es admin, redirigir a AdminArtistas
+      if (data.es_admin) {
+        console.log("Usuario es admin");
+        router.push("/AdminArtistas");
+      }
+      else{
+        router.push("/baseLayoutPages/home");
+        recoverLastSong();
+      }
     } catch (error) {
       console.log("Error en el inicio de sesion");
       Alert.alert("Error", "Error en el inicio de sesión");
@@ -120,13 +127,7 @@ export default function LoginScreen() {
         <TouchableOpacity style={styles.button2} onPress={handlePressForgot}>
           <Text style={styles.buttonText2}>He olvidado mi contraseña</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleDebug}>
-          <Text style={styles.buttonText}>DEBUG</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={handleDebugAdmin}>
-          <Text style={styles.buttonText}>DEBUG ADMIN</Text>
-        </TouchableOpacity>
+        
         
       </View>
     </ImageBackground>

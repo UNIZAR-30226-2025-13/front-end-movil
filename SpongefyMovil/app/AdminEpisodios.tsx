@@ -136,7 +136,7 @@ useEffect(() => {
               }
   
               if (response.ok) {
-                Alert.alert("Éxito", "Cancion eliminada con éxito.");
+                Alert.alert("Éxito", "Episodio eliminado con éxito.");
                 setEpisodios((prev) =>
                 prev.filter((c) => c.id_ep !== cancionSeleccionada));
                 setCancionSeleccionada(null);
