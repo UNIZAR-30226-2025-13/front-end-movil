@@ -15,7 +15,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { saveData, getData, removeData } from "../../utils/storage";
-import { fetchAndSaveLibrary, changeListPrivacy } from "../../utils/fetch";
+import { fetchAndSaveLibrary } from "../../utils/fetch";
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -48,7 +48,6 @@ export default function CreatePlaylistScreen() {
     const handleGuardar = async (
         nombreUsuario: string,
         tipo: "canciones" | "episodios",
-        tipo2: "publica" | "privada" = "privada"
     ) => {
 
         try {
@@ -82,15 +81,6 @@ export default function CreatePlaylistScreen() {
         }
 
         const id_lista = listas.find((lista) => lista.nombre === playlistName)?.id_lista;
-
-        if (isPublic) {
-            try {
-                const result = await changeListPrivacy(id_lista, nombreUsuario);
-                console.log("Changé en public :", result.message);
-            } catch (e) {
-                console.warn("Impossible de passer en public", e);
-            }
-        }
 
     };
     const [selectedColor, setSelectedColor] = useState<string>("");
@@ -187,17 +177,6 @@ export default function CreatePlaylistScreen() {
             </View>
 
             {/* Tabs de navegación */}
-            <View style={styles.backButton}>
-                <Text style={styles.title}>
-                    {isPublic ? "Publique" : "Privée"}
-                </Text>
-                <Switch
-                    value={isPublic}
-                    onValueChange={setIsPublic}
-                    thumbColor={isPublic ? "#4CAF50" : "#f4f3f4"}
-                    trackColor={{ false: "#767577", true: "#81b0ff" }}
-                />
-            </View>
             <View style={styles.tabsContainer}>
                 {tabs.map((tab) => (
                     <TouchableOpacity

@@ -7,13 +7,14 @@ import {
     ScrollView,
     TouchableOpacity,
     TextInput,
-    ActivityIndicator
+    ActivityIndicator,
+    Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { getData } from '../../../utils/storage';
 import { usePlayer } from '../PlayerContext';
-import { changeListPrivacy } from '../../../utils/fetch';
+import { changeListPrivacy, deletePlaylist } from '../../../utils/fetch';
 
 import { Component } from 'react';
 import type { ViewProps } from 'react-native';
@@ -201,6 +202,14 @@ export default function PlaylistDetailScreen() {
         return `${h}h ${m}m ${s}s`;
     };
 
+    const handleDelete = async () => {
+        try {
+            const { message } = await deletePlaylist(id_playlist);
+            router.push('../Biblioteca');
+        } catch (err) {
+            Alert.alert("No se ha podido eliminar la lista");
+        }
+    };
     return (
         <View style={styles.container}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -230,7 +239,16 @@ export default function PlaylistDetailScreen() {
             </View>
 
             <View style={styles.controls}>
-                <TouchableOpacity onPress={() => setIsPlaying(!isPlaying)} style={styles.controlButton}>
+                <TouchableOpacity
+                    onPress={() => {
+                        const newPlaying = !isPlaying;
+                        setIsPlaying(newPlaying);
+                        if (newPlaying && sortedSongs.length > 0) {
+                            fetchAndPlaySong(sortedSongs[0].id_cm.toString());
+                        }
+                    }}
+                    style={styles.controlButton}
+                >
                     <Ionicons
                         name={isPlaying ? 'pause-circle' : 'play-circle'}
                         size={48}
@@ -244,14 +262,15 @@ export default function PlaylistDetailScreen() {
                     <Ionicons name="ellipsis-horizontal" size={24} color="#fff" />
                 </TouchableOpacity>
             </View>
-            <View style={styles.sortContainer}>
-                <View style={styles.optionsMenu}>
+            <View>
+                <View style={styles.sortContainer}>
                     <Picker
                         selectedValue={sortKey}
                         onValueChange={(v: any) => {
                             setSortKey(v as any);
                             setAscending(true);
                         }}
+                        style={styles.optionsMenu}
                     >
                         <Picker.Item label="Fecha de publicacion" value="fecha_pub" style={styles.optionText} />
                         <Picker.Item label="Titulo" value="titulo" style={styles.optionText} />
@@ -304,6 +323,11 @@ export default function PlaylistDetailScreen() {
             {showOptions && (
                 <View style={styles.optionsOverlay}>
                     <View style={styles.optionsMenu}>
+                        <TouchableOpacity onPress={handleDelete}>
+                            <Text style={styles.optionText}>
+                                Eliminar lista
+                            </Text>
+                        </TouchableOpacity>
                         <TouchableOpacity onPress={handleTogglePrivacy}>
                             <Text style={styles.optionText}>
                                 {playlistData.es_publica ? 'Cambiar a privada' : 'Cambiar a pública'}
@@ -354,6 +378,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#6A0DAD',  // violet
         borderRadius: 12,
         paddingVertical: 8,
+        color: '#fff',
     },
     optionItem: {
         paddingVertical: 12,

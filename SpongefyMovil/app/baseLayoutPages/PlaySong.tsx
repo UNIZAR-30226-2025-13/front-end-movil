@@ -13,7 +13,6 @@ const THUMB_SIZE = 200;
 export default function SongDetail() {
     const { currentSong, isPlaying, setIsPlaying } = usePlayer();
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(false);
     const [progress, setProgress] = useState(0); // Estado para la barra de progreso
     const audioPlayer = useRef<Audio.Sound | null>(null);
     const rotation = useRef(new Animated.Value(0)).current;
@@ -21,6 +20,7 @@ export default function SongDetail() {
     const { fetchAndPlaySong } = usePlayer();
     //indice de la cola
     const [queueIndex, setQueueIndex] = useState(0);
+    const [isLooping, setIsLooping] = useState(false);
     // Listado de playlists estáticas (puedes agregar más si lo necesitas)
     /*
     const playlists = [
@@ -28,15 +28,25 @@ export default function SongDetail() {
       { id: 2, nombre: "Playlist 2" },
       { id: 3, nombre: "Playlist 3" },
     ];*/
+
+    const toggleLoop = () => {
+        setIsLooping(prev => {
+            const next = !prev;
+            if (audioPlayer.current) {
+                audioPlayer.current.setIsLoopingAsync(next);
+            }
+            return next;
+        });
+    };
     useEffect(() => {
         if (!currentSong || !currentSong.link_cm) {
             console.error("❌ No se encontró el link_cm en la canción.");
-            setIsLoading(false);
+            setLoading(false);
             return;
         }
 
         const loadAndPlaySong = async () => {
-            setIsLoading(true);
+            setLoading(true);
 
             try {
                 if (audioPlayer.current) {
@@ -47,6 +57,7 @@ export default function SongDetail() {
                 const newSound = new Audio.Sound();
                 await newSound.loadAsync({ uri: currentSong.link_cm as string });
                 await newSound.playAsync();
+                await newSound.setIsLoopingAsync(isLooping);
 
                 audioPlayer.current = newSound;
                 setIsPlaying(true);
@@ -62,7 +73,7 @@ export default function SongDetail() {
             } catch (error) {
                 console.error("❌ Error cargando la canción:", error);
             } finally {
-                setIsLoading(false);
+                setLoading(false);
             }
         };
 
@@ -73,7 +84,8 @@ export default function SongDetail() {
                 audioPlayer.current.unloadAsync();
             }
         };
-    }, [currentSong]);
+    }, [currentSong, isLooping]);
+
     const handleSongEnd = async () => {
         //aumentar el indice de la cola
         setQueueIndex(prevIndex => {
@@ -113,7 +125,7 @@ export default function SongDetail() {
             setProgress(status.positionMillis / status.durationMillis);
         }
         // Verificar si la canción ha terminado
-        if (status.positionMillis === status.durationMillis) {
+        if (!isLooping && status.positionMillis === status.durationMillis) {
             console.log("La canción ha terminado");
             // Aquí puedes realizar la acción que desees cuando termine la canción
 
@@ -404,7 +416,7 @@ export default function SongDetail() {
                     <Ionicons name="play-skip-forward" size={32} color="#fff" />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => console.log('Repeat')} style={styles.controlBtn}>
+                <TouchableOpacity onPress={toggleLoop} style={styles.controlBtn}>
                     <Image source={require('../../assets/bucle.png')} style={styles.controlIcon} />
                 </TouchableOpacity>
             </View>
@@ -602,7 +614,7 @@ const styles = StyleSheet.create({
     controlsRow: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        
+
         alignItems: 'center',
         marginBottom: 20,
     },

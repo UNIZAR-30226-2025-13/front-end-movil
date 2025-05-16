@@ -326,7 +326,7 @@ export const fetchAndSaveAllCreators = async () => {
         console.error("Error en fetchAndSaveAllCreators:", error);
     }
 };
-export const fetchandSaveAlbum = async (id_album ) => {
+export const fetchandSaveAlbum = async (id_album) => {
 
     try {
         const response = await fetch(
@@ -435,7 +435,7 @@ export const addToQueue = async (nombre_usuario, id_cancion) => {
         const response = await fetch(url, {
             method: "POST",
             headers: {
-            "Content-Type": "application/json",
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(bodyData),
         });
@@ -477,12 +477,12 @@ export const fetchAndSaveQueue = async (nombre_usuario, posicion) => {
     }
 };
 
-export const  clearQueue = async (nombre_usuario) => {
+export const clearQueue = async (nombre_usuario) => {
     try {
         const response = await fetch(`https://spongefy-back-end.onrender.com/queue/clear`, {
             method: "POST",
             headers: {
-            "Content-Type": "application/json"
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({ nombre_usuario }) // 👈 enviar el usuario en el body
         });
@@ -555,28 +555,55 @@ export const fetchAndSaveQueuePosition = async (nombre_usuario, posicion) => {
 };
 
 export const changeListPrivacy = async (id_lista, nombre_usuario) => {
-  try {
-    const bodyData = { id_lista, nombre_usuario };
-    const response = await fetch(
-      `https://spongefy-back-end.onrender.com/change-list-privacy`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bodyData),
-      }
-    );
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Erreur serveur change-list-privacy:", errorText);
-      throw new Error(
-        `Erreur au changement de confidentialité: ${response.status} ${response.statusText}`
-      );
+    try {
+        const bodyData = { id_lista, nombre_usuario };
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/change-list-privacy`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(bodyData),
+            }
+        );
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Erreur serveur change-list-privacy:", errorText);
+            throw new Error(
+                `Erreur au changement de confidentialité: ${response.status} ${response.statusText}`
+            );
+        }
+        const json = await response.json();
+        console.log("changeListPrivacy:", json.message);
+        return json;
+    } catch (error) {
+        console.error("Error in changeListPrivacy:", error);
+        throw error;
     }
-    const json = await response.json();
-    console.log("changeListPrivacy:", json.message);
-    return json;
-  } catch (error) {
-    console.error("Error in changeListPrivacy:", error);
-    throw error;
-  }
+};
+
+export const deletePlaylist = async (id_lista) => {
+    try {
+        const bodyData = { id_lista };
+        const response = await fetch(
+            `https://spongefy-back-end.onrender.com/delete-list`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(bodyData),
+            }
+        );
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Erreur serveur delete-list:", errorText);
+            throw new Error(
+                `Erreur lors de la suppression de la playlist: ${response.status} ${response.statusText}`
+            );
+        }
+        const json = await response.json();
+        console.log("deletePlaylist:", json.message);
+        return json;
+    } catch (error) {
+        console.error("Error in deletePlaylist:", error);
+        throw error;
+    }
 };
