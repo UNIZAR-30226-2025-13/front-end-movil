@@ -219,6 +219,14 @@ export default function BibliotecaScreen() {
     //     );
     // };
 
+    const displayedListas = searchQuery.trim() === ''
+        ? listas
+        : listas.filter(l =>
+            l.nombre
+                .toLowerCase()
+                .startsWith(searchQuery.trim().toLowerCase())
+        );
+
     const renderSectionContent = () => {
         if (searchResults) {
             return (
@@ -287,15 +295,16 @@ export default function BibliotecaScreen() {
 
 
                             <ScrollView style={styles.scrollView}>
-                                {Array.isArray(listas) ? listas.map((lista, index) => (
-                                    <TouchableOpacity
-                                        key={index}
-                                        style={styles.playlistItem}
-                                        onPress={() => handleGoToPlaylist(lista.id_lista)}
-                                    >
-                                        <Text style={styles.playlistText}>{lista.nombre}</Text>
-                                    </TouchableOpacity>
-                                )) : <Text style={styles.playlistText}>No tienes listas</Text>}
+                                {Array.isArray(displayedListas)
+                                    ? displayedListas.map((lista, index) => (
+                                        <TouchableOpacity
+                                            key={index}
+                                            style={styles.playlistItem}
+                                            onPress={() => handleGoToPlaylist(lista.id_lista)}
+                                        >
+                                            <Text style={styles.playlistText}>{lista.nombre}</Text>
+                                        </TouchableOpacity>
+                                    )) : <Text style={styles.playlistText}>No tienes listas</Text>}
                             </ScrollView>
 
 
