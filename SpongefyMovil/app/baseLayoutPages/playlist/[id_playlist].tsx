@@ -16,10 +16,10 @@ import { getData } from '../../../utils/storage';
 import { usePlayer } from '../PlayerContext';
 import { changeListPrivacy, deletePlaylist } from '../../../utils/fetch';
 
-import { Component } from 'react';
-import type { ViewProps } from 'react-native';
 
 import { Picker } from '@react-native-picker/picker';
+
+
 
 export default function PlaylistDetailScreen() {
     const router = useRouter();
@@ -30,6 +30,9 @@ export default function PlaylistDetailScreen() {
     const [sortKey, setSortKey] = useState<'fecha_pub' | 'titulo' | 'nombre_creador' | 'duracion' | 'valoracion_media'>('fecha_pub');
     const [ascending, setAscending] = useState(true);
     const [sortedSongs, setSortedSongs] = useState<typeof playlistData.contenido>([]);
+    const [searchTerm, setSearchTerm] = useState<string>('');
+
+
 
     interface Song {
         id_cm: number;
@@ -59,6 +62,7 @@ export default function PlaylistDetailScreen() {
 
     const [loading, setLoading] = useState(true);
     const [isPlaying, setIsPlaying] = useState(false);
+
 
     const getMyRating = async (id_cm: number) => {
         try {
@@ -210,6 +214,12 @@ export default function PlaylistDetailScreen() {
             Alert.alert("No se ha podido eliminar la lista");
         }
     };
+
+    const displayedSongs = sortedSongs.filter(song =>
+        song.titulo
+            .toLowerCase()
+            .startsWith(searchTerm.trim().toLowerCase())
+    );
     return (
         <View style={styles.container}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -235,6 +245,8 @@ export default function PlaylistDetailScreen() {
                     style={styles.searchInput}
                     placeholder="Buscar canción..."
                     placeholderTextColor="#888"
+                    value={searchTerm}
+                    onChangeText={setSearchTerm}
                 />
             </View>
 
@@ -284,21 +296,20 @@ export default function PlaylistDetailScreen() {
                 </View>
             </View>
             <ScrollView style={styles.songList}>
-                {sortedSongs.map((song) => (
-                    <TouchableOpacity
-                        key={song.id_cm}
-                        style={styles.songItem}
-                        onPress={() => fetchAndPlaySong(song.id_cm.toString())}
-                    >
-                        <Image
-                            source={{ uri: song.link_imagen }}
-                            style={styles.songImage}
-                        />
-                        <View style={styles.songText}>
-                            <Text style={styles.songTitle}>{song.titulo}</Text>
-                            <Text style={styles.songArtist}>{song.nombre_creador}</Text>
-                        </View>
-                    </TouchableOpacity>
+                {displayedSongs.map((song) => (<TouchableOpacity
+                    key={song.id_cm}
+                    style={styles.songItem}
+                    onPress={() => fetchAndPlaySong(song.id_cm.toString())}
+                >
+                    <Image
+                        source={{ uri: song.link_imagen }}
+                        style={styles.songImage}
+                    />
+                    <View style={styles.songText}>
+                        <Text style={styles.songTitle}>{song.titulo}</Text>
+                        <Text style={styles.songArtist}>{song.nombre_creador}</Text>
+                    </View>
+                </TouchableOpacity>
                 ))}
             </ScrollView>
 
